@@ -37,6 +37,13 @@ namespace Microsoft.SpatialAlignment
         private AlignmentState state;
         #endregion // Member Variables
 
+        #region Unity Overrides
+        protected virtual void Update()
+        {
+
+        }
+        #endregion // Unity Overrides
+
         #region Overridables / Event Triggers
         /// <summary>
         /// Called when the value of the <see cref="Accuracy"/> property has changed.

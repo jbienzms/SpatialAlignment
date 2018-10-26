@@ -829,7 +829,8 @@
     <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\UnityARSessionNativeInterface.cs" />
     <Compile Include="Assets\SpatialAlignment\AlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\IAlignmentStrategy.cs" />
-    <Compile Include="Assets\SpatialAlignment\Strategies\SingleAnchorAlignment.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\MultiAnchorAlignment.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\MultiParentAlignment.cs" />
     <None Include="Assets\HoloToolkit\Utilities\Scripts\GLTF\Shaders\GLTFConstant.cginc" />
     <None Include="Assets\HoloToolkit\Common\Shaders\Obsolete\UnlitConfigurable.shader" />
     <None Include="Assets\HoloToolkit\UX\Shaders\HUXButtonShader.shader" />

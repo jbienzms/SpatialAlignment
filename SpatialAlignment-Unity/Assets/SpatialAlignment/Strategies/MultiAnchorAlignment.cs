@@ -31,9 +31,9 @@ using UnityEngine.XR.WSA.Persistence;
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// An alignment strategy that attaches the object to one and only one world anchor.
+    /// An alignment strategy that attaches the object to one or more world anchors.
     /// </summary>
-    public class SingleAnchorAlignment : AlignmentStrategy
+    public class MultiAnchorAlignment : AlignmentStrategy
     {
         #region Member Variables
         static private WorldAnchorStore anchorStore;
