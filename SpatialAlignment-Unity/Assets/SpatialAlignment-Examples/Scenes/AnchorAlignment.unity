@@ -507,7 +507,7 @@ MonoBehaviour:
     rotation: {x: 0, y: 45, z: 0}
     scale: {x: 0.3, y: 0.3, z: 0.3}
   referenceTransform: {fileID: 0}
-  updateFrequency: 0.02
+  updateFrequency: 1
 --- !u!1 &992500263
 GameObject:
   m_ObjectHideFlags: 0

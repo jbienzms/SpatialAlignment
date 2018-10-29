@@ -66,7 +66,7 @@ namespace Microsoft.SpatialAlignment
 
         [SerializeField]
         [Tooltip("The time between updates (in seconds). If zero, alignment is updated every frame.")]
-        private float updateFrequency = 0.02f;
+        private float updateFrequency = 2.00f;
         #endregion // Member Variables
 
         #region Internal Methods
@@ -102,10 +102,16 @@ namespace Microsoft.SpatialAlignment
                 parentOption = parentOptions.OrderBy(t => (t.Parent.transform.position - referencePos).sqrMagnitude).First();
             }
 
-            // Re-parent the object
+            // If already parented to this object, no additional work needed
+            if (this.transform.parent == parentOption.Parent.transform)
+            {
+                return true;
+            }
+
+            // Update the parent
             this.transform.SetParent(parentOption.Parent.transform, worldPositionStays: false);
 
-            // Apply any offsets
+            // Apply transform modifications
             this.transform.localPosition = parentOption.Position;
             this.transform.localRotation = Quaternion.Euler(parentOption.Rotation);
             this.transform.localScale = parentOption.Scale;
