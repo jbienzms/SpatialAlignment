@@ -45,7 +45,7 @@ namespace Microsoft.SpatialAlignment
     /// <remarks>
     /// This strategy directly updates the world transform of the attached object. Therefore,
     /// the transform of the Unity parent GameObject has no impact on alignment unless it is
-    /// added to the <see cref="ParentTransforms"/> collection.
+    /// added to the <see cref="ParentOptions"/> collection.
     /// </remarks>
     public class MultiParentAlignment : AlignmentStrategy
     {
@@ -57,11 +57,11 @@ namespace Microsoft.SpatialAlignment
         private MultiParentAlignmentMode mode;
 
         [SerializeField]
-        [Tooltip("The list of transforms that will serve as parents.")]
-        private List<Transform> parentTransforms = new List<Transform>();
+        [Tooltip("The list of parent alignment options.")]
+        private List<ParentAlignmentOptions> parentOptions = new List<ParentAlignmentOptions>();
 
         [SerializeField]
-        [Tooltip("The transform that will serve as the frame of reference when calculating modes like NearestNeighbor. If blank, the main cameras transform will be used.")]
+        [Tooltip("The transform that will serve as the frame of reference when calculating modes like NearestNeighbor. If blank, the main camera transform will be used.")]
         private Transform referenceTransform;
 
         [SerializeField]
@@ -88,25 +88,46 @@ namespace Microsoft.SpatialAlignment
             Vector3 referencePos = reference.position;
 
             // Placeholder
-            Transform parent;
+            ParentAlignmentOptions parentOption;
 
-            // If only one parent, always use that
-            if (parentTransforms.Count == 1)
+            // If only one parent option, always use that
+            if (parentOptions.Count == 1)
             {
-                // Use only parent
-                parent = parentTransforms[0];
+                // Use only parent option
+                parentOption = parentOptions[0];
             }
             else
             {
-                // Find the parent closest to the reference point
-                parent = parentTransforms.OrderBy(t => (t.position - referencePos).sqrMagnitude).First();
+                // Find the parent option closest to the reference point
+                parentOption = parentOptions.OrderBy(t => (t.Parent.transform.position - referencePos).sqrMagnitude).First();
             }
 
-            // Update the world transform
-            transform.SetPositionAndRotation(parent.position, parent.rotation);
+            // Re-parent the object
+            this.transform.SetParent(parentOption.Parent.transform, worldPositionStays: false);
+
+            // Apply any offsets
+            this.transform.localPosition = parentOption.Position;
+            this.transform.localRotation = Quaternion.Euler(parentOption.Rotation);
+            this.transform.localScale = parentOption.Scale;
 
             // Success
             return true;
+        }
+
+        /// <summary>
+        /// Validates the contents of the <see cref="ParentOptions"/> collection.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation simply validates that all parent options have a valid parent.
+        /// </remarks>
+        protected virtual void ValidateParentOptions()
+        {
+            // Validate each option
+            for (int i = 0; i < parentOptions.Count; i++)
+            {
+                var opt = parentOptions[i];
+                if (opt.Parent == null) { throw new InvalidOperationException($"{nameof(ParentAlignmentOptions)}.{nameof(ParentAlignmentOptions.Parent)} must be set."); }
+            }
         }
         #endregion // Internal Methods
 
@@ -181,12 +202,15 @@ namespace Microsoft.SpatialAlignment
         /// </returns>
         public virtual void UpdateTransform()
         {
-            // If there are no parents, nothing to do
-            if (parentTransforms.Count == 0)
+            // If there are no parent options, nothing to do
+            if (parentOptions.Count == 0)
             {
                 State = AlignmentState.Unresolved;
                 return;
             }
+
+            // Validate the parent options
+            ValidateParentOptions();
 
             // Align based on mode
             switch (mode)
@@ -225,27 +249,27 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// Gets or sets the list of transforms that will serve as parents.
+        /// Gets or sets the list of parent alignment options.
         /// </summary>
         /// <remarks>
-        /// Replacing this list will cause the transforms to be recalculated.
+        /// Replacing this list will cause the transform to be recalculated.
         /// </remarks>
-        public List<Transform> ParentTransforms
+        public List<ParentAlignmentOptions> ParentOptions
         {
             get
             {
-                return parentTransforms;
+                return parentOptions;
             }
             set
             {
                 // Ensure changing
-                if (parentTransforms != value)
+                if (parentOptions != value)
                 {
                     // Validate
                     if (value == null) throw new ArgumentNullException(nameof(value));
 
                     // Store
-                    parentTransforms = value;
+                    parentOptions = value;
 
                     // Attempt to update the transform
                     UpdateTransform();
@@ -259,7 +283,7 @@ namespace Microsoft.SpatialAlignment
         /// <remarks>
         /// This transform is used when calculating modes like
         /// <see cref="MultiParentAlignmentMode.NearestNeighbor">NearestNeighbor</see>.
-        /// By default, if this property is <see langword = "null" /> the main cameras
+        /// By default, if this property is <see langword = "null" /> the main camera
         /// transform will be used.
         /// </remarks>
         public Transform ReferenceTransform
