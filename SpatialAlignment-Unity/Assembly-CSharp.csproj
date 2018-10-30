@@ -827,8 +827,12 @@
     <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARTrackingStateReason.cs" />
     <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARUserAnchor.cs" />
     <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\UnityARSessionNativeInterface.cs" />
-    <Compile Include="Assets\SpatialAlignment\AlignmentStrategy.cs" />
-    <Compile Include="Assets\SpatialAlignment\IAlignmentStrategy.cs" />
+    <Compile Include="Assets\SpatialAlignment\Frames\ISpatialFrame.cs" />
+    <Compile Include="Assets\SpatialAlignment\Frames\SpatialFrame.cs" />
+    <Compile Include="Assets\SpatialAlignment\Persistence\IAlignmentProvider.cs" />
+    <Compile Include="Assets\SpatialAlignment\Persistence\IFrameProvider.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\AlignmentStrategy.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\IAlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\MultiParentAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\ParentAlignmentOptions.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\SimulatedAlignment.cs" />

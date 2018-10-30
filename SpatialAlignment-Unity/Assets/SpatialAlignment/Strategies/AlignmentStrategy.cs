@@ -30,6 +30,10 @@ using UnityEngine;
 
 namespace Microsoft.SpatialAlignment
 {
+    /// <summary>
+    /// An abstract base class for a <see cref="MonoBehaviour"/> that implements
+    /// <see cref="IAlignmentStrategy"/>.
+    /// </summary>
     public abstract class AlignmentStrategy : MonoBehaviour, IAlignmentStrategy
     {
         #region Member Variables
@@ -89,6 +93,9 @@ namespace Microsoft.SpatialAlignment
                 }
             }
         }
+
+        /// <inheritdoc />
+        GameObject IAlignmentStrategy.GameObject { get => this.gameObject; }
 
         /// <inheritdoc />
         public string ID { get; set; }
