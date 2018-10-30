@@ -36,9 +36,14 @@ namespace Microsoft.SpatialAlignment
     public enum AlignmentState
     {
         /// <summary>
+        /// An error has occurred with the alignment strategy.
+        /// </summary>
+        Error = -1,
+
+        /// <summary>
         /// Alignment has never been resolved in this session.
         /// </summary>
-        Unresolved,
+        Unresolved = 0,
 
         /// <summary>
         /// Alignment is temporarily inhibited (usually due to some form of tracking loss).
@@ -46,12 +51,12 @@ namespace Microsoft.SpatialAlignment
         Inhibited,
 
         /// <summary>
-        /// Alignment has been resolved once but there is no active tracking.
+        /// Alignment has been resolved at least once but there is no active tracking.
         /// </summary>
         Resolved,
 
         /// <summary>
-        /// Alignment has been resolved and there is active tracking.
+        /// Alignment has been resolved at least once and there is active tracking.
         /// </summary>
         Tracking,
     }

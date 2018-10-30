@@ -40,7 +40,7 @@ namespace Microsoft.SpatialAlignment
     }
 
     /// <summary>
-    /// An strategy that coordinates alignment based on the alignment of multiple "parent" objects.
+    /// A strategy that coordinates alignment based on the alignment of multiple "parent" objects.
     /// </summary>
     /// <remarks>
     /// This strategy directly updates the world transform of the attached object. Therefore,
@@ -69,56 +69,26 @@ namespace Microsoft.SpatialAlignment
         private float updateFrequency = 2.00f;
         #endregion // Member Variables
 
-        #region Internal Methods
+        #region Overridables / Event Triggers
         /// <summary>
-        /// Attempts to align to the nearest neighbor.
+        /// Applies the specified parent options to this object.
         /// </summary>
-        /// <returns>
-        /// <c>true</c> if aligned; otherwise <c>false</c>.
-        /// </returns>
-        private bool AlignNearestNeighbor()
+        /// <param name="parentOption">
+        /// The parent options to apply.
+        /// </param>
+        /// <remarks>
+        /// The default implementation of this method parents the transform
+        /// and applies position, rotation and scale modifications.
+        /// </remarks>
+        protected virtual void ApplyParent(ParentAlignmentOptions parentOption)
         {
-            // Attempt to get the reference transform
-            Transform reference = GetReferenceTransform();
-
-            // If no transform, can't continue
-            if (reference == null) { return false; }
-
-            // Get position once
-            Vector3 referencePos = reference.position;
-
-            // Placeholder
-            ParentAlignmentOptions parentOption = null;
-
-            // If only one parent option, always use that
-            if (parentOptions.Count == 1)
-            {
-                // Use only parent option, if valid
-                parentOption = (parentOptions[0].IsValidTarget() ? parentOptions[0] : null);
-            }
-            else
-            {
-                // Find the parent option closest to the reference point
-                // parentOption = parentOptions.OrderBy(t => (t.Parent.transform.position - referencePos).sqrMagnitude).First();
-                parentOption = (from o in ParentOptions
-                                where o.IsValidTarget()
-                                orderby (o.Parent.transform.position - referencePos).sqrMagnitude
-                                select o
-                               ).FirstOrDefault();
-
-            }
-
-            // If no option could be found, fail
-            if (parentOption == null)
-            {
-                // TODO: Log
-                return false;
-            }
+            // Validate
+            if (parentOption == null) { throw new ArgumentNullException(nameof(parentOption)); }
 
             // If already parented to this object, no additional work needed
             if (this.transform.parent == parentOption.Parent.transform)
             {
-                return true;
+                return;
             }
 
             // Update the parent
@@ -129,28 +99,9 @@ namespace Microsoft.SpatialAlignment
             this.transform.localRotation = Quaternion.Euler(parentOption.Rotation);
             this.transform.localScale = parentOption.Scale;
 
-            // Success
-            return true;
+            // Done!
         }
 
-        /// <summary>
-        /// Validates the contents of the <see cref="ParentOptions"/> collection.
-        /// </summary>
-        /// <remarks>
-        /// The default implementation simply validates that all parent options have a valid parent.
-        /// </remarks>
-        protected virtual void ValidateParentOptions()
-        {
-            // Validate each option
-            for (int i = 0; i < parentOptions.Count; i++)
-            {
-                var opt = parentOptions[i];
-                if (opt.Parent == null) { throw new InvalidOperationException($"{nameof(ParentAlignmentOptions)}.{nameof(ParentAlignmentOptions.Parent)} must be set."); }
-            }
-        }
-        #endregion // Internal Methods
-
-        #region Overridables / Event Triggers
         /// <summary>
         /// Gets the transform that serves as the frame of reference.
         /// </summary>
@@ -172,6 +123,83 @@ namespace Microsoft.SpatialAlignment
             else
             {
                 return Camera.main?.transform;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to select to the parent that is closest to the <see cref="ReferenceTransform"/>.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="ParentAlignmentOptions"/> that represent the parent, if found;
+        /// otherwise <see langword = "null" />.
+        /// </returns>
+        private ParentAlignmentOptions SelectNearestNeighbor()
+        {
+            // Attempt to get the reference transform
+            Transform reference = GetReferenceTransform();
+
+            // If no transform, can't continue
+            if (reference == null) { return null; }
+
+            // Get position once
+            Vector3 referencePos = reference.position;
+
+            // Placeholder
+            ParentAlignmentOptions parentOption = null;
+
+            // If only one parent option, always use that
+            if (parentOptions.Count == 1)
+            {
+                // Use only parent option, if valid
+                parentOption = (parentOptions[0].IsValidTarget() ? parentOptions[0] : null);
+            }
+            else
+            {
+                // Find the parent option closest to the reference point
+                parentOption = (from o in ParentOptions
+                                where o.IsValidTarget()
+                                orderby (o.Parent.transform.position - referencePos).sqrMagnitude
+                                select o
+                               ).FirstOrDefault();
+
+            }
+
+            // Done searching
+            return parentOption;
+        }
+
+        /// <summary>
+        /// Attempts to select the best parent based on the current mode.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="ParentAlignmentOptions"/> that represent the best parent,
+        /// if found; otherwise <see langword = "null" />.
+        /// </returns>
+        protected virtual ParentAlignmentOptions SelectParent()
+        {
+            // Select based on mode
+            switch (mode)
+            {
+                case MultiParentAlignmentMode.NearestNeighbor:
+                    return SelectNearestNeighbor();
+                default:
+                    throw new InvalidOperationException("Unexpected Branch");
+            }
+        }
+
+        /// <summary>
+        /// Validates the contents of the <see cref="ParentOptions"/> collection.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation simply validates that all parent options have a valid parent.
+        /// </remarks>
+        protected virtual void ValidateParentOptions()
+        {
+            // Validate each option
+            for (int i = 0; i < parentOptions.Count; i++)
+            {
+                var opt = parentOptions[i];
+                if (opt.Parent == null) { throw new InvalidOperationException($"{nameof(ParentAlignmentOptions)}.{nameof(ParentAlignmentOptions.Parent)} must be set."); }
             }
         }
 
@@ -216,31 +244,39 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Attempts to calculate and update the transform.
         /// </summary>
-        /// <returns>
-        /// <c>true</c> if the transform was updated; otherwise <c>false</c>.
-        /// </returns>
         public virtual void UpdateTransform()
         {
             // If there are no parent options, nothing to do
             if (parentOptions.Count == 0)
             {
-                State = AlignmentState.Unresolved;
+                State = AlignmentState.Error;
+                Debug.LogError($"{nameof(MultiParentAlignment)}: No parent options to select from.");
                 return;
             }
 
             // Validate the parent options
             ValidateParentOptions();
 
-            // Align based on mode
-            switch (mode)
+            // Use virtual method to select the best parent option
+            ParentAlignmentOptions parentOption = SelectParent();
+
+            // If no option could be found, fail
+            if (parentOption == null)
             {
-                case MultiParentAlignmentMode.NearestNeighbor:
-                    State = (AlignNearestNeighbor() ? AlignmentState.Tracking : AlignmentState.Inhibited);
-                    break;
-                default:
-                    throw new InvalidOperationException("Unexpected Branch");
+                State = AlignmentState.Inhibited;
+                Debug.LogWarning($"{nameof(MultiParentAlignment)}: No parent could be found that meets the minimum criteria.");
+                return;
+            }
+            else
+            {
+                // Actually apply the parent
+                ApplyParent(parentOption);
+
+                // Resolved
+                State = AlignmentState.Tracking;
             }
         }
+
         #endregion // Public Methods
 
         #region Public Properties

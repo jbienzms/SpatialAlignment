@@ -78,15 +78,18 @@ namespace Microsoft.SpatialAlignment
             // Can't be null
             if (parent == null) { return false; }
 
-            // Placeholder for strategy
-            IAlignmentStrategy strategy = null;
+            // Get alignment strategy
+            IAlignmentStrategy strategy = parent.GetComponent<IAlignmentStrategy>();
+
+            // If no strategy, warn
+            if (strategy == null)
+            {
+                Debug.LogWarning($"Parent '{parent.name}' has no alignment strategy.");
+            }
 
             // Check the state
-            if (minimuState > AlignmentState.Unresolved)
+            if (minimuState > AlignmentState.Error)
             {
-                // Attempt to get the alignment strategy
-                if (strategy == null) { strategy = parent.GetComponent<IAlignmentStrategy>(); }
-
                 // Must have a strategy
                 if (strategy == null) { return false; }
 
@@ -97,9 +100,6 @@ namespace Microsoft.SpatialAlignment
             // Check the accuracy
             if (minimumAccuracy != Vector3.zero)
             {
-                // Attempt to get the alignment strategy
-                if (strategy == null) { strategy = parent.GetComponent<IAlignmentStrategy>(); }
-
                 // Must have a strategy
                 if (strategy == null) { return false; }
 
