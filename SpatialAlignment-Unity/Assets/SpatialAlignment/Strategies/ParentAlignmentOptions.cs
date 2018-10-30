@@ -38,6 +38,14 @@ namespace Microsoft.SpatialAlignment
     {
         #region Member Variables
         [SerializeField]
+        [Tooltip("The minimum accuracy of the parent alignment for it to be considered valid. Zero means always valid.")]
+        private Vector3 minimumAccuracy = Vector3.zero;
+
+        [SerializeField]
+        [Tooltip("The minimum state of the parent alignment for it to be considered valid. Unresolved means always valid.")]
+        private AlignmentState minimuState = AlignmentState.Resolved;
+
+        [SerializeField]
         [Tooltip("The GameObject that serves as the parent.")]
         private GameObject parent;
 
@@ -54,7 +62,85 @@ namespace Microsoft.SpatialAlignment
         private Vector3 scale = Vector3.one;
         #endregion // Member Variables
 
+        #region Public Methods
+        /// <summary>
+        /// Returns a value that indicates if the parent should be considered a valid target.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if the parent is a valid target; otherwise <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// The default implementation makes sure the parent isn't null and also checks
+        /// <see cref="MinimumAccuracy"/> and <see cref="MinimumState"/>
+        /// </remarks>
+        public virtual bool IsValidTarget()
+        {
+            // Can't be null
+            if (parent == null) { return false; }
+
+            // Placeholder for strategy
+            IAlignmentStrategy strategy = null;
+
+            // Check the state
+            if (minimuState > AlignmentState.Unresolved)
+            {
+                // Attempt to get the alignment strategy
+                if (strategy == null) { strategy = parent.GetComponent<IAlignmentStrategy>(); }
+
+                // Must have a strategy
+                if (strategy == null) { return false; }
+
+                // Strategy state must match minimum
+                if (strategy.State < minimuState) { return false; }
+            }
+
+            // Check the accuracy
+            if (minimumAccuracy != Vector3.zero)
+            {
+                // Attempt to get the alignment strategy
+                if (strategy == null) { strategy = parent.GetComponent<IAlignmentStrategy>(); }
+
+                // Must have a strategy
+                if (strategy == null) { return false; }
+
+                // Strategy accuracy match minimum
+                if ((minimumAccuracy.x > 0) && (strategy.Accuracy.x > minimumAccuracy.x)) { return false; }
+                if ((minimumAccuracy.y > 0) && (strategy.Accuracy.y > minimumAccuracy.y)) { return false; }
+                if ((minimumAccuracy.z > 0) && (strategy.Accuracy.z > minimumAccuracy.z)) { return false; }
+            }
+
+            // All checks passed
+            return true;
+        }
+        #endregion // Public Methods
+
         #region Public Properties
+        /// <summary>
+        /// Gets or sets the minimum accuracy of the parent alignment for it to be considered
+        /// valid.
+        /// </summary>
+        /// <remarks>
+        /// If this value is set to <see cref="Vector3.zero"/>, the parent will
+        /// always be considered valid. Otherwise, the parent must have a behavior
+        /// attached that implements <see cref="IAlignmentStrategy"/> and that behavior must
+        /// return an <see cref="IAlignmentStrategy.Accuracy">Accuracy</see> of this level or
+        /// higher to be considered valid.
+        /// </remarks>
+        public Vector3 MinimumAccuracy { get => minimumAccuracy; set => minimumAccuracy = value; }
+
+        /// <summary>
+        /// Gets or sets the minimum state of the parent alignment for it to be considered valid.
+        /// </summary>
+        /// <remarks>
+        /// If this value is set to <see cref="AlignmentState.Unresolved"/>, the parent will
+        /// always be considered valid. If this value is set to
+        /// <see cref="AlignmentState.Inhibited"/> or higher, the parent must have a behavior
+        /// attached that implements <see cref="IAlignmentStrategy"/> and that behavior must
+        /// return a <see cref="IAlignmentStrategy.State">State</see> of this level or higher
+        /// to be considered valid.
+        /// </remarks>
+        public AlignmentState MinimumState { get => minimuState; set => minimuState = value; }
+
         /// <summary>
         /// Gets or sets the GameObject that serves as the parent.
         /// </summary>

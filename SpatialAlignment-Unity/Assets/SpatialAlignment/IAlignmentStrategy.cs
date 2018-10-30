@@ -41,6 +41,11 @@ namespace Microsoft.SpatialAlignment
         Unresolved,
 
         /// <summary>
+        /// Alignment is temporarily inhibited (usually due to some form of tracking loss).
+        /// </summary>
+        Inhibited,
+
+        /// <summary>
         /// Alignment has been resolved once but there is no active tracking.
         /// </summary>
         Resolved,
@@ -49,11 +54,6 @@ namespace Microsoft.SpatialAlignment
         /// Alignment has been resolved and there is active tracking.
         /// </summary>
         Tracking,
-
-        /// <summary>
-        /// Alignment is temporarily inhibited (usually due to some form of tracking loss).
-        /// </summary>
-        Inhibited,
     }
 
     /// <summary>

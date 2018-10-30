@@ -88,18 +88,31 @@ namespace Microsoft.SpatialAlignment
             Vector3 referencePos = reference.position;
 
             // Placeholder
-            ParentAlignmentOptions parentOption;
+            ParentAlignmentOptions parentOption = null;
 
             // If only one parent option, always use that
             if (parentOptions.Count == 1)
             {
-                // Use only parent option
-                parentOption = parentOptions[0];
+                // Use only parent option, if valid
+                parentOption = (parentOptions[0].IsValidTarget() ? parentOptions[0] : null);
             }
             else
             {
                 // Find the parent option closest to the reference point
-                parentOption = parentOptions.OrderBy(t => (t.Parent.transform.position - referencePos).sqrMagnitude).First();
+                // parentOption = parentOptions.OrderBy(t => (t.Parent.transform.position - referencePos).sqrMagnitude).First();
+                parentOption = (from o in ParentOptions
+                                where o.IsValidTarget()
+                                orderby (o.Parent.transform.position - referencePos).sqrMagnitude
+                                select o
+                               ).FirstOrDefault();
+
+            }
+
+            // If no option could be found, fail
+            if (parentOption == null)
+            {
+                // TODO: Log
+                return false;
             }
 
             // If already parented to this object, no additional work needed
