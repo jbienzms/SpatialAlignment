@@ -38,10 +38,20 @@ namespace Microsoft.SpatialAlignment
         #endregion // Member Variables
 
         #region Unity Overrides
-        protected virtual void Update()
-        {
+        /// <summary>
+        /// Awake is called when the script instance is being loaded.
+        /// </summary>
+        protected virtual void Awake() {}
 
-        }
+        /// <summary>
+        /// Start is called before the first frame update.
+        /// </summary>
+        protected virtual void Start() {}
+
+        /// <summary>
+        /// Update is called once per frame
+        /// </summary>
+        protected virtual void Update() {}
         #endregion // Unity Overrides
 
         #region Overridables / Event Triggers
