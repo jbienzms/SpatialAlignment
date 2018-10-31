@@ -50,8 +50,11 @@ namespace Microsoft.SpatialAlignment
     public class MultiParentAlignment : AlignmentStrategy
     {
         #region Member Variables
+        private ParentAlignmentOptions currentParent;
         private float lastUpdateTime;
+        #endregion // Member Variables
 
+        #region Unity Inspector Variables
         [SerializeField]
         [Tooltip("The method used to align with multiple parents.")]
         private MultiParentAlignmentMode mode;
@@ -67,9 +70,10 @@ namespace Microsoft.SpatialAlignment
         [SerializeField]
         [Tooltip("The time between updates (in seconds). If zero, alignment is updated every frame.")]
         private float updateFrequency = 2.00f;
-        #endregion // Member Variables
+        #endregion // Unity Inspector Variables
 
-        #region Overridables / Event Triggers
+
+        #region Internal Methods
         /// <summary>
         /// Applies the specified parent options to this object.
         /// </summary>
@@ -84,20 +88,21 @@ namespace Microsoft.SpatialAlignment
         {
             // Validate
             if (parentOption == null) { throw new ArgumentNullException(nameof(parentOption)); }
+            if (parentOption.Frame == null) { throw new InvalidOperationException($"{nameof(parentOption.Frame)} cannot be null."); }
 
             // If already parented to this object, no additional work needed
-            if (this.transform.parent == parentOption.Parent.transform)
-            {
-                return;
-            }
+            if (currentParent == parentOption) { return; }
 
-            // Update the parent
-            this.transform.SetParent(parentOption.Parent.transform, worldPositionStays: false);
+            // Make our transform a child of the frame
+            this.transform.SetParent(parentOption.Frame.transform, worldPositionStays: false);
 
             // Apply transform modifications
             this.transform.localPosition = parentOption.Position;
             this.transform.localRotation = Quaternion.Euler(parentOption.Rotation);
             this.transform.localScale = parentOption.Scale;
+
+            // Notify of parent change
+            CurrentParent = parentOption;
 
             // Done!
         }
@@ -158,7 +163,7 @@ namespace Microsoft.SpatialAlignment
                 // Find the parent option closest to the reference point
                 parentOption = (from o in ParentOptions
                                 where o.IsValidTarget()
-                                orderby (o.Parent.transform.position - referencePos).sqrMagnitude
+                                orderby (o.Frame.transform.position - referencePos).sqrMagnitude
                                 select o
                                ).FirstOrDefault();
 
@@ -199,7 +204,8 @@ namespace Microsoft.SpatialAlignment
             for (int i = 0; i < parentOptions.Count; i++)
             {
                 var opt = parentOptions[i];
-                if (opt.Parent == null) { throw new InvalidOperationException($"{nameof(ParentAlignmentOptions)}.{nameof(ParentAlignmentOptions.Parent)} must be set."); }
+                if (opt.Frame == null) { throw new InvalidOperationException($"{nameof(ParentAlignmentOptions)}.{nameof(ParentAlignmentOptions.Frame)} can't be null."); }
+                if (opt.Frame.transform == null) { throw new InvalidOperationException($"{nameof(SpatialFrame)}.{nameof(SpatialFrame.transform)} can't be null."); }
             }
         }
 
@@ -218,6 +224,16 @@ namespace Microsoft.SpatialAlignment
         protected virtual bool ShouldUpdateTransform()
         {
             return (Time.unscaledTime - lastUpdateTime) >= updateFrequency;
+        }
+        #endregion // Overridables / Event Triggers
+
+        #region Overridables / Event Triggers
+        /// <summary>
+        /// Called when the value of the <see cref="CurrentParent"/> property has changed.
+        /// </summary>
+        protected virtual void OnCurrentParentChanged()
+        {
+            CurrentParentChanged?.Invoke(this, EventArgs.Empty);
         }
         #endregion // Overridables / Event Triggers
 
@@ -280,6 +296,26 @@ namespace Microsoft.SpatialAlignment
         #endregion // Public Methods
 
         #region Public Properties
+        /// <summary>
+        /// Gets the <see cref="ParentAlignmentOptions"/> that represent the currently
+        /// selected parent.
+        /// </summary>
+        public virtual ParentAlignmentOptions CurrentParent
+        {
+            get
+            {
+                return currentParent;
+            }
+            protected set
+            {
+                if (currentParent != value)
+                {
+                    currentParent = value;
+                    OnCurrentParentChanged();
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the method used to align with multiple parents.
         /// </summary>
@@ -383,5 +419,10 @@ namespace Microsoft.SpatialAlignment
             }
         }
         #endregion // Public Properties
+
+        #region Public Events
+        /// <inheritdoc />
+        public event EventHandler CurrentParentChanged;
+        #endregion // Public Events
     }
 }

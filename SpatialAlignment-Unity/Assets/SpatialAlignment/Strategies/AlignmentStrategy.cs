@@ -95,12 +95,6 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <inheritdoc />
-        GameObject IAlignmentStrategy.GameObject { get => this.gameObject; }
-
-        /// <inheritdoc />
-        public string ID { get; set; }
-
-        /// <inheritdoc />
         public virtual AlignmentState State
         {
             get

@@ -28,39 +28,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
-namespace Microsoft.SpatialAlignment.Persistence
+namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// The interface for a class that can load and save spatial frames.
+    /// Designates a spatial frame of reference.
     /// </summary>
-    public interface IFrameProvider
+    /// <remarks>
+    /// As mentioned in the article
+    /// <see href="https://docs.microsoft.com/en-us/windows/mixed-reality/coordinate-systems">
+    /// Coordinate Systems</see>, large-scale mixed reality applications may make use of
+    /// more than one frame of reference. The <see cref="ISpatialFrame"/> interface is used
+    /// to represent one of potentially many frames of reference.
+    /// </remarks>
+    public class SpatialFrame : MonoBehaviour
     {
-        /// <summary>
-        /// Loads the frame with the specified ID.
-        /// </summary>
-        /// <param name="id">
-        /// The ID of the frame to load.
-        /// </param>
-        /// <returns>
-        /// The loaded frame.
-        /// </returns>
-        /// <remarks>
-        /// If the frame is already loaded, the existing instance is returned
-        /// and no error is generated.
-        /// </remarks>
-        Task<ISpatialFrame> LoadAsync(string id);
+        #region Unity Inspector Variables
+        [SerializeField]
+        [Tooltip("A unique ID for the spatial frame.")]
+        private string id;
+        #endregion // Unity Inspector Variables
 
-        /// <summary>
-        /// Saves the specified frame.
-        /// </summary>
-        /// <param name="frame">
-        /// The frame to save.
-        /// </param>
-        /// <returns>
-        /// <returns>
-        /// A <see cref="Task"/> that represents the operation.
-        /// </returns>
-        Task SaveAsync(ISpatialFrame frame);
+        #region Public Properties
+        /// <inheritdoc />
+        public virtual IAlignmentStrategy AlignmentStrategy { get => GetComponent<IAlignmentStrategy>(); }
+
+        /// <inheritdoc />
+        public virtual string ID { get => id; set => id = value; }
+        #endregion // Public Properties
     }
 }

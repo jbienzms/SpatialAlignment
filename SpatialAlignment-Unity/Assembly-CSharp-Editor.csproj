@@ -154,11 +154,11 @@
     <Reference Include="Unity.CollabProxy.Editor">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.XR.WindowsMR.Editor">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/ScriptAssemblies/Unity.XR.WindowsMR.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.XR.WindowsMR">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/ScriptAssemblies/Unity.XR.WindowsMR.dll</HintPath>
@@ -409,6 +409,15 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="GLTFSerialization">
+      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit/Utilities/Scripts/GLTF/Plugins/GLTFSerialization/GLTFSerialization.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit/Utilities/Scripts/GLTF/Plugins/JsonNet/Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="QRCodesTrackerPlugin.Placeholder">
+      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit-Preview/QRTracker/Plugins/QRCodesTrackerPlugin.Placeholder.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.Advertisements">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/PackageCache/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
     </Reference>
@@ -429,15 +438,6 @@
     </Reference>
     <Reference Include="UnityEditor.Purchasing">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/PackageCache/com.unity.purchasing@2.0.1/Editor/UnityEditor.Purchasing.dll</HintPath>
-    </Reference>
-    <Reference Include="GLTFSerialization">
-      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit/Utilities/Scripts/GLTF/Plugins/GLTFSerialization/GLTFSerialization.dll</HintPath>
-    </Reference>
-    <Reference Include="QRCodesTrackerPlugin.Placeholder">
-      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit-Preview/QRTracker/Plugins/QRCodesTrackerPlugin.Placeholder.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit/Utilities/Scripts/GLTF/Plugins/JsonNet/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0b7/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>

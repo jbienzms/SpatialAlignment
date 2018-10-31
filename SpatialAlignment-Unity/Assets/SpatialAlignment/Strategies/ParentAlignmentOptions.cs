@@ -38,16 +38,16 @@ namespace Microsoft.SpatialAlignment
     {
         #region Member Variables
         [SerializeField]
+        [Tooltip("The spatial frame that serves as the parent.")]
+        private SpatialFrame frame;
+
+        [SerializeField]
         [Tooltip("The minimum accuracy of the parent alignment for it to be considered valid. Zero means always valid.")]
         private Vector3 minimumAccuracy = Vector3.zero;
 
         [SerializeField]
         [Tooltip("The minimum state of the parent alignment for it to be considered valid. Unresolved means always valid.")]
         private AlignmentState minimuState = AlignmentState.Resolved;
-
-        [SerializeField]
-        [Tooltip("The GameObject that serves as the parent.")]
-        private GameObject parent;
 
         [SerializeField]
         [Tooltip("Position to use when a child of this parent.")]
@@ -76,15 +76,15 @@ namespace Microsoft.SpatialAlignment
         public virtual bool IsValidTarget()
         {
             // Can't be null
-            if (parent == null) { return false; }
+            if (frame == null) { return false; }
 
             // Get alignment strategy
-            IAlignmentStrategy strategy = parent.GetComponent<IAlignmentStrategy>();
+            IAlignmentStrategy strategy = frame.AlignmentStrategy;
 
             // If no strategy, warn
             if (strategy == null)
             {
-                Debug.LogWarning($"Parent '{parent.name}' has no alignment strategy.");
+                Debug.LogWarning($"Parent frame '{frame.ID}' has no alignment strategy.");
             }
 
             // Check the state
@@ -116,6 +116,11 @@ namespace Microsoft.SpatialAlignment
 
         #region Public Properties
         /// <summary>
+        /// Gets or sets the spatial frame that serves as the parent.
+        /// </summary>
+        public SpatialFrame Frame { get => frame; set => frame = value; }
+
+        /// <summary>
         /// Gets or sets the minimum accuracy of the parent alignment for it to be considered
         /// valid.
         /// </summary>
@@ -140,11 +145,6 @@ namespace Microsoft.SpatialAlignment
         /// to be considered valid.
         /// </remarks>
         public AlignmentState MinimumState { get => minimuState; set => minimuState = value; }
-
-        /// <summary>
-        /// Gets or sets the GameObject that serves as the parent.
-        /// </summary>
-        public GameObject Parent { get => parent; set => parent = value; }
 
         /// <summary>
         /// Gets or sets the position to use when a child of this parent.

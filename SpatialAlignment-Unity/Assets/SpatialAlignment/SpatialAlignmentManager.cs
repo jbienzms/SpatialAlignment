@@ -33,17 +33,11 @@ using UnityEngine;
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// The most basic <see cref="MonoBehaviour"/> that implements
-    /// <see cref="ISpatialFrame"/>.
+    /// Manages the graph of spatial frames and alignment strategies
+    /// within the application.
     /// </summary>
-    public class SpatialFrame : MonoBehaviour, ISpatialFrame
+    public class SpatialAlignmentManager : MonoBehaviour
     {
-        #region Public Properties
-        /// <inheritdoc />
-        GameObject ISpatialFrame.GameObject { get => this.gameObject; }
 
-        /// <inheritdoc />
-        public string ID { get; set; }
-        #endregion // Public Properties
     }
 }

@@ -80,16 +80,6 @@ namespace Microsoft.SpatialAlignment
         Vector3 Accuracy { get; }
 
         /// <summary>
-        /// Gets the <see cref="GameObject"/> that strategy is attached to.
-        /// </summary>
-        GameObject GameObject { get; }
-
-        /// <summary>
-        /// Gets or sets a unique ID for this instance of the strategy.
-        /// </summary>
-        string ID { get; set; }
-
-        /// <summary>
         /// Gets the current state of the alignment.
         /// </summary>
         AlignmentState State { get; }

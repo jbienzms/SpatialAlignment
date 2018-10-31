@@ -366,6 +366,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 332004588}
+  - component: {fileID: 332004590}
   - component: {fileID: 332004589}
   m_Layer: 0
   m_Name: Parent3
@@ -403,6 +404,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentAccuracy: {x: 0, y: 0, z: 0}
   currentState: 2
+--- !u!114 &332004590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332004587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f610d7a18b59247bad01d88be94815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Parent3
 --- !u!1 &404797277
 GameObject:
   m_ObjectHideFlags: 0
@@ -509,21 +523,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mode: 0
   parentOptions:
-  - minimumAccuracy: {x: 0, y: 0, z: 0}
+  - frame: {fileID: 1478666017}
+    minimumAccuracy: {x: 0, y: 0, z: 0}
     minimuState: 2
-    parent: {fileID: 1478666014}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
     scale: {x: 0.3, y: 0.3, z: 0.3}
-  - minimumAccuracy: {x: 0, y: 0, z: 0}
+  - frame: {fileID: 1891623029}
+    minimumAccuracy: {x: 0, y: 0, z: 0}
     minimuState: 2
-    parent: {fileID: 1891623026}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
     scale: {x: 0.3, y: 0.3, z: 0.3}
-  - minimumAccuracy: {x: 0, y: 0, z: 0}
+  - frame: {fileID: 332004590}
+    minimumAccuracy: {x: 0, y: 0, z: 0}
     minimuState: 2
-    parent: {fileID: 332004587}
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0}
     scale: {x: 0.3, y: 0.3, z: 0.3}
@@ -720,6 +734,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1478666015}
+  - component: {fileID: 1478666017}
   - component: {fileID: 1478666016}
   m_Layer: 0
   m_Name: Parent1
@@ -757,6 +772,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentAccuracy: {x: 0, y: 0, z: 0}
   currentState: 2
+--- !u!114 &1478666017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478666014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f610d7a18b59247bad01d88be94815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Parent1
 --- !u!1001 &1638356315
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -835,6 +863,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1891623027}
+  - component: {fileID: 1891623029}
   - component: {fileID: 1891623028}
   m_Layer: 0
   m_Name: Parent2
@@ -872,6 +901,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentAccuracy: {x: 0, y: 0, z: 0}
   currentState: 2
+--- !u!114 &1891623029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1891623026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f610d7a18b59247bad01d88be94815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: Parent2
 --- !u!1 &2059821774
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,35 +23,35 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Microsoft.SpatialAlignment
+namespace Microsoft.SpatialAlignment.Persistence
 {
     /// <summary>
-    /// The interface for a spatial frame of reference.
+    /// A class that can load and save spatial alignment data using json.
     /// </summary>
-    /// <remarks>
-    /// As mentioned in the article
-    /// <see href="https://docs.microsoft.com/en-us/windows/mixed-reality/coordinate-systems">
-    /// Coordinate Systems</see>, large-scale mixed reality applications may make use of
-    /// more than one frame of reference. The <see cref="ISpatialFrame"/> interface is used
-    /// to represent one of potentially many frames of reference.
-    /// </remarks>
-    public interface ISpatialFrame
+    public class JsonStore : ISpatialAlignmentStore
     {
-        /// <summary>
-        /// Gets the <see cref="GameObject"/> that represents the root of the spatial frame.
-        /// </summary>
-        GameObject GameObject { get; }
+        /// <inheritdoc />
+        public Task<SpatialFrame> LoadFrameAsync(string id)
+        {
+            throw new System.NotImplementedException();
+        }
 
-        /// <summary>
-        /// Gets or sets a unique ID for the spatial frame.
-        /// </summary>
-        string ID { get; set; }
+        /// <inheritdoc />
+        public Task SaveFrameAsync(SpatialFrame frame)
+        {
+            // Validate
+            if (frame == null) throw new ArgumentNullException(nameof(frame));
+
+            var js = JsonConvert.SerializeObject(frame);
+
+            return Task.CompletedTask;
+        }
     }
 }

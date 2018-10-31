@@ -32,35 +32,35 @@ using System.Threading.Tasks;
 namespace Microsoft.SpatialAlignment.Persistence
 {
     /// <summary>
-    /// The interface for a class that can load and save alignment strategies.
+    /// The interface for a class that can load and save spatial alignment data.
     /// </summary>
-    public interface IAlignmentProvider
+    public interface ISpatialAlignmentStore
     {
         /// <summary>
-        /// Loads the alignment strategy with the specified ID.
+        /// Loads the frame with the specified ID.
         /// </summary>
         /// <param name="id">
-        /// The ID of the strategy to load.
+        /// The ID of the frame to load.
         /// </param>
         /// <returns>
-        /// The loaded strategy.
+        /// The loaded frame.
         /// </returns>
         /// <remarks>
-        /// If the strategy is already loaded, the existing instance is returned
+        /// If the frame is already loaded, the existing instance is returned
         /// and no error is generated.
         /// </remarks>
-        Task<IAlignmentStrategy> LoadAsync(string id);
+        Task<SpatialFrame> LoadFrameAsync(string id);
 
         /// <summary>
-        /// Saves the specified alignment strategy.
+        /// Saves the specified frame.
         /// </summary>
-        /// <param name="strategy">
+        /// <param name="frame">
         /// The frame to save.
         /// </param>
         /// <returns>
         /// <returns>
         /// A <see cref="Task"/> that represents the operation.
         /// </returns>
-        Task SaveAsync(IAlignmentStrategy strategy);
+        Task SaveFrameAsync(SpatialFrame frame);
     }
 }
