@@ -32,14 +32,6 @@ using UnityEngine;
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// Defines the various modes for multi-parent alignment.
-    /// </summary>
-    public enum MultiParentAlignmentMode
-    {
-        NearestNeighbor
-    }
-
-    /// <summary>
     /// A strategy that coordinates alignment based on the alignment of multiple "parent" objects.
     /// </summary>
     /// <remarks>
@@ -55,10 +47,6 @@ namespace Microsoft.SpatialAlignment
         #endregion // Member Variables
 
         #region Unity Inspector Variables
-        [SerializeField]
-        [Tooltip("The method used to align with multiple parents.")]
-        private MultiParentAlignmentMode mode;
-
         [SerializeField]
         [Tooltip("The list of parent alignment options.")]
         private List<ParentAlignmentOptions> parentOptions = new List<ParentAlignmentOptions>();
@@ -121,33 +109,33 @@ namespace Microsoft.SpatialAlignment
         /// </remarks>
         protected virtual Transform GetReferenceTransform()
         {
-            if (referenceTransform != null)
+            if (referenceTransform == null)
             {
-                return referenceTransform;
+                referenceTransform = Camera.main?.transform;
             }
-            else
-            {
-                return Camera.main?.transform;
-            }
+            return referenceTransform;
         }
 
         /// <summary>
-        /// Attempts to select to the parent that is closest to the <see cref="ReferenceTransform"/>.
+        /// Attempts to select the best parent option based on current settings.
         /// </summary>
         /// <returns>
-        /// The <see cref="ParentAlignmentOptions"/> that represent the parent, if found;
-        /// otherwise <see langword = "null" />.
+        /// The <see cref="ParentAlignmentOptions"/> that represent the best parent,
+        /// if found; otherwise <see langword = "null" />.
         /// </returns>
-        private ParentAlignmentOptions SelectNearestNeighbor()
+        /// <remarks>
+        /// The default implementation examines all options where
+        /// <see cref="ParentAlignmentOptions.IsValidTarget">IsValidTarget</see>
+        /// returns <c>true</c> and selects the top option sorted by
+        /// <see cref="ParentAlignmentOptions.SortOrder(Transform)">SortOrder</see>.
+        /// </remarks>
+        protected virtual ParentAlignmentOptions SelectParent()
         {
             // Attempt to get the reference transform
             Transform reference = GetReferenceTransform();
 
             // If no transform, can't continue
             if (reference == null) { return null; }
-
-            // Get position once
-            Vector3 referencePos = reference.position;
 
             // Placeholder
             ParentAlignmentOptions parentOption = null;
@@ -160,10 +148,10 @@ namespace Microsoft.SpatialAlignment
             }
             else
             {
-                // Find the parent option closest to the reference point
+                // Find the best valid parent, sorted by logic in the ParentAlignmentOption itself
                 parentOption = (from o in ParentOptions
                                 where o.IsValidTarget()
-                                orderby (o.Frame.transform.position - referencePos).sqrMagnitude
+                                orderby o.SortOrder(reference)
                                 select o
                                ).FirstOrDefault();
 
@@ -171,25 +159,6 @@ namespace Microsoft.SpatialAlignment
 
             // Done searching
             return parentOption;
-        }
-
-        /// <summary>
-        /// Attempts to select the best parent based on the current mode.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="ParentAlignmentOptions"/> that represent the best parent,
-        /// if found; otherwise <see langword = "null" />.
-        /// </returns>
-        protected virtual ParentAlignmentOptions SelectParent()
-        {
-            // Select based on mode
-            switch (mode)
-            {
-                case MultiParentAlignmentMode.NearestNeighbor:
-                    return SelectNearestNeighbor();
-                default:
-                    throw new InvalidOperationException("Unexpected Branch");
-            }
         }
 
         /// <summary>
@@ -312,29 +281,6 @@ namespace Microsoft.SpatialAlignment
                 {
                     currentParent = value;
                     OnCurrentParentChanged();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the method used to align with multiple parents.
-        /// </summary>
-        public MultiParentAlignmentMode Mode
-        {
-            get
-            {
-                return mode;
-            }
-            set
-            {
-                // Ensure changing
-                if (mode != value)
-                {
-                    // Store
-                    mode = value;
-
-                    // Attempt to update the transform
-                    UpdateTransform();
                 }
             }
         }

@@ -112,6 +112,33 @@ namespace Microsoft.SpatialAlignment
             // All checks passed
             return true;
         }
+
+        /// <summary>
+        /// Provides a sort order for this option relative to the specified transform.
+        /// </summary>
+        /// <param name="reference">
+        /// The reference transform to sort by.
+        /// </param>
+        /// <returns>
+        /// A number that represents the sort order for this option.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// This method is used for sorting, similar to the way
+        /// <see cref="IComparable.CompareTo(object)">IComparable.CompareTo</see>
+        /// can be used to sort a collection. However, rather than comparing two
+        /// options with each other this method compares the option to a specified
+        /// frame of reference (generally the users location).
+        /// </para>
+        /// <para>
+        /// The default implementation of this method returns a sort order which is
+        /// based on the distance to the frame of reference.
+        /// </para>
+        /// </remarks>
+        public virtual float SortOrder(Transform reference)
+        {
+            return (frame.transform.position - reference.position).sqrMagnitude;
+        }
         #endregion // Public Methods
 
         #region Public Properties

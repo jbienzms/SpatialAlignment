@@ -539,7 +539,7 @@ MonoBehaviour:
     minimumAccuracy: {x: 0, y: 0, z: 0}
     minimuState: 2
     position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0}
+    rotation: {x: -2, y: 0, z: 0}
     scale: {x: 0.3, y: 0.3, z: 0.3}
   referenceTransform: {fileID: 0}
   updateFrequency: 1
