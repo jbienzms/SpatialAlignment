@@ -23,23 +23,54 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
+using Microsoft.SpatialAlignment.Persistence.Json;
+using Newtonsoft.Json;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Microsoft.SpatialAlignment
+namespace Microsoft.SpatialAlignment.Persistence
 {
-    /// <summary>
-    /// Manages the graph of spatial frames and alignment strategies
-    /// within the application.
-    /// </summary>
-    public class SpatialAlignmentManager : MonoBehaviour
+    public class PersistenceExampleManager : MonoBehaviour
     {
-        private Dictionary<string, SpatialFrame> frames = new Dictionary<string, SpatialFrame>();
+        #region Member Variables
+        private JsonStore store;
+        #endregion // Member Variables
 
-        // private List<SpatialFrame> frames = new List<SpatialFrame>();
+        #region Unity Inspector Variables
+        public List<SpatialFrame> Frames = new List<SpatialFrame>();
+        #endregion // Unity Inspector Variables
+
+        private async Task LoadAsync()
+        {
+
+        }
+
+        private async Task SaveAsync()
+        {
+            foreach (var frame in Frames)
+            {
+                await store.SaveFrameAsync(frame);
+            }
+
+            using (StringWriter sw = new StringWriter())
+            {
+                using (JsonTextWriter jw = new JsonTextWriter(sw))
+                {
+                    await store.SaveDocumentAsync(jw);
+                }
+
+            }
+
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            store = new JsonStore();
+            var t = LoadAsync();
+        }
     }
 }

@@ -25,33 +25,41 @@
 
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Microsoft.SpatialAlignment.Persistence
+namespace Microsoft.SpatialAlignment.Persistence.Json
 {
-    /// <summary>
-    /// A class that can load and save spatial alignment data using json.
-    /// </summary>
-    public class JsonStore : ISpatialAlignmentStore
+    public class SpatialFrameConverter : JsonConverter
     {
-        /// <inheritdoc />
-        public Task<SpatialFrame> LoadFrameAsync(string id)
+        public override bool CanConvert(Type objectType)
         {
-            throw new System.NotImplementedException();
+            return typeof(SpatialFrame).IsAssignableFrom(objectType);
         }
 
-        /// <inheritdoc />
-        public Task SaveFrameAsync(SpatialFrame frame)
+        public override bool CanWrite => false; // Only use for read operations, not write operations.
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            // Validate
-            if (frame == null) throw new ArgumentNullException(nameof(frame));
+            // Instantiate the object the way Unity needs
+            GameObject go = new GameObject();
 
-            var js = JsonConvert.SerializeObject(frame);
+            // Add a SpatialFrame to it
+            SpatialFrame frame = go.AddComponent<SpatialFrame>();
 
-            return Task.CompletedTask;
+            // Deserialize into the instance
+            serializer.Populate(reader, frame);
+
+            // Return the frame
+            return frame;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

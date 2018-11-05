@@ -23,6 +23,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Microsoft.SpatialAlignment.Persistence;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -35,7 +37,7 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// An alignment strategy that attaches the object to a HoloLens world anchor.
     /// </summary>
-    public class WorldAnchorAlignment : AlignmentStrategy
+    public class WorldAnchorAlignment : AlignmentStrategy, INativePersistence
     {
         #region Member Variables
         private WorldAnchor anchor;
@@ -51,6 +53,54 @@ namespace Microsoft.SpatialAlignment
         [Tooltip("Whether the anchor should be loaded when the behavior starts.")]
         private bool loadOnStart = true;
         #endregion // Unity Inspector Variables
+
+        #region Internal Methods
+        /// <summary>
+        /// Ensures that the application has access to the anchor store.
+        /// </summary>
+        /// <returns>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        private async Task EnsureAnchorStoreAsync()
+        {
+            // Do we need to acquire the store?
+            if (anchorStore == null)
+            {
+                // Create the completion source
+                TaskCompletionSource<bool> tc = new TaskCompletionSource<bool>();
+
+                // Start process to get store via callback
+                WorldAnchorStore.GetAsync((WorldAnchorStore store) =>
+                {
+                    if (store != null) { anchorStore = store; }
+                    tc.SetResult(store != null);
+                });
+
+                // Wait for callback to complete
+                await tc.Task;
+            }
+
+            // If store is still not acquired, log and fail
+            if (anchorStore == null)
+            {
+                State = AlignmentState.Error;
+                throw new UnauthorizedAccessException($"{nameof(WorldAnchorAlignment)}: {nameof(WorldAnchorStore)} could not be acquired.");
+            }
+        }
+        #endregion // Internal Methods
+
+        #region INativePersistence Members
+        Task INativePersistence.LoadNativeAsync()
+        {
+            return TryLoadAnchorAsync();
+        }
+
+        Task INativePersistence.SaveNativeAsync()
+        {
+            return SaveAnchorAsync();
+        }
+        #endregion // INativePersistence Members
 
         #region Overrides / Event Handlers
         private void Anchor_OnTrackingChanged(WorldAnchor worldAnchor, bool located)
@@ -83,10 +133,10 @@ namespace Microsoft.SpatialAlignment
 
         #region Public Methods
         /// <summary>
-        /// Attempts to load the anchor specified by <see cref="AnchorId"/>.
+        /// Attempts to load the native anchor specified by <see cref="AnchorId"/>.
         /// </summary>
         /// <returns>
-        /// <c>true</c> if the anchor was loaded and applied; otherwise <c>false</c>.
+        /// A <see cref="Task"/> that represents the operation.
         /// </returns>
         public async Task<bool> TryLoadAnchorAsync()
         {
@@ -97,34 +147,11 @@ namespace Microsoft.SpatialAlignment
             if (string.IsNullOrEmpty(anchorId))
             {
                 State = AlignmentState.Error;
-                Debug.LogError($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
-                return false;
+                throw new InvalidOperationException($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
             }
 
-            // Do we need to acquire the store?
-            if (anchorStore == null)
-            {
-                // Create the completion source
-                TaskCompletionSource<bool> tc = new TaskCompletionSource<bool>();
-
-                // Start process to get store via callback
-                WorldAnchorStore.GetAsync((WorldAnchorStore store) =>
-                {
-                    if (store != null) { anchorStore = store; }
-                    tc.SetResult(store != null);
-                });
-
-                // Wait for callback to complete
-                await tc.Task;
-            }
-
-            // If store is still not acquired, log and fail
-            if (anchorStore == null)
-            {
-                State = AlignmentState.Error;
-                Debug.LogError($"{nameof(WorldAnchorAlignment)}: {nameof(WorldAnchorStore)} could not be acquired.");
-                return false;
-            }
+            // Make sure we have access to the anchor store
+            await EnsureAnchorStoreAsync();
 
             // Now try to load the anchor itself
             anchor = anchorStore.Load(anchorId, this.gameObject);
@@ -136,15 +163,46 @@ namespace Microsoft.SpatialAlignment
                 Debug.LogError($"{nameof(WorldAnchorAlignment)}: {nameof(WorldAnchor)} with the id '{anchorId}' was not found.");
                 return false;
             }
+            else
+            {
+                // Subscribe to anchor events
+                anchor.OnTrackingChanged += Anchor_OnTrackingChanged;
 
-            // Subscribe to anchor events
-            anchor.OnTrackingChanged += Anchor_OnTrackingChanged;
+                // Update state based on anchor state
+                State = (anchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
 
-            // Update state based on anchor state
-            State = (anchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
+                // Loaded!
+                return true;
+            }
+        }
 
-            // Loaded!
-            return true;
+        /// <summary>
+        /// Attempts to save the native anchor with the specified <see cref="AnchorId"/>.
+        /// If the current game object doesn't have an anchor, it will automatically
+        /// be created.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        public async Task SaveAnchorAsync()
+        {
+            // Make sure the anchor is created
+            if (anchor == null)
+            {
+                anchor = this.gameObject.AddComponent<WorldAnchor>();
+            }
+
+            // Validate the ID
+            if (string.IsNullOrEmpty(anchorId))
+            {
+                throw new InvalidOperationException($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
+            }
+
+            // Make sure we have access to the anchor store
+            await EnsureAnchorStoreAsync();
+
+            // Now try to save the anchor itself
+            anchorStore.Save(anchorId, anchor);
         }
 
         /// <summary>
