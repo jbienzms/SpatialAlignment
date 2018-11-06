@@ -54,6 +54,11 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Add converter
             settings.Converters.Add(new SpatialFrameConverter());
 
+            // Enable automatic type name handling to allow extensions for alignment strategies
+            // WARNING: Must implement ISerializationBinder to safely handle instantiation
+            // See https://stackoverflow.com/questions/39565954/typenamehandling-caution-in-newtonsoft-json
+            settings.TypeNameHandling = TypeNameHandling.Auto;
+
             // Create the serializer
             return JsonSerializer.Create(settings);
         }

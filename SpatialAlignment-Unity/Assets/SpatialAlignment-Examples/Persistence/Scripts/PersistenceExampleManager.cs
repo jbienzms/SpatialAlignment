@@ -50,6 +50,7 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         private async Task SaveAsync()
         {
+            string result = null;
             foreach (var frame in Frames)
             {
                 await store.SaveFrameAsync(frame);
@@ -60,9 +61,11 @@ namespace Microsoft.SpatialAlignment.Persistence
                 using (JsonTextWriter jw = new JsonTextWriter(sw))
                 {
                     await store.SaveDocumentAsync(jw);
+                    result = sw.ToString();
                 }
-
             }
+
+            Debug.Log(result);
 
         }
 
@@ -70,7 +73,8 @@ namespace Microsoft.SpatialAlignment.Persistence
         void Start()
         {
             store = new JsonStore();
-            var t = LoadAsync();
+            var t = SaveAsync();
+            t.Wait();
         }
     }
 }

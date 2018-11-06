@@ -27,6 +27,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace Microsoft.SpatialAlignment
@@ -38,13 +39,16 @@ namespace Microsoft.SpatialAlignment
     /// This strategy doesn't modify the transform of the object it's applied to, it simply
     /// simulates the various states of the <see cref="IAlignmentStrategy"/> interface.
     /// </remarks>
+    [DataContract]
     public class SimulatedAlignment : AlignmentStrategy
     {
         #region Unity Inspector Variables
+        [DataMember]
         [SerializeField]
         [Tooltip("The current simulated accuracy.")]
         private Vector3 currentAccuracy;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("The current simulated state.")]
         private AlignmentState currentState = AlignmentState.Resolved;

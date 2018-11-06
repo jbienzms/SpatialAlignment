@@ -23,9 +23,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -42,9 +44,11 @@ namespace Microsoft.SpatialAlignment
     /// more than one frame of reference. The <see cref="ISpatialFrame"/> interface is used
     /// to represent one of potentially many frames of reference.
     /// </remarks>
+    [DataContract]
     public class SpatialFrame : MonoBehaviour
     {
         #region Unity Inspector Variables
+        [DataMember]
         [SerializeField]
         [Tooltip("A unique ID for the spatial frame.")]
         private string id;
@@ -52,6 +56,7 @@ namespace Microsoft.SpatialAlignment
 
         #region Public Properties
         /// <inheritdoc />
+        [DataMember]
         public virtual IAlignmentStrategy AlignmentStrategy { get => GetComponent<IAlignmentStrategy>(); }
 
         /// <inheritdoc />
