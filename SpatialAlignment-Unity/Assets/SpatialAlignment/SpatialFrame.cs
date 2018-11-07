@@ -54,13 +54,48 @@ namespace Microsoft.SpatialAlignment
         private string id;
         #endregion // Unity Inspector Variables
 
+        #region Overridables / Event Triggers
+        /// <summary>
+        /// Occurs when the value of the <see cref="Id"/> property has changed.
+        /// </summary>
+        protected virtual void OnIdChanged()
+        {
+            this.IdChanged?.Invoke(this, EventArgs.Empty);
+        }
+        #endregion // Overridables / Event Triggers
+
         #region Public Properties
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the <see cref="IAlignmentStrategy"/> that is being used to align the frame.
+        /// </summary>
         [DataMember]
         public virtual IAlignmentStrategy AlignmentStrategy { get => GetComponent<IAlignmentStrategy>(); }
 
-        /// <inheritdoc />
-        public virtual string ID { get => id; set => id = value; }
+        /// <summary>
+        /// Gets or sets a unique ID for the frame.
+        /// </summary>
+        /// <remarks>
+        /// A unique ID for the frame.
+        /// </remarks>
+        public virtual string Id
+        {
+            get => id;
+            set
+            {
+                if (id != value)
+                {
+                    id = value;
+                    OnIdChanged();
+                }
+            }
+        }
         #endregion // Public Properties
+
+        #region Public Methods
+        /// <summary>
+        /// Raised when the value of the <see cref="Id"/> property has changed.
+        /// </summary>
+        public event EventHandler IdChanged;
+        #endregion // Public Methods
     }
 }

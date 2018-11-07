@@ -33,36 +33,40 @@ using UnityEngine;
 
 namespace Microsoft.SpatialAlignment.Persistence.Json
 {
-    public class SpatialFrameConverter : JsonConverter
+    public class Vector3Converter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(SpatialFrame).IsAssignableFrom(objectType);
+            return typeof(Vector3).IsAssignableFrom(objectType);
         }
-
-        public override bool CanWrite => false; // Only use for read operations, not write operations.
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            // Instantiate the object the way Unity needs
-            GameObject go = new GameObject();
+            // Deserialize from the reader into a token
+            var token = serializer.Deserialize(reader);
 
-            // Add a SpatialFrame to it
-            SpatialFrame frame = go.AddComponent<SpatialFrame>();
-
-            // Deserialize into the instance
-            serializer.Populate(reader, frame);
-
-            // Update the game object name to match
-            go.name = frame.Id;
-
-            // Return the frame
-            return frame;
+            // Now deserialize the token into a Vector
+            return JsonConvert.DeserializeObject<Vector3>(token.ToString());
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            // We know that value is a Vector3
+            Vector3 vector = (Vector3)value;
+
+            // Start the object
+            writer.WriteStartObject();
+
+            // Write x, y and Z fields
+            writer.WritePropertyName("x");
+            writer.WriteValue(vector.x);
+            writer.WritePropertyName("y");
+            writer.WriteValue(vector.y);
+            writer.WritePropertyName("z");
+            writer.WriteValue(vector.z);
+
+            // Finish the object
+            writer.WriteEndObject();
         }
     }
 }

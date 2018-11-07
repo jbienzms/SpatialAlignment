@@ -84,7 +84,7 @@ namespace Microsoft.SpatialAlignment
             // If no strategy, warn
             if (strategy == null)
             {
-                Debug.LogWarning($"Parent frame '{frame.ID}' has no alignment strategy.");
+                Debug.LogWarning($"Parent frame '{frame.Id}' has no alignment strategy.");
             }
 
             // Check the state

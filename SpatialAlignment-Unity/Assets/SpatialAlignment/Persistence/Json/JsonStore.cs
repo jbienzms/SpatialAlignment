@@ -24,6 +24,7 @@
 //
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
     public class JsonStore : ISpatialAlignmentStore
     {
         #region Member Variables
-        private Dictionary<string, SpatialFrame> frames = new Dictionary<string, SpatialFrame>();
+        private SpatialFrameCollection frames = new SpatialFrameCollection();
         #endregion // Member Variables
 
         #region Internal Methods
@@ -51,8 +52,10 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Make pretty
             settings.Formatting = Formatting.Indented;
 
-            // Add converter
+            // Add converters
             settings.Converters.Add(new SpatialFrameConverter());
+            settings.Converters.Add(new StringEnumConverter());
+            settings.Converters.Add(new Vector3Converter());
 
             // Enable automatic type name handling to allow extensions for alignment strategies
             // WARNING: Must implement ISerializationBinder to safely handle instantiation
@@ -81,7 +84,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Unload all existing objects
             foreach (var frame in frames)
             {
-                GameObject.DestroyImmediate(frame.Value.gameObject);
+                GameObject.DestroyImmediate(frame.gameObject);
             }
             frames.Clear();
 
@@ -92,10 +95,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             var loadedFrames = ser.Deserialize<List<SpatialFrame>>(reader);
 
             // Add each frame to the lookup table
-            foreach (var frame in loadedFrames)
-            {
-                frames[frame.ID] = frame;
-            }
+            frames.AddRange(loadedFrames);
 
             // No tasks to await yet. May move portions of this
             // method into a parallel task.
@@ -109,8 +109,8 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             if (string.IsNullOrEmpty(id)) throw new ArgumentException(nameof(id));
 
             // Try to get from lookup table
-            SpatialFrame frame;
-            frames.TryGetValue(id, out frame);
+            SpatialFrame frame = null;
+            if (frames.Contains(id)) { frame = frames[id]; }
 
             // Return as result
             return Task.FromResult(frame);
@@ -121,12 +121,9 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Validate
             if (writer == null) throw new ArgumentNullException(nameof(writer));
 
-            // Get as list
-            List<SpatialFrame> saveFrames = frames.Values.ToList<SpatialFrame>();
-
             // If any of the alignment strategies uses native persistence,
             // save them first.
-            foreach (SpatialFrame frame in saveFrames)
+            foreach (SpatialFrame frame in frames)
             {
                 INativePersistence np = frame.AlignmentStrategy as INativePersistence;
                 if (np != null)
@@ -139,7 +136,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             JsonSerializer ser = CreateSerializer();
 
             // Serialize the list of frames
-            ser.Serialize(writer, saveFrames);
+            ser.Serialize(writer, frames);
         }
 
         /// <inheritdoc />
@@ -148,14 +145,8 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Validate
             if (frame == null) throw new ArgumentNullException(nameof(frame));
 
-            // Make sure something else doesn't already have this ID
-            if ((frames.ContainsKey(frame.ID) && (frames[frame.ID] != frame)))
-            {
-                throw new InvalidOperationException($"A different frame already exists with ID '{frame.ID}'");
-            }
-
             // Add it into the lookup table
-            frames[frame.ID] = frame;
+            frames.Add(frame);
 
             // Done
             return Task.CompletedTask;

@@ -35,17 +35,68 @@ namespace Microsoft.SpatialAlignment.Persistence
 {
     public class PersistenceExampleManager : MonoBehaviour
     {
+        #region Constants
+        private const string SampleData = @"
+		[
+		  {
+			""id"": ""Parent1"",
+			""AlignmentStrategy"": {
+			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
+			  ""currentAccuracy"": {
+				""x"": 0.0,
+				""y"": 0.0,
+				""z"": 0.0
+			  },
+			  ""currentState"": ""Resolved""
+			}
+		  },
+		  {
+			""id"": ""Parent2"",
+			""AlignmentStrategy"": {
+			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
+			  ""currentAccuracy"": {
+				""x"": 0.0,
+				""y"": 0.0,
+				""z"": 0.0
+			  },
+			  ""currentState"": ""Resolved""
+			}
+		},
+		  {
+			""id"": ""Parent3"",
+			""AlignmentStrategy"": {
+			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
+			  ""currentAccuracy"": {
+				""x"": 0.0,
+				""y"": 0.0,
+				""z"": 0.0
+			  },
+			  ""currentState"": ""Resolved""
+			}
+		  }
+		]";
+        #endregion // Constants
+
         #region Member Variables
         private JsonStore store;
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [SerializeField]
         public List<SpatialFrame> Frames = new List<SpatialFrame>();
         #endregion // Unity Inspector Variables
 
         private async Task LoadAsync()
         {
+            using (StringReader sr = new StringReader(SampleData))
+            {
+                using (JsonTextReader jr = new JsonTextReader(sr))
+                {
+                    await store.LoadDocumentAsync(jr);
+                }
+            }
 
+            // Debug.Log($"Loaded {} frames.");
         }
 
         private async Task SaveAsync()
@@ -73,7 +124,8 @@ namespace Microsoft.SpatialAlignment.Persistence
         void Start()
         {
             store = new JsonStore();
-            var t = SaveAsync();
+            // var t = SaveAsync();
+            var t = LoadAsync();
             t.Wait();
         }
     }

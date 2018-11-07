@@ -831,8 +831,10 @@
     <Compile Include="Assets\SpatialAlignment\Persistence\ISpatialAlignmentStore.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\JsonStore.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\SpatialFrameConverter.cs" />
+    <Compile Include="Assets\SpatialAlignment\Persistence\Json\Vector3Converter.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialAlignmentManager.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrame.cs" />
+    <Compile Include="Assets\SpatialAlignment\SpatialFrameCollection.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\AlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\IAlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\MultiParentAlignment.cs" />
