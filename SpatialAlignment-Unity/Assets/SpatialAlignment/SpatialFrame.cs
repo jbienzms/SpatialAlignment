@@ -23,6 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,18 @@ namespace Microsoft.SpatialAlignment
         /// Gets the <see cref="IAlignmentStrategy"/> that is being used to align the frame.
         /// </summary>
         [DataMember]
-        public virtual IAlignmentStrategy AlignmentStrategy { get => GetComponent<IAlignmentStrategy>(); }
+        // [JsonProperty(ItemConverterType = typeof(AlignmentStrategyConverter))]
+        public virtual IAlignmentStrategy AlignmentStrategy
+        {
+            get
+            {
+                return GetComponent<IAlignmentStrategy>();
+            }
+            set
+            {
+                var v = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a unique ID for the frame.

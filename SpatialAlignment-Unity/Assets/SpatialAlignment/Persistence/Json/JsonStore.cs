@@ -52,8 +52,12 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Make pretty
             settings.Formatting = Formatting.Indented;
 
+            // Use custom contract resolver (handles Unity-specific instantiation)
+            settings.ContractResolver = new SpatialContractResolver();
+
             // Add converters
-            settings.Converters.Add(new SpatialFrameConverter());
+            // settings.Converters.Add(new AlignmentStrategyConverter());
+            // settings.Converters.Add(new SpatialFrameConverter());
             settings.Converters.Add(new StringEnumConverter());
             settings.Converters.Add(new Vector3Converter());
 

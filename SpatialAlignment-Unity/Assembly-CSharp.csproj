@@ -829,8 +829,11 @@
     <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\UnityARSessionNativeInterface.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\INativePersistence.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\ISpatialAlignmentStore.cs" />
+    <Compile Include="Assets\SpatialAlignment\Persistence\Json\AlignmentStrategyConverter.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\JsonStore.cs" />
+    <Compile Include="Assets\SpatialAlignment\Persistence\Json\SpatialContractResolver.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\SpatialFrameConverter.cs" />
+    <Compile Include="Assets\SpatialAlignment\Persistence\Json\UnityContractResolver.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\Vector3Converter.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialAlignmentManager.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrame.cs" />
