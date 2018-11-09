@@ -835,6 +835,7 @@
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\SpatialFrameConverter.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\UnityContractResolver.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\Vector3Converter.cs" />
+    <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinableAnchor.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialAlignmentManager.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrame.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrameCollection.cs" />
@@ -845,6 +846,7 @@
     <Compile Include="Assets\SpatialAlignment\Strategies\SimulatedAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\WorldAnchorAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
+    <Compile Include="Assets\SpatialAlignment-Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <None Include="Assets\HoloToolkit\Utilities\Scripts\GLTF\Shaders\GLTFConstant.cginc" />
     <None Include="Assets\HoloToolkit\Common\Shaders\Obsolete\UnlitConfigurable.shader" />
     <None Include="Assets\HoloToolkit\UX\Shaders\HUXButtonShader.shader" />
