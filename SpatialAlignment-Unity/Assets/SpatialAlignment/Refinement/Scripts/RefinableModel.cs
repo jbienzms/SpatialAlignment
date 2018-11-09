@@ -34,46 +34,48 @@ using UnityEngine;
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// Defines the various modes of a <see cref="RefinableAnchor"/>.
+    /// Defines the various modes of a <see cref="RefinableModel"/>.
     /// </summary>
-    public enum RefinableAnchorMode
+    public enum RefinableModelMode
     {
         /// <summary>
-        /// The anchor is in the default "placed" mode.
+        /// The model is in the default "placed" mode.
         /// </summary>
         Placed,
 
         /// <summary>
-        /// The anchor is in the process of being placed.
+        /// The model is in the process of being placed. <see cref="Placing"/>
+        /// is usually a quick "rough draft" positioning of the object
+        /// that is then followed up with <see cref="Refining"/>.
         /// </summary>
         Placing,
 
         /// <summary>
-        /// The anchor position or orientation is being refined.
+        /// The position or orientation of the model is being refined.
         /// </summary>
         Refining
     }
 
     /// <summary>
-    /// Represents an anchor in space that can be positioned and
+    /// Represents an model in space that can be positioned and
     /// updated by the user interactively.
     /// </summary>
     [RequireComponent(typeof(BoundingBoxRig))]
     [RequireComponent(typeof(TapToPlace))]
     [RequireComponent(typeof(TwoHandManipulatable))]
-    public class RefinableAnchor : MonoBehaviour
+    public class RefinableModel : MonoBehaviour
     {
         #region Member Variables
         private BoundingBoxRig boundingBoxRig;
-        private RefinableAnchorMode mode;
+        private RefinableModelMode lastMode;
         private TapToPlace tapToPlace;
         private TwoHandManipulatable twoHandManipulatable;
         #endregion // Member Variables
 
         #region Unity Inspector Variables
         [SerializeField]
-        [Tooltip("The mode that the anchor should start in.")]
-        private RefinableAnchorMode startMode;
+        [Tooltip("The mode of the current model.")]
+        private RefinableModelMode mode;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -88,42 +90,44 @@ namespace Microsoft.SpatialAlignment
             twoHandManipulatable = GetComponent<TwoHandManipulatable>();
             if (boundingBoxRig == null)
             {
-                Debug.LogError($"A {nameof(BoundingBoxRig)} component is required but none was found. {nameof(RefinableAnchor)} has been disabled.");
+                Debug.LogError($"A {nameof(BoundingBoxRig)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
             if (tapToPlace == null)
             {
-                Debug.LogError($"A {nameof(TapToPlace)} component is required but none was found. {nameof(RefinableAnchor)} has been disabled.");
+                Debug.LogError($"A {nameof(TapToPlace)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
             if (twoHandManipulatable == null)
             {
-                Debug.LogError($"A {nameof(TwoHandManipulatable)} component is required but none was found. {nameof(RefinableAnchor)} has been disabled.");
+                Debug.LogError($"A {nameof(TwoHandManipulatable)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
         }
 
         /// <summary>
-        /// Switches the UI and interactive elements of the anchor to enable
+        /// Switches the UI and interactive elements of the model to enable
         /// the specified mode.
         /// </summary>
         /// <param name="newMode">
         /// The mode to switch to.
         /// </param>
-        protected virtual void SwitchMode(RefinableAnchorMode newMode)
+        protected virtual void SwitchMode(RefinableModelMode newMode)
         {
             switch (newMode)
             {
-                case RefinableAnchorMode.Placed:
+                case RefinableModelMode.Placed:
                     // Disable all
-                    boundingBoxRig.enabled = false;
+                    boundingBoxRig.Deactivate();
+                    // boundingBoxRig.enabled = false;
                     tapToPlace.enabled = false;
                     twoHandManipulatable.enabled = false;
                     break;
 
-                case RefinableAnchorMode.Placing:
+                case RefinableModelMode.Placing:
                     // Disable bounds and hands
-                    boundingBoxRig.enabled = false;
+                    boundingBoxRig.Deactivate();
+                    // boundingBoxRig.enabled = false;
                     twoHandManipulatable.enabled = false;
 
                     // Enable and start Tap to Place
@@ -131,14 +135,15 @@ namespace Microsoft.SpatialAlignment
                     tapToPlace.IsBeingPlaced = true;
                     break;
 
-                case RefinableAnchorMode.Refining:
+                case RefinableModelMode.Refining:
                     // Stop and disable Tap to Place
                     tapToPlace.IsBeingPlaced = false;
                     tapToPlace.enabled = false;
 
-                    // Enable bounds and hands
-                    boundingBoxRig.enabled = true;
+                    // Enable hands and bounds and put in adjust mode
                     twoHandManipulatable.enabled = true;
+                    // boundingBoxRig.enabled = true;
+                    boundingBoxRig.Activate();
                     break;
 
                 default:
@@ -146,6 +151,7 @@ namespace Microsoft.SpatialAlignment
             }
 
             // Store new mode
+            lastMode = newMode;
             mode = newMode;
 
             // Notify
@@ -173,31 +179,38 @@ namespace Microsoft.SpatialAlignment
             // Gather dependencies
             GatherComponents();
 
-            // Switch to the starting mode
-            SwitchMode(startMode);
+            // Switch to the starting mode to ensure
+            // all visuals are set correctly
+            SwitchMode(mode);
+        }
+
+        /// <summary>
+        /// Update is called once per frame
+        /// </summary>
+        protected virtual void Update()
+        {
+            if (lastMode != mode)
+            {
+                SwitchMode(mode);
+            }
         }
         #endregion // Unity Overrides
 
         #region Public Properties
         /// <summary>
-        /// Gets the current mode of the anchor.
+        /// Gets the current mode of the model.
         /// </summary>
-        public RefinableAnchorMode Mode
+        public RefinableModelMode Mode
         {
             get => mode;
             set
             {
-                if (mode != value)
+                if (lastMode != value)
                 {
                     SwitchMode(value);
                 }
             }
         }
-
-        /// <summary>
-        /// Gets or sets the mode that the anchor should start in.
-        /// </summary>
-        public RefinableAnchorMode StartMode { get => startMode; set => startMode = value; }
         #endregion // Public Properties
 
         #region Public Events
