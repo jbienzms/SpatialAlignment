@@ -572,6 +572,18 @@ MonoBehaviour:
     scale: {x: 0.3, y: 0.3, z: 0.3}
   referenceTransform: {fileID: 0}
   updateFrequency: 1
+--- !u!114 &770035350 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8585153564237688258, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
+    type: 3}
+  m_PrefabInstance: {fileID: 7741485009986127323}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a5bb127cefd14d48861c04fc787a0d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &992500263
 GameObject:
   m_ObjectHideFlags: 0
@@ -1239,11 +1251,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: RefinableAnchor
       objectReference: {fileID: 0}
-    - target: {fileID: 6140007148329196887, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
-        type: 3}
-      propertyPath: mode
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6140007148329196883, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
         type: 3}
       propertyPath: m_Enabled
@@ -1254,5 +1261,15 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6140007148329196887, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
+        type: 3}
+      propertyPath: mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9032341044956441394, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
+        type: 3}
+      propertyPath: buttons.Array.data[0].EventTarget
+      value: 
+      objectReference: {fileID: 770035350}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 65fa06b8557cfec4aa35d0d5913ccc38, type: 3}

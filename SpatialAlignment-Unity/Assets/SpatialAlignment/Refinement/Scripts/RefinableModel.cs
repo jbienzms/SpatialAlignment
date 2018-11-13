@@ -24,12 +24,15 @@
 //
 
 using HoloToolkit.Unity.InputModule.Utilities.Interactions;
+using HoloToolkit.Unity.Receivers;
 using HoloToolkit.Unity.SpatialMapping;
 using HoloToolkit.Unity.UX;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using HoloToolkit.Unity.InputModule;
 
 namespace Microsoft.SpatialAlignment
 {
@@ -63,7 +66,7 @@ namespace Microsoft.SpatialAlignment
     [RequireComponent(typeof(BoundingBoxRig))]
     [RequireComponent(typeof(TapToPlace))]
     [RequireComponent(typeof(TwoHandManipulatable))]
-    public class RefinableModel : MonoBehaviour
+    public class RefinableModel : InteractionReceiver
     {
         #region Member Variables
         private BoundingBoxRig boundingBoxRig;
@@ -79,15 +82,33 @@ namespace Microsoft.SpatialAlignment
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
+        private void EnsureFinishButton()
+        {
+            //// HACK: Wire up "Finished" button
+            //GameObject finishedObject = boundingBoxRig?.AppBarInstance?.interactables.Where(i => i.name == "Finished").FirstOrDefault();
+            //if (finishedObject == null)
+            //{
+            //    Debug.LogError($"An interactible named 'Finished' is required in the AppBar but was not found. {nameof(RefinableModel)} has been disabled.");
+            //    this.enabled = false;
+            //}
+            //else
+            //{
+            //    Registerinteractable(finishedObject);
+            //}
+        }
+
         /// <summary>
         /// Gathers all dependency components and disables the behavior if a
         /// dependency is not found.
         /// </summary>
         protected virtual void GatherComponents()
         {
+            // Get components
             boundingBoxRig = GetComponent<BoundingBoxRig>();
             tapToPlace = GetComponent<TapToPlace>();
             twoHandManipulatable = GetComponent<TwoHandManipulatable>();
+
+            // Validate components
             if (boundingBoxRig == null)
             {
                 Debug.LogError($"A {nameof(BoundingBoxRig)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
@@ -103,6 +124,20 @@ namespace Microsoft.SpatialAlignment
                 Debug.LogError($"A {nameof(TwoHandManipulatable)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
+
+            //// Add a 'Finished' button
+            //List<AppBar.ButtonTemplate> buttons = boundingBoxRig.AppBarPrefab.Buttons.ToList();
+            //buttons.Add(new AppBar.ButtonTemplate()
+            //{
+            //    DefaultPosition = 1,
+            //    ManipulationPosition = 1,
+            //    Type = AppBar.ButtonTypeEnum.Custom,
+            //    Name = "Finished",
+            //    Icon = "AppBarDone",
+            //    Text = "Finished",
+            //    EventTarget = this,
+            //});
+            //boundingBoxRig.AppBarPrefab.Buttons = buttons.ToArray();
         }
 
         /// <summary>
@@ -117,9 +152,15 @@ namespace Microsoft.SpatialAlignment
             switch (newMode)
             {
                 case RefinableModelMode.Placed:
-                    // Disable all
+                    // Collapse the AppBar
+                    if (boundingBoxRig.AppBarInstance != null)
+                    {
+                        boundingBoxRig.AppBarInstance.State = AppBar.AppBarStateEnum.Default;
+                    }
+
+                    // Deactivate BoundingBoxRig
                     boundingBoxRig.Deactivate();
-                    // boundingBoxRig.enabled = false;
+
                     tapToPlace.enabled = false;
                     twoHandManipulatable.enabled = false;
                     break;
@@ -136,6 +177,8 @@ namespace Microsoft.SpatialAlignment
                     break;
 
                 case RefinableModelMode.Refining:
+                    EnsureFinishButton();
+
                     // Stop and disable Tap to Place
                     tapToPlace.IsBeingPlaced = false;
                     tapToPlace.enabled = false;
@@ -159,7 +202,30 @@ namespace Microsoft.SpatialAlignment
         }
         #endregion // Internal Methods
 
+        #region Overrides / Event Handlers
+        /// <inheritdoc />
+        protected override void InputClicked(GameObject obj, InputClickedEventData eventData)
+        {
+            // Pass to base first
+            base.InputClicked(obj, eventData);
+
+            // If it's the Finished button, finish
+            if (obj.name == "Finished")
+            {
+                Finish();
+            }
+        }
+        #endregion // Overrides / Event Handlers
+
         #region Overridables / Event Triggers
+        /// <summary>
+        /// Called when the user has finished refining the model.
+        /// </summary>
+        protected virtual void OnFinished()
+        {
+            Finished?.Invoke(this, EventArgs.Empty);
+        }
+
         /// <summary>
         /// Called when the value of the <see cref="Mode"/> property has
         /// changed.
@@ -196,6 +262,15 @@ namespace Microsoft.SpatialAlignment
         }
         #endregion // Unity Overrides
 
+        /// <summary>
+        /// Notifies that the user has finished refining the model.
+        /// </summary>
+        public void Finish()
+        {
+            Mode = RefinableModelMode.Placed;
+            OnFinished();
+        }
+
         #region Public Properties
         /// <summary>
         /// Gets the current mode of the model.
@@ -214,6 +289,11 @@ namespace Microsoft.SpatialAlignment
         #endregion // Public Properties
 
         #region Public Events
+        /// <summary>
+        /// Raised when the user has finished refining the model.
+        /// </summary>
+        public event EventHandler Finished;
+
         /// <summary>
         /// Raised when the value of the <see cref="Mode"/> property has
         /// changed.
