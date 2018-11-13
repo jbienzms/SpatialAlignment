@@ -33,100 +33,150 @@ using UnityEngine;
 
 namespace Microsoft.SpatialAlignment.Persistence
 {
+    /// <summary>
+    /// An example manager that shows how to add and edit refinement anchors.
+    /// </summary>
     public class RefinementExampleManager : MonoBehaviour
     {
-        #region Constants
-        private const string SampleData = @"
-		[
-		  {
-			""id"": ""Parent1"",
-			""AlignmentStrategy"": {
-			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-			  ""currentAccuracy"": {
-				""x"": 0.0,
-				""y"": 0.0,
-				""z"": 0.0
-			  },
-			  ""currentState"": ""Resolved""
-			}
-		  },
-		  {
-			""id"": ""Parent2"",
-			""AlignmentStrategy"": {
-			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-			  ""currentAccuracy"": {
-				""x"": 0.0,
-				""y"": 0.0,
-				""z"": 0.0
-			  },
-			  ""currentState"": ""Resolved""
-			}
-		},
-		  {
-			""id"": ""Parent3"",
-			""AlignmentStrategy"": {
-			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-			  ""currentAccuracy"": {
-				""x"": 0.0,
-				""y"": 0.0,
-				""z"": 0.0
-			  },
-			  ""currentState"": ""Resolved""
-			}
-		  }
-		]";
-        #endregion // Constants
-
         #region Member Variables
-        private JsonStore store;
+        private RefinableModel newAnchor;
+        private SpatialFrameCollection frames = new SpatialFrameCollection();
         #endregion // Member Variables
 
         #region Unity Inspector Variables
         [SerializeField]
-        public List<SpatialFrame> Frames = new List<SpatialFrame>();
+        [Tooltip("The container for all refining anchors.")]
+        private GameObject anchorContainer;
+
+        [SerializeField]
+        [Tooltip("The prefab used represent an anchor.")]
+        private GameObject anchorPrefab;
+
+        [SerializeField]
+        [Tooltip("The large-scale model.")]
+        private GameObject model;
         #endregion // Unity Inspector Variables
 
-        private async Task LoadAsync()
+        #region Unity Overrides
+        /// <summary>
+        /// Start is called before the first frame update
+        /// </summary>
+        protected virtual void Start()
         {
-            using (StringReader sr = new StringReader(SampleData))
+            if (anchorContainer == null)
             {
-                using (JsonTextReader jr = new JsonTextReader(sr))
-                {
-                    await store.LoadDocumentAsync(jr);
-                }
+                anchorContainer = new GameObject("Anchor Container");
             }
 
-            // Debug.Log($"Loaded {} frames.");
-        }
-
-        private async Task SaveAsync()
-        {
-            string result = null;
-            foreach (var frame in Frames)
+            if (anchorPrefab == null)
             {
-                await store.SaveFrameAsync(frame);
+                Debug.LogError($"{nameof(anchorPrefab)} is required but is not set. {nameof(RefinementExampleManager)} has been disabled.");
+                this.enabled = false;
             }
 
-            using (StringWriter sw = new StringWriter())
+            if (model == null)
             {
-                using (JsonTextWriter jw = new JsonTextWriter(sw))
-                {
-                    await store.SaveDocumentAsync(jw);
-                    result = sw.ToString();
-                }
+                Debug.LogError($"{nameof(model)} is required but is not set. {nameof(RefinementExampleManager)} has been disabled.");
+                this.enabled = false;
             }
-
-            Debug.Log(result);
-
         }
+        #endregion // Unity Overrides
 
-        // Start is called before the first frame update
-        void Start()
+        #region Public Methods
+        /// <summary>
+        /// Begins the process of adding a refinement anchor.
+        /// </summary>
+        public void BeginAddRefinement()
         {
-            store = new JsonStore();
-            // var t = SaveAsync();
-            var t = LoadAsync();
-            t.Wait();
+            // Hide the large-scale model
+            HideModel();
+
+            // Instantiate the anchor prefab
+            GameObject anchorGO = GameObject.Instantiate(anchorPrefab);
+
+            // Set the parent
+            anchorGO.transform.SetParent(anchorContainer.transform, worldPositionStays: true);
+
+            // Get or create the refining behavior
+            newAnchor = anchorGO.GetComponent<RefinableModel>();
+            if (newAnchor == null) { newAnchor = anchorGO.AddComponent<RefinableModel>(); }
+
+            // Put the refining behavior in placement mode
+            newAnchor.Mode = RefinableModelMode.Placing;
         }
+
+        /// <summary>
+        /// Cancels the process of adding a refinement anchor.
+        /// </summary>
+        public void CancelAddRefinement()
+        {
+            // Delete the anchor
+            DestroyImmediate(newAnchor);
+            newAnchor = null;
+
+            // Show the model
+            ShowModel();
+        }
+
+        /// <summary>
+        /// Completes the process of adding a refinement anchor.
+        /// </summary>
+        public void EndAddRefinement()
+        {
+            // TODO: Save the anchor
+
+            // Show the model
+            ShowModel();
+        }
+
+        /// <summary>
+        /// Hides all refinement anchors.
+        /// </summary>
+        public void HideAnchors()
+        {
+
+        }
+
+        /// <summary>
+        /// Hides the model.
+        /// </summary>
+        public void HideModel()
+        {
+            model.SetActive(false);
+        }
+
+        /// <summary>
+        /// Shows all refinement anchors.
+        /// </summary>
+        public void ShowAnchors()
+        {
+
+        }
+
+        /// <summary>
+        /// Shows the model.
+        /// </summary>
+        public void ShowModel()
+        {
+            model.SetActive(true);
+        }
+        #endregion // Public Methods
+
+        #region Public Properties
+        /// <summary>
+        /// Gets or sets the container for all refining anchors.
+        /// </summary>
+        public GameObject AnchorContainer { get => anchorContainer; set => anchorContainer = value; }
+
+        /// <summary>
+        /// Gets or sets The prefab used represent an anchor.
+        /// </summary>
+        public GameObject AnchorPrefab { get => anchorPrefab; set => anchorPrefab = value; }
+
+        /// <summary>
+        /// Gets or sets the large-scale model.
+        /// </summary>
+        public GameObject Model { get => model; set => model = value; }
+        #endregion // Public Properties
     }
 }

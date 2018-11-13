@@ -248,7 +248,7 @@ MonoBehaviour:
   rotateAroundPivot: 1
   boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
     type: 3}
-  appBarPrefab: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+  appBarPrefab: {fileID: 114050950401502068, guid: d685d9c2f70fafb4aac95938c3996f64,
     type: 3}
 --- !u!114 &6140007148329196892
 MonoBehaviour:
@@ -333,4 +333,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5bb127cefd14d48861c04fc787a0d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startMode: 0
+  mode: 0
