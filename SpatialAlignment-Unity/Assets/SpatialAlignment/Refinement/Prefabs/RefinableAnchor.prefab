@@ -1,23 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!4 &8997232597319051434 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c,
-    type: 3}
-  m_PrefabInstance: {fileID: 8992671334625771590}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &9032341044956441394 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-    type: 3}
-  m_PrefabInstance: {fileID: 8992671334625771590}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80c870726057bb743b9c4f8faa604b98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3085669558037708234
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +150,7 @@ MonoBehaviour:
   interactables: []
   Targets: []
   lockFocus: 0
-  mode: 0
+  refinementMode: 0
 --- !u!1 &3085926608004584324
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,6 +337,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &8997232597319051434 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c,
+    type: 3}
+  m_PrefabInstance: {fileID: 8992671334625771590}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9032341044956441394 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+    type: 3}
+  m_PrefabInstance: {fileID: 8992671334625771590}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80c870726057bb743b9c4f8faa604b98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8992671334625771590
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -362,11 +362,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6140007148329025917}
     m_Modifications:
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.size
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -417,6 +412,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
         type: 3}
+      propertyPath: buttons.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
       propertyPath: buttons.Array.data[0].OnTappedEvent.m_TypeName
       value: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
@@ -434,7 +434,7 @@ PrefabInstance:
     - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
         type: 3}
       propertyPath: buttons.Array.data[0].Name
-      value: Finished
+      value: Finish
       objectReference: {fileID: 0}
     - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
         type: 3}
@@ -444,11 +444,52 @@ PrefabInstance:
     - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
         type: 3}
       propertyPath: buttons.Array.data[0].Text
-      value: Finished
+      value: Finish
       objectReference: {fileID: 0}
     - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
         type: 3}
       propertyPath: buttons.Array.data[0].EventTarget
+      value: 
+      objectReference: {fileID: 8585153564237688258}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: UseRemove
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: buttons.Array.data[1].OnTappedEvent.m_TypeName
+      value: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: buttons.Array.data[1].DefaultPosition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: buttons.Array.data[1].ManipulationPosition
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: buttons.Array.data[1].Name
+      value: Cancel
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: buttons.Array.data[1].Icon
+      value: KeyboardKeyGlyphs_Close
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: buttons.Array.data[1].Text
+      value: Cancel
+      objectReference: {fileID: 0}
+    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+        type: 3}
+      propertyPath: buttons.Array.data[1].EventTarget
       value: 
       objectReference: {fileID: 8585153564237688258}
     m_RemovedComponents: []

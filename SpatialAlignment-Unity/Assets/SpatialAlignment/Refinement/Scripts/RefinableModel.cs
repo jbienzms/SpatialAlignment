@@ -39,7 +39,7 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// Defines the various modes of a <see cref="RefinableModel"/>.
     /// </summary>
-    public enum RefinableModelMode
+    public enum RefinementMode
     {
         /// <summary>
         /// The model is in the default "placed" mode.
@@ -70,38 +70,26 @@ namespace Microsoft.SpatialAlignment
     {
         #region Member Variables
         private BoundingBoxRig boundingBoxRig;
-        private RefinableModelMode lastMode;
+        private RefinementMode lastMode;
+        private Vector3 lastPosition;
+        private Quaternion lastRotation;
         private TapToPlace tapToPlace;
         private TwoHandManipulatable twoHandManipulatable;
+        private bool wasBeingPlaced;
         #endregion // Member Variables
 
         #region Unity Inspector Variables
         [SerializeField]
-        [Tooltip("The mode of the current model.")]
-        private RefinableModelMode mode;
+        [Tooltip("The refinement mode of the current model.")]
+        private RefinementMode refinementMode;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
-        private void EnsureFinishButton()
-        {
-            //// HACK: Wire up "Finished" button
-            //GameObject finishedObject = boundingBoxRig?.AppBarInstance?.interactables.Where(i => i.name == "Finished").FirstOrDefault();
-            //if (finishedObject == null)
-            //{
-            //    Debug.LogError($"An interactible named 'Finished' is required in the AppBar but was not found. {nameof(RefinableModel)} has been disabled.");
-            //    this.enabled = false;
-            //}
-            //else
-            //{
-            //    Registerinteractable(finishedObject);
-            //}
-        }
-
         /// <summary>
         /// Gathers all dependency components and disables the behavior if a
         /// dependency is not found.
         /// </summary>
-        protected virtual void GatherComponents()
+        protected virtual void GatherDependencies()
         {
             // Get components
             boundingBoxRig = GetComponent<BoundingBoxRig>();
@@ -141,17 +129,35 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
+        /// Restores the last transform to the current transform.
+        /// </summary>
+        private void RestoreLastTransform()
+        {
+            transform.position = lastPosition;
+            transform.rotation = lastRotation;
+        }
+
+        /// <summary>
+        /// Saves the current transform as the last transform.
+        /// </summary>
+        private void SaveLastTransform()
+        {
+            lastPosition = transform.position;
+            lastRotation = transform.rotation;
+        }
+
+        /// <summary>
         /// Switches the UI and interactive elements of the model to enable
         /// the specified mode.
         /// </summary>
         /// <param name="newMode">
         /// The mode to switch to.
         /// </param>
-        protected virtual void SwitchMode(RefinableModelMode newMode)
+        protected virtual void SwitchMode(RefinementMode newMode)
         {
             switch (newMode)
             {
-                case RefinableModelMode.Placed:
+                case RefinementMode.Placed:
                     // Collapse the AppBar
                     if (boundingBoxRig.AppBarInstance != null)
                     {
@@ -165,7 +171,10 @@ namespace Microsoft.SpatialAlignment
                     twoHandManipulatable.enabled = false;
                     break;
 
-                case RefinableModelMode.Placing:
+                case RefinementMode.Placing:
+                    // Save transform in case of cancellation
+                    SaveLastTransform();
+
                     // Disable bounds and hands
                     boundingBoxRig.Deactivate();
                     // boundingBoxRig.enabled = false;
@@ -176,8 +185,9 @@ namespace Microsoft.SpatialAlignment
                     tapToPlace.IsBeingPlaced = true;
                     break;
 
-                case RefinableModelMode.Refining:
-                    EnsureFinishButton();
+                case RefinementMode.Refining:
+                    // Save transform in case of cancellation
+                    SaveLastTransform();
 
                     // Stop and disable Tap to Place
                     tapToPlace.IsBeingPlaced = false;
@@ -195,7 +205,7 @@ namespace Microsoft.SpatialAlignment
 
             // Store new mode
             lastMode = newMode;
-            mode = newMode;
+            refinementMode = newMode;
 
             // Notify
             OnModeChanged();
@@ -209,30 +219,42 @@ namespace Microsoft.SpatialAlignment
             // Pass to base first
             base.InputClicked(obj, eventData);
 
-            // If it's the Finished button, finish
-            if (obj.name == "Finished")
+            // If it's any of our buttons, do the right action.
+            if (obj.name == "Finish")
             {
-                Finish();
+                FinishRefinement();
+            }
+            else if (obj.name == "Cancel")
+            {
+                CancelRefinement();
             }
         }
         #endregion // Overrides / Event Handlers
 
         #region Overridables / Event Triggers
         /// <summary>
-        /// Called when the user has finished refining the model.
+        /// Called when the user has canceled refining the model.
         /// </summary>
-        protected virtual void OnFinished()
+        protected virtual void OnCanceledRefinement()
         {
-            Finished?.Invoke(this, EventArgs.Empty);
+            CanceledRefinement?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
-        /// Called when the value of the <see cref="Mode"/> property has
+        /// Called when the user has finished refining the model.
+        /// </summary>
+        protected virtual void OnFinishedRefinement()
+        {
+            FinishedRefinement?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Called when the value of the <see cref="RefinementMode"/> property has
         /// changed.
         /// </summary>
         protected virtual void OnModeChanged()
         {
-            ModeChanged?.Invoke(this, EventArgs.Empty);
+            RefinementModeChanged?.Invoke(this, EventArgs.Empty);
         }
         #endregion // Overridables / Event Triggers
 
@@ -243,11 +265,11 @@ namespace Microsoft.SpatialAlignment
         protected virtual void Start()
         {
             // Gather dependencies
-            GatherComponents();
+            GatherDependencies();
 
             // Switch to the starting mode to ensure
             // all visuals are set correctly
-            SwitchMode(mode);
+            SwitchMode(refinementMode);
         }
 
         /// <summary>
@@ -255,29 +277,58 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         protected virtual void Update()
         {
-            if (lastMode != mode)
+            // Check for a mode change from editor inspector
+            if (lastMode != refinementMode)
             {
-                SwitchMode(mode);
+                SwitchMode(refinementMode);
+            }
+
+            // Check for tap-to-place complete
+            if (tapToPlace != null)
+            {
+                if ((wasBeingPlaced) && (!tapToPlace.IsBeingPlaced))
+                {
+                    SwitchMode(RefinementMode.Placed);
+                }
+                wasBeingPlaced = tapToPlace.IsBeingPlaced;
             }
         }
         #endregion // Unity Overrides
 
+        #region Public Methods
+        /// <summary>
+        /// Notifies that the user has canceled refining the model.
+        /// </summary>
+        public void CancelRefinement()
+        {
+            if (refinementMode != RefinementMode.Placed)
+            {
+                RestoreLastTransform();
+                RefinementMode = RefinementMode.Placed;
+                OnCanceledRefinement();
+            }
+        }
+
         /// <summary>
         /// Notifies that the user has finished refining the model.
         /// </summary>
-        public void Finish()
+        public void FinishRefinement()
         {
-            Mode = RefinableModelMode.Placed;
-            OnFinished();
+            if (refinementMode != RefinementMode.Placed)
+            {
+                RefinementMode = RefinementMode.Placed;
+                OnFinishedRefinement();
+            }
         }
+        #endregion // Public Methods
 
         #region Public Properties
         /// <summary>
         /// Gets the current mode of the model.
         /// </summary>
-        public RefinableModelMode Mode
+        public RefinementMode RefinementMode
         {
-            get => mode;
+            get => refinementMode;
             set
             {
                 if (lastMode != value)
@@ -290,15 +341,20 @@ namespace Microsoft.SpatialAlignment
 
         #region Public Events
         /// <summary>
-        /// Raised when the user has finished refining the model.
+        /// Raised when the user has canceled refining the model.
         /// </summary>
-        public event EventHandler Finished;
+        public event EventHandler CanceledRefinement;
 
         /// <summary>
-        /// Raised when the value of the <see cref="Mode"/> property has
+        /// Raised when the user has finished refining the model.
+        /// </summary>
+        public event EventHandler FinishedRefinement;
+
+        /// <summary>
+        /// Raised when the value of the <see cref="RefinementMode"/> property has
         /// changed.
         /// </summary>
-        public event EventHandler ModeChanged;
+        public event EventHandler RefinementModeChanged;
         #endregion // Public Events
     }
 }

@@ -51,7 +51,7 @@ namespace Microsoft.SpatialAlignment
 
         [SerializeField]
         [Tooltip("Whether the anchor should be loaded when the behavior starts.")]
-        private bool loadOnStart = true;
+        private bool loadOnStart = false;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -147,7 +147,8 @@ namespace Microsoft.SpatialAlignment
             if (string.IsNullOrEmpty(anchorId))
             {
                 State = AlignmentState.Error;
-                throw new InvalidOperationException($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
+                Debug.LogError($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
+                return false;
             }
 
             // Make sure we have access to the anchor store
