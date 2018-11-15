@@ -64,12 +64,15 @@ namespace Microsoft.SpatialAlignment
     /// updated by the user interactively.
     /// </summary>
     [RequireComponent(typeof(BoundingBoxRig))]
+    [RequireComponent(typeof(Collider))]
     [RequireComponent(typeof(TapToPlace))]
     [RequireComponent(typeof(TwoHandManipulatable))]
     public class RefinableModel : InteractionReceiver
     {
         #region Member Variables
         private BoundingBoxRig boundingBoxRig;
+        private Collider collider;
+        private bool firstUpdate = true;
         private RefinementMode lastMode;
         private Vector3 lastPosition;
         private Quaternion lastRotation;
@@ -93,6 +96,7 @@ namespace Microsoft.SpatialAlignment
         {
             // Get components
             boundingBoxRig = GetComponent<BoundingBoxRig>();
+            collider = GetComponent<Collider>();
             tapToPlace = GetComponent<TapToPlace>();
             twoHandManipulatable = GetComponent<TwoHandManipulatable>();
 
@@ -100,6 +104,11 @@ namespace Microsoft.SpatialAlignment
             if (boundingBoxRig == null)
             {
                 Debug.LogError($"A {nameof(BoundingBoxRig)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
+                this.enabled = false;
+            }
+            if (collider == null)
+            {
+                Debug.LogError($"A {nameof(Collider)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
             if (tapToPlace == null)
@@ -164,9 +173,13 @@ namespace Microsoft.SpatialAlignment
                         boundingBoxRig.AppBarInstance.State = AppBar.AppBarStateEnum.Default;
                     }
 
+                    // Disable collider
+                    collider.enabled = false;
+
                     // Deactivate BoundingBoxRig
                     boundingBoxRig.Deactivate();
 
+                    // Disable tap and hands
                     tapToPlace.enabled = false;
                     twoHandManipulatable.enabled = false;
                     break;
@@ -180,6 +193,9 @@ namespace Microsoft.SpatialAlignment
                     // boundingBoxRig.enabled = false;
                     twoHandManipulatable.enabled = false;
 
+                    // Disable collider
+                    collider.enabled = false;
+
                     // Enable and start Tap to Place
                     tapToPlace.enabled = true;
                     tapToPlace.IsBeingPlaced = true;
@@ -192,6 +208,9 @@ namespace Microsoft.SpatialAlignment
                     // Stop and disable Tap to Place
                     tapToPlace.IsBeingPlaced = false;
                     tapToPlace.enabled = false;
+
+                    // Enable collider
+                    collider.enabled = true;
 
                     // Enable hands and bounds and put in adjust mode
                     twoHandManipulatable.enabled = true;
@@ -278,8 +297,9 @@ namespace Microsoft.SpatialAlignment
         protected virtual void Update()
         {
             // Check for a mode change from editor inspector
-            if (lastMode != refinementMode)
+            if ((lastMode != refinementMode) || (firstUpdate))
             {
+                firstUpdate = false;
                 SwitchMode(refinementMode);
             }
 
@@ -329,13 +349,7 @@ namespace Microsoft.SpatialAlignment
         public RefinementMode RefinementMode
         {
             get => refinementMode;
-            set
-            {
-                if (lastMode != value)
-                {
-                    SwitchMode(value);
-                }
-            }
+            set => refinementMode = value;
         }
         #endregion // Public Properties
 
