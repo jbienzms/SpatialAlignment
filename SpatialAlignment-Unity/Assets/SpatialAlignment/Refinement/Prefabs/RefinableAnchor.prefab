@@ -9,12 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3087241584767748348}
-  - component: {fileID: 6690751421245021391}
-  - component: {fileID: 5840639485604221862}
-  - component: {fileID: 2611613479768117600}
-  - component: {fileID: 4118701476616521879}
-  - component: {fileID: 8441122818699680255}
-  - component: {fileID: 8585153564237688258}
   m_Layer: 0
   m_Name: AnchorMarker
   m_TagString: Untagged
@@ -36,121 +30,8 @@ Transform:
   - {fileID: 3082495389593676208}
   - {fileID: 3087255250093402468}
   m_Father: {fileID: 6140007148329025917}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6690751421245021391
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3085669558037708234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4768146f072b50149a922df192dfb58f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  flattenedAxis: 0
-  scaleHandleMaterial: {fileID: 2100000, guid: 4a9072a0d8623aa44abf31f02d209a09, type: 2}
-  rotateHandleMaterial: {fileID: 2100000, guid: 4a9072a0d8623aa44abf31f02d209a09,
-    type: 2}
-  interactingMaterial: {fileID: 2100000, guid: b614a09bc429623478e946d8170b15ae, type: 2}
-  scaleRate: 0
-  appBarHoverOffsetZ: 0.05
-  maxScale: 1
-  rotationType: 0
-  handMotionToRotate: 1
-  rotateAroundPivot: 1
-  boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
-    type: 3}
-  appBarPrefab: {fileID: 9032341044956441394}
---- !u!114 &5840639485604221862
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3085669558037708234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6eb034688bcf84b4bb52b3a3310868c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hostTransform: {fileID: 0}
-  boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
-    type: 3}
-  manipulationMode: 5
-  rotationConstraint: 0
-  enableOneHandMovement: 1
---- !u!136 &2611613479768117600
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3085669558037708234}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 1.7
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.33, z: 0}
---- !u!114 &4118701476616521879
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3085669558037708234}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb69de839bd015f4099b5bd2c45e53e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnscaledTime: 1
-  PositionPerSecond: 30
-  RotationDegreesPerSecond: 720
-  RotationSpeedScaler: 0
-  ScalePerSecond: 5
-  SmoothLerpToTarget: 0
-  SmoothPositionLerpRatio: 0.5
-  SmoothRotationLerpRatio: 0.5
-  SmoothScaleLerpRatio: 0.5
---- !u!114 &8441122818699680255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3085669558037708234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12f64a7e6f461aa409b8322f413f96b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DefaultGazeDistance: 2
-  PlaceParentOnTap: 0
-  ParentGameObjectToPlace: {fileID: 0}
-  IsBeingPlaced: 0
-  AllowMeshVisualizationControl: 1
-  UseColliderCenter: 0
---- !u!114 &8585153564237688258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3085669558037708234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a5bb127cefd14d48861c04fc787a0d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactables: []
-  Targets: []
-  lockFocus: 0
-  refinementMode: 0
 --- !u!1 &3085926608004584324
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +195,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6140007148329025917}
+  - component: {fileID: 5542908525721627291}
+  - component: {fileID: 2677089888787947171}
   m_Layer: 0
   m_Name: RefinableAnchor
   m_TagString: Untagged
@@ -332,165 +215,45 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 8997232597319051434}
   - {fileID: 3087241584767748348}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &8997232597319051434 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c,
-    type: 3}
-  m_PrefabInstance: {fileID: 8992671334625771590}
+--- !u!136 &5542908525721627291
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &9032341044956441394 stripped
+  m_GameObject: {fileID: 6140007148329196893}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.05
+  m_Height: 0.17
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.033, z: 0}
+--- !u!114 &2677089888787947171
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-    type: 3}
-  m_PrefabInstance: {fileID: 8992671334625771590}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 6140007148329196893}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80c870726057bb743b9c4f8faa604b98, type: 3}
+  m_Script: {fileID: 11500000, guid: 1a5bb127cefd14d48861c04fc787a0d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &8992671334625771590
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 6140007148329025917}
-    m_Modifications:
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4773597359991020, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1275815092924048, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
-      propertyPath: m_Name
-      value: RefinableAnchorAppBar
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[0].OnTappedEvent.m_TypeName
-      value: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[0].DefaultPosition
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[0].ManipulationPosition
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[0].Name
-      value: Finish
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[0].Icon
-      value: AppBarDone
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[0].Text
-      value: Finish
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[0].EventTarget
-      value: 
-      objectReference: {fileID: 8585153564237688258}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: UseRemove
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[1].OnTappedEvent.m_TypeName
-      value: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
-        Culture=neutral, PublicKeyToken=null
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[1].DefaultPosition
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[1].ManipulationPosition
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[1].Name
-      value: Cancel
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[1].Icon
-      value: KeyboardKeyGlyphs_Close
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[1].Text
-      value: Cancel
-      objectReference: {fileID: 0}
-    - target: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-        type: 3}
-      propertyPath: buttons.Array.data[1].EventTarget
-      value: 
-      objectReference: {fileID: 8585153564237688258}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: aa610ada334bff640a535f0d23a9a15c, type: 3}
+  interactables: []
+  Targets: []
+  lockFocus: 0
+  manipulationMode: 5
+  rotationConstraint: 0
+  refinementMode: 0
+  useBoundingBoxRig: 0
+  useTwoHand: 1
+  appBarPrefab: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
+    type: 3}
+  boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
+    type: 3}

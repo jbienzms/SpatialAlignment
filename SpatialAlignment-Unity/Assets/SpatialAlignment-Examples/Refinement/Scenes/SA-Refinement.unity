@@ -464,10 +464,6 @@ GameObject:
   - component: {fileID: 404797278}
   - component: {fileID: 404797282}
   - component: {fileID: 404797283}
-  - component: {fileID: 404797288}
-  - component: {fileID: 404797287}
-  - component: {fileID: 404797286}
-  - component: {fileID: 404797285}
   - component: {fileID: 404797284}
   m_Layer: 0
   m_Name: LargeScaleModel
@@ -609,91 +605,15 @@ MonoBehaviour:
   interactables: []
   Targets: []
   lockFocus: 0
-  refinementMode: 0
---- !u!114 &404797285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404797277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6eb034688bcf84b4bb52b3a3310868c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hostTransform: {fileID: 0}
-  boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
-    type: 3}
   manipulationMode: 5
   rotationConstraint: 2
-  enableOneHandMovement: 1
---- !u!114 &404797286
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404797277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4768146f072b50149a922df192dfb58f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  flattenedAxis: 0
-  scaleHandleMaterial: {fileID: 2100000, guid: 4a9072a0d8623aa44abf31f02d209a09, type: 2}
-  rotateHandleMaterial: {fileID: 2100000, guid: 4a9072a0d8623aa44abf31f02d209a09,
-    type: 2}
-  interactingMaterial: {fileID: 2100000, guid: b614a09bc429623478e946d8170b15ae, type: 2}
-  scaleRate: 0
-  appBarHoverOffsetZ: 0.05
-  maxScale: 1
-  rotationType: 0
-  handMotionToRotate: 1
-  rotateAroundPivot: 0
-  boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
-    type: 3}
+  refinementMode: 0
+  useBoundingBoxRig: 0
+  useTwoHand: 1
   appBarPrefab: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
     type: 3}
---- !u!114 &404797287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404797277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12f64a7e6f461aa409b8322f413f96b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DefaultGazeDistance: 2
-  PlaceParentOnTap: 0
-  ParentGameObjectToPlace: {fileID: 0}
-  IsBeingPlaced: 0
-  AllowMeshVisualizationControl: 1
-  UseColliderCenter: 0
---- !u!114 &404797288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 404797277}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb69de839bd015f4099b5bd2c45e53e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnscaledTime: 1
-  PositionPerSecond: 30
-  RotationDegreesPerSecond: 720
-  RotationSpeedScaler: 0
-  ScalePerSecond: 5
-  SmoothLerpToTarget: 0
-  SmoothPositionLerpRatio: 0.5
-  SmoothRotationLerpRatio: 0.5
-  SmoothScaleLerpRatio: 0.5
+  boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
+    type: 3}
 --- !u!1 &992500263
 GameObject:
   m_ObjectHideFlags: 0
@@ -847,12 +767,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Keywords:
-  - Keyword: Add Refinement
+  - Keyword: Add Anchor
     Response:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1034952782}
-          m_MethodName: BeginAddRefinement
+          m_MethodName: BeginAddAnchor
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -864,12 +784,12 @@ MonoBehaviour:
           m_CallState: 2
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - Keyword: Finish Refinement
+  - Keyword: Cancel Anchor
     Response:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1034952782}
-          m_MethodName: FinishAddRefinement
+          m_MethodName: CancelAddAnchor
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -881,12 +801,29 @@ MonoBehaviour:
           m_CallState: 2
       m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
-  - Keyword: Cancel Refinement
+  - Keyword: Finish Anchor
     Response:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1034952782}
-          m_MethodName: CancelAddRefinement
+          m_MethodName: FinishAddAnchor
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - Keyword: Next Step
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1034952782}
+          m_MethodName: NextStep
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -915,12 +852,14 @@ MonoBehaviour:
   PersistentKeywords: 1
   RecognizerStart: 0
   Keywords:
-  - Keyword: Add Refinement
-    KeyCode: 257
-  - Keyword: Finish Refinement
-    KeyCode: 259
-  - Keyword: Cancel Refinement
-    KeyCode: 258
+  - Keyword: Add Anchor
+    KeyCode: 117
+  - Keyword: Finish Anchor
+    KeyCode: 112
+  - Keyword: Cancel Anchor
+    KeyCode: 105
+  - Keyword: Next Step
+    KeyCode: 111
   recognitionConfidenceLevel: 0
 --- !u!1 &1231208087
 GameObject:
@@ -1313,7 +1252,7 @@ PrefabInstance:
     - target: {fileID: 6140007148329025917, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6140007148329025917, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
         type: 3}
@@ -1378,6 +1317,11 @@ PrefabInstance:
     - target: {fileID: 6140007148329196893, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
         type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2677089888787947171, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
+        type: 3}
+      propertyPath: useBoundingBoxRig
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

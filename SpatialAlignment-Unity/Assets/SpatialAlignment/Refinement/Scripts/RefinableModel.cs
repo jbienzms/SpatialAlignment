@@ -63,15 +63,12 @@ namespace Microsoft.SpatialAlignment
     /// Represents an model in space that can be positioned and
     /// updated by the user interactively.
     /// </summary>
-    [RequireComponent(typeof(BoundingBoxRig))]
     [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(TapToPlace))]
-    [RequireComponent(typeof(TwoHandManipulatable))]
     public class RefinableModel : InteractionReceiver
     {
         #region Member Variables
         private BoundingBoxRig boundingBoxRig;
-        private Collider collider;
+        private Collider modelCollider;
         private bool firstUpdate = true;
         private RefinementMode lastMode;
         private Vector3 lastPosition;
@@ -82,43 +79,168 @@ namespace Microsoft.SpatialAlignment
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [Header("Behavior")]
+        [SerializeField]
+        [Tooltip("The manipulation modes that should be supported.")]
+        private ManipulationMode manipulationMode = ManipulationMode.MoveScaleAndRotate;
+
+        [SerializeField]
+        [Tooltip("Constrain rotation along an axis")]
+        private AxisConstraint rotationConstraint = AxisConstraint.None;
+
         [SerializeField]
         [Tooltip("The refinement mode of the current model.")]
         private RefinementMode refinementMode;
+
+        [SerializeField]
+        [Tooltip("Whether to use bounding box when in refinement mode.")]
+        private bool useBoundingBoxRig = true;
+
+        [SerializeField]
+        [Tooltip("Whether to use two hand manipulation when in refinement mode.")]
+        private bool useTwoHand = true;
+
+        [Header("Preset Components")]
+        [SerializeField]
+        [Tooltip("The prefab to instantiate when an AppBar is needed. A default exists at MixedRealityToolkit/UX/Prefabs/AppBar/AppBar.prefab.")]
+        private AppBar appBarPrefab;
+
+        [SerializeField]
+        [Tooltip("The prefab to instantiate when a bounding box is needed. A default exists at MixedRealityToolkit/UX/Prefabs/BoundingBoxes/BoundingBoxBasic.prefab.")]
+        private BoundingBox boundingBoxPrefab;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
         /// <summary>
+        /// Disables <see cref="BoundingBoxRig"/>.
+        /// </summary>
+        private void DisableBoundingBox()
+        {
+            if (boundingBoxRig != null)
+            {
+                // TODO: Destroy AppBar
+
+                // Destroy rig
+                Destroy(boundingBoxRig);
+                boundingBoxRig = null;
+            }
+        }
+
+        /// <summary>
+        /// Disables <see cref="TapToPlace"/>.
+        /// </summary>
+        private void DisableTapToPlace()
+        {
+            if (tapToPlace != null)
+            {
+                // Get rid of tap to place
+                Destroy(tapToPlace);
+
+                // Collider can be re-enabled now
+                modelCollider.enabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Disables <see cref="TwoHandManipulatable"/>.
+        /// </summary>
+        private void DisableTwoHand()
+        {
+            if (twoHandManipulatable != null)
+            {
+                Destroy(twoHandManipulatable);
+            }
+        }
+
+        /// <summary>
+        /// Enables <see cref="BoundingBoxRig"/>.
+        /// </summary>
+        private void EnableBoundingBox()
+        {
+            // Make sure not already enabled
+            if (boundingBoxRig != null) { return; }
+
+            // Instantiate the bounding box rig
+            boundingBoxRig = gameObject.AddComponent<BoundingBoxRig>();
+
+            // Setup the prefabs
+            boundingBoxRig.AppBarPrefab = appBarPrefab;
+            boundingBoxRig.BoundingBoxPrefab = boundingBoxPrefab;
+
+            // Disable scaling?
+            if ((manipulationMode & ManipulationMode.Scale) != ManipulationMode.Scale)
+            {
+                boundingBoxRig.ScaleRate = 0;
+            }
+
+            // TODO: Add menu buttons
+        }
+
+        /// <summary>
+        /// Enables <see cref="TapToPlace"/>.
+        /// </summary>
+        private void EnableTapToPlace()
+        {
+            // Make sure not already enabled
+            if (tapToPlace != null) { return; }
+
+            // Add component
+            tapToPlace = gameObject.AddComponent<TapToPlace>();
+
+            // Don't modify the mesh
+            tapToPlace.AllowMeshVisualizationControl = false;
+
+            // Collider can't be on while TapToPlace is on
+            modelCollider.enabled = false;
+
+            // Start placing
+            tapToPlace.IsBeingPlaced = true;
+        }
+
+        /// <summary>
+        /// Enables <see cref="TwoHandManipulatable"/>.
+        /// </summary>
+        private void EnableTwoHand()
+        {
+            // Make sure not already enabled
+            if (twoHandManipulatable != null) { return; }
+
+            // Add component
+            twoHandManipulatable = gameObject.AddComponent<TwoHandManipulatable>();
+
+            // Set manipulations and constraints
+            twoHandManipulatable.ManipulationMode = manipulationMode;
+            twoHandManipulatable.RotationConstraint = rotationConstraint;
+
+            // Allow single hand as well
+            twoHandManipulatable.EnableEnableOneHandedMovement = true;
+        }
+
+        /// <summary>
         /// Gathers all dependency components and disables the behavior if a
         /// dependency is not found.
         /// </summary>
-        protected virtual void GatherDependencies()
+        private void GatherDependencies()
         {
             // Get components
-            boundingBoxRig = GetComponent<BoundingBoxRig>();
-            collider = GetComponent<Collider>();
-            tapToPlace = GetComponent<TapToPlace>();
-            twoHandManipulatable = GetComponent<TwoHandManipulatable>();
+            modelCollider = GetComponent<Collider>();
 
             // Validate components
-            if (boundingBoxRig == null)
-            {
-                Debug.LogError($"A {nameof(BoundingBoxRig)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
-                this.enabled = false;
-            }
-            if (collider == null)
+            if (modelCollider == null)
             {
                 Debug.LogError($"A {nameof(Collider)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
-            if (tapToPlace == null)
+
+            if (appBarPrefab == null)
             {
-                Debug.LogError($"A {nameof(TapToPlace)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
+                Debug.LogError($"{nameof(appBarPrefab)} is required but is not set. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
-            if (twoHandManipulatable == null)
+
+            if (boundingBoxPrefab == null)
             {
-                Debug.LogError($"A {nameof(TwoHandManipulatable)} component is required but none was found. {nameof(RefinableModel)} has been disabled.");
+                Debug.LogError($"{nameof(boundingBoxPrefab)} is required but is not set. {nameof(RefinableModel)} has been disabled.");
                 this.enabled = false;
             }
 
@@ -167,55 +289,37 @@ namespace Microsoft.SpatialAlignment
             switch (newMode)
             {
                 case RefinementMode.Placed:
-                    // Collapse the AppBar
-                    if (boundingBoxRig.AppBarInstance != null)
-                    {
-                        boundingBoxRig.AppBarInstance.State = AppBar.AppBarStateEnum.Default;
-                    }
 
-                    // Disable collider
-                    collider.enabled = false;
-
-                    // Deactivate BoundingBoxRig
-                    boundingBoxRig.Deactivate();
-
-                    // Disable tap and hands
-                    tapToPlace.enabled = false;
-                    twoHandManipulatable.enabled = false;
+                    // Disable all components
+                    DisableBoundingBox();
+                    DisableTapToPlace();
+                    DisableTwoHand();
                     break;
 
                 case RefinementMode.Placing:
+
+                    // Disable bounds and hands
+                    DisableBoundingBox();
+                    DisableTwoHand();
+
                     // Save transform in case of cancellation
                     SaveLastTransform();
 
-                    // Disable bounds and hands
-                    boundingBoxRig.Deactivate();
-                    // boundingBoxRig.enabled = false;
-                    twoHandManipulatable.enabled = false;
-
-                    // Disable collider
-                    collider.enabled = false;
-
-                    // Enable and start Tap to Place
-                    tapToPlace.enabled = true;
-                    tapToPlace.IsBeingPlaced = true;
+                    // Enable Tap to Place
+                    EnableTapToPlace();
                     break;
 
                 case RefinementMode.Refining:
+
+                    // Disable TapToPlace
+                    DisableTapToPlace();
+
                     // Save transform in case of cancellation
                     SaveLastTransform();
 
-                    // Stop and disable Tap to Place
-                    tapToPlace.IsBeingPlaced = false;
-                    tapToPlace.enabled = false;
-
-                    // Enable collider
-                    collider.enabled = true;
-
-                    // Enable hands and bounds and put in adjust mode
-                    twoHandManipulatable.enabled = true;
-                    // boundingBoxRig.enabled = true;
-                    boundingBoxRig.Activate();
+                    // Enable which components?
+                    if (useBoundingBoxRig) { EnableBoundingBox(); }
+                    if (useTwoHand) { EnableTwoHand(); }
                     break;
 
                 default:
@@ -344,13 +448,39 @@ namespace Microsoft.SpatialAlignment
 
         #region Public Properties
         /// <summary>
-        /// Gets the current mode of the model.
+        /// Gets or sets the prefab to instantiate when an AppBar is needed.
         /// </summary>
-        public RefinementMode RefinementMode
-        {
-            get => refinementMode;
-            set => refinementMode = value;
-        }
+        public AppBar AppBarPrefab { get => appBarPrefab; set => appBarPrefab = value; }
+
+        /// <summary>
+        /// Gets or sets the prefab to instantiate when a bounding box is needed.
+        /// </summary>
+        public BoundingBox BoundingBoxPrefab { get => boundingBoxPrefab; set => boundingBoxPrefab = value; }
+
+        /// <summary>
+        /// Gets or sets the manipulation modes that should be supported.
+        /// </summary>
+        public ManipulationMode ManipulationMode { get => manipulationMode; set => manipulationMode = value; }
+
+        /// <summary>
+        /// Gets or sets a constraint for rotation along an axis.
+        /// </summary>
+        public AxisConstraint RotationConstraint { get => rotationConstraint; set => rotationConstraint = value; }
+
+        /// <summary>
+        /// Gets or sets the current mode of the model.
+        /// </summary>
+        public RefinementMode RefinementMode { get => refinementMode; set => refinementMode = value; }
+
+        /// <summary>
+        /// Gets or sets whether to use a bounding box rig when in refinement mode.
+        /// </summary>
+        public bool UseBoundingBoxRig { get => useBoundingBoxRig; set => useBoundingBoxRig = value; }
+
+        /// <summary>
+        /// Gets or sets Whether to use two hand manipulation when in refinement mode.
+        /// </summary>
+        public bool UseTwoHand { get => useTwoHand; set => useTwoHand = value; }
         #endregion // Public Properties
 
         #region Public Events

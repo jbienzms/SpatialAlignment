@@ -41,15 +41,7 @@ namespace Microsoft.SpatialAlignment.Persistence
     /// </summary>
     public class RefinementExampleManager : MonoBehaviour
     {
-        private enum RefinementExampleMode
-        {
-            None,
-            AddingAnchor,
-            RefiningAnchor,
-            RefiningModel
-        }
-
-        private enum RefinementStep
+        private enum AddAnchorStep
         {
             New,
             PlacingAnchor,
@@ -59,12 +51,19 @@ namespace Microsoft.SpatialAlignment.Persistence
             Done,
         }
 
+        private enum RefinementExampleMode
+        {
+            None,
+            AddAnchor,
+            EditingAnchor,
+        }
+
         #region Member Variables
         private SpatialFrame largeScaleFrame;
         private RefinementExampleMode mode;
         private MultiParentAlignment multiParent;
         private RefinableModel newAnchor;
-        private RefinementStep refinementStep;
+        private AddAnchorStep anchorStep;
         private SpatialFrameCollection frames = new SpatialFrameCollection();
         #endregion // Member Variables
 
@@ -84,24 +83,28 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         #region Internal Methods
         /// <summary>
-        /// Executes the specified refinement step.
+        /// Executes the specified step in a series of steps.
         /// </summary>
         /// <param name="step">
-        /// The step to execute.
+        /// The <see cref="AddAnchorStep"/> step to execute.
         /// </param>
-        private void DoRefinementStep(RefinementStep step)
+        private void DoStep(AddAnchorStep step)
         {
+            // Log
+            Debug.Log($"Doing {nameof(AddAnchorStep)}: {step}");
+
             // Execute actions
             switch (step)
             {
-                case RefinementStep.PlacingAnchor:
+                case AddAnchorStep.PlacingAnchor:
+
                     // Hide the large-scale model
                     HideModel();
 
                     // Instantiate the anchor prefab
                     GameObject anchorGO = GameObject.Instantiate(anchorPrefab);
 
-                    // Set the parent
+                    // Set the parent so it's in the anchor container
                     anchorGO.transform.SetParent(anchorContainer.transform, worldPositionStays: true);
 
                     // Get the refining behavior
@@ -119,15 +122,20 @@ namespace Microsoft.SpatialAlignment.Persistence
                     break;
 
 
-                case RefinementStep.RefiningAnchor:
+                case AddAnchorStep.RefiningAnchor:
+
                     // Now refining anchor
                     newAnchor.RefinementMode = RefinementMode.Refining;
-
                     break;
 
-                case RefinementStep.RefiningModel:
+
+                case AddAnchorStep.RefiningModel:
+
                     // Done placing anchor
                     newAnchor.RefinementMode = RefinementMode.Placed;
+
+                    // Show the model
+                    ShowModel();
 
                     // Disable MultiParent alignment on large-scale model so
                     // that it can be positioned
@@ -138,28 +146,41 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                     // Put the model in refining mode
                     largeScaleModel.RefinementMode = RefinementMode.Refining;
-
                     break;
 
-                case RefinementStep.Finishing:
+
+                case AddAnchorStep.Finishing:
+
                     // Unsubscribe from anchor events
                     UnsubscribeAnchor(newAnchor);
 
+                    // Come up with an ID for this anchor
+                    string id = DateTime.Now.ToUniversalTime().Ticks.ToString();
+
                     // Create a new game object
-                    GameObject frameGO = new GameObject();
+                    GameObject frameGO = new GameObject(id);
 
                     // Set position and rotation same as the anchor
                     frameGO.transform.position = newAnchor.transform.position;
                     frameGO.transform.rotation = newAnchor.transform.rotation;
 
+                    // Parent it in the anchor container
+                    frameGO.transform.SetParent(anchorContainer.transform, worldPositionStays: true);
+
                     // Add spatial frame to game object
                     SpatialFrame newFrame = frameGO.AddComponent<SpatialFrame>();
+
+                    // Give the frame an ID
+                    newFrame.Id = id;
 
                     // Add a WorldAnchorAlignment to SpatialFrame
                     WorldAnchorAlignment worldAlignment = frameGO.AddComponent<WorldAnchorAlignment>();
 
-                    // Give it an ID
-                    worldAlignment.AnchorId = DateTime.Now.ToUniversalTime().Ticks.ToString();
+                    // Give the anchor an ID
+                    worldAlignment.AnchorId = id;
+
+                    // Temporarily parent the large model to the new frame
+                    largeScaleFrame.transform.SetParent(newFrame.transform, worldPositionStays: true);
 
                     // Add this new frame to MultiParentAlignment as a new
                     // parent option and using the current large-scale offset
@@ -170,27 +191,34 @@ namespace Microsoft.SpatialAlignment.Persistence
                         Frame = newFrame,
 
                         // Set offsets
-                        Position = newAnchor.transform.position - largeScaleFrame.transform.position,
-                        Rotation = newAnchor.transform.rotation.eulerAngles - largeScaleFrame.transform.rotation.eulerAngles,
+                        Position = largeScaleFrame.transform.localPosition,
+                        Rotation = largeScaleFrame.transform.localRotation.eulerAngles,
+                        Scale = largeScaleFrame.transform.localScale,
                     });
 
-                    // Re-enable MultiParent alignment
-                    multiParent.enabled = true;
+                    // Unparent the large-scale model
+                    largeScaleFrame.transform.parent = null;
 
-                    // Delete the anchor
-                    DestroyImmediate(newAnchor);
+                    // Delete the new anchor game object and all children
+                    DestroyImmediate(newAnchor.gameObject);
                     newAnchor = null;
 
                     // Show the model
                     ShowModel();
 
+                    // Re-enable MultiParent alignment
+                    multiParent.enabled = true;
+
                     // Done
-                    refinementStep = RefinementStep.Done;
+                    anchorStep = AddAnchorStep.Done;
                     mode = RefinementExampleMode.None;
                     break;
 
+
                 default:
-                    throw new InvalidOperationException("Unexpected Branch");
+
+                    Debug.LogError($"Unknown step {step}");
+                    break;
             }
         }
 
@@ -248,16 +276,6 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
-        private void NextRefinementStep()
-        {
-            // Go to next step
-            if (refinementStep < RefinementStep.Done)
-            {
-                refinementStep++;
-                DoRefinementStep(refinementStep);
-            }
-        }
-
         private void SubscribeAnchor(RefinableModel anchor)
         {
             // Subscribe from refinement events
@@ -278,36 +296,48 @@ namespace Microsoft.SpatialAlignment.Persistence
         #region Overrides / Event Handlers
         private void Anchor_CanceledRefinement(object sender, System.EventArgs e)
         {
-            // Cancel refinement
-            CancelAddRefinement();
+            // Cancel adding anchor
+            if (mode == RefinementExampleMode.AddAnchor)
+            {
+                CancelAddAnchor();
+            }
         }
 
         private void Anchor_FinishedRefinement(object sender, System.EventArgs e)
         {
             // Go on to the next step
-            NextRefinementStep();
+            if (mode == RefinementExampleMode.AddAnchor)
+            {
+                NextStep();
+            }
         }
 
         private void Anchor_RefinementModeChanged(object sender, EventArgs e)
         {
             // If we are placing an anchor and it's now placed,
             // go on to the next step.
-            if ((refinementStep == RefinementStep.PlacingAnchor) && (newAnchor.RefinementMode == RefinementMode.Placed))
+            if ((anchorStep == AddAnchorStep.PlacingAnchor) && (newAnchor.RefinementMode == RefinementMode.Placed))
             {
-                NextRefinementStep();
+                NextStep();
             }
         }
 
         private void LargeScaleModel_CanceledRefinement(object sender, System.EventArgs e)
         {
-            // Cancel refinement
-            CancelAddRefinement();
+            // Cancel adding anchor
+            if (mode == RefinementExampleMode.AddAnchor)
+            {
+                CancelAddAnchor();
+            }
         }
 
         private void LargeScaleModel_FinishedRefinement(object sender, System.EventArgs e)
         {
-            // Go on to the next step
-            NextRefinementStep();
+            // If adding an anchor, go on to the next step
+            if (mode == RefinementExampleMode.AddAnchor)
+            {
+                NextStep();
+            }
         }
         #endregion // Overrides / Event Handlers
 
@@ -325,40 +355,38 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// <summary>
         /// Begins the process of adding a refinement anchor.
         /// </summary>
-        public void BeginAddRefinement()
+        public void BeginAddAnchor()
         {
             // If already in another mode, ignore
             if (mode != RefinementExampleMode.None)
             {
-                Debug.LogWarning($"{nameof(BeginAddRefinement)} called but already in {mode}");
+                Debug.LogWarning($"{nameof(BeginAddAnchor)} called but already in {mode}");
                 return;
             }
 
-            // Now in adding
-            mode = RefinementExampleMode.AddingAnchor;
-
-            // Start a new refinement
-            refinementStep = RefinementStep.New;
-            NextRefinementStep();
+            // Start adding a new anchor
+            mode = RefinementExampleMode.AddAnchor;
+            anchorStep = AddAnchorStep.New;
+            NextStep();
         }
 
         /// <summary>
         /// Cancels the process of adding a refinement anchor.
         /// </summary>
-        public void CancelAddRefinement()
+        public void CancelAddAnchor()
         {
             // If in another mode, ignore
-            if (mode != RefinementExampleMode.AddingAnchor)
+            if (mode != RefinementExampleMode.AddAnchor)
             {
-                Debug.LogWarning($"{nameof(CancelAddRefinement)} called but in {mode}");
+                Debug.LogWarning($"{nameof(CancelAddAnchor)} called but in {mode}");
                 return;
             }
 
             // Unsubscribe from anchor events
             UnsubscribeAnchor(newAnchor);
 
-            // Delete the anchor
-            DestroyImmediate(newAnchor);
+            // Delete the new anchor game object and all children
+            DestroyImmediate(newAnchor.gameObject);
             newAnchor = null;
 
             // Re-enable MultiParent alignment
@@ -368,24 +396,24 @@ namespace Microsoft.SpatialAlignment.Persistence
             ShowModel();
 
             // Done
-            refinementStep = RefinementStep.Done;
+            anchorStep = AddAnchorStep.Done;
             mode = RefinementExampleMode.None;
         }
 
         /// <summary>
         /// Finishes the process of adding a refinement anchor.
         /// </summary>
-        public void FinishAddRefinement()
+        public void FinishAddAnchor()
         {
             // If in another mode, ignore
-            if (mode != RefinementExampleMode.AddingAnchor)
+            if (mode != RefinementExampleMode.AddAnchor)
             {
-                Debug.LogWarning($"{nameof(FinishAddRefinement)} called but in {mode}");
+                Debug.LogWarning($"{nameof(FinishAddAnchor)} called but in {mode}");
                 return;
             }
 
             // Do the finishing step
-            DoRefinementStep(RefinementStep.Finishing);
+            DoStep(AddAnchorStep.Finishing);
         }
 
         /// <summary>
@@ -402,6 +430,21 @@ namespace Microsoft.SpatialAlignment.Persistence
         public void HideModel()
         {
             largeScaleModel.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Proceeds to the next step in the current mode.
+        /// </summary>
+        public void NextStep()
+        {
+            switch (mode)
+            {
+                case RefinementExampleMode.AddAnchor:
+                    DoStep(++anchorStep);
+                    break;
+                default:
+                    break;
+            }
         }
 
         /// <summary>

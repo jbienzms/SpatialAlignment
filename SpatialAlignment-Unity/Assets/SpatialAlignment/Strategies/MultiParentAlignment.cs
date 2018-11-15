@@ -68,18 +68,22 @@ namespace Microsoft.SpatialAlignment
         /// <param name="parentOption">
         /// The parent options to apply.
         /// </param>
+        /// <param name="force">
+        /// <c>true</c> to force an update even if reusing the same option.
+        /// The default is <c>false</c>.
+        /// </param>
         /// <remarks>
         /// The default implementation of this method parents the transform
         /// and applies position, rotation and scale modifications.
         /// </remarks>
-        protected virtual void ApplyParent(ParentAlignmentOptions parentOption)
+        protected virtual void ApplyParent(ParentAlignmentOptions parentOption, bool force=false)
         {
             // Validate
             if (parentOption == null) { throw new ArgumentNullException(nameof(parentOption)); }
             if (parentOption.Frame == null) { throw new InvalidOperationException($"{nameof(parentOption.Frame)} cannot be null."); }
 
             // If already parented to this object, no additional work needed
-            if (currentParent == parentOption) { return; }
+            if ((!force) && (currentParent == parentOption)) { return; }
 
             // Make our transform a child of the frame
             this.transform.SetParent(parentOption.Frame.transform, worldPositionStays: false);
@@ -208,6 +212,16 @@ namespace Microsoft.SpatialAlignment
 
         #region Unity Overrides
         /// <inheritdoc />
+        protected override void OnEnable()
+        {
+            // Pass to base first
+            base.OnEnable();
+
+            // Perform immediate update
+            UpdateTransform(force: true);
+        }
+
+        /// <inheritdoc />
         protected override void Update()
         {
             // Call base first
@@ -229,7 +243,11 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Attempts to calculate and update the transform.
         /// </summary>
-        public virtual void UpdateTransform()
+        /// <param name="force">
+        /// <c>true</c> to force an update even if the same parent option is
+        /// selected. The default is <c>false</c>.
+        /// </param>
+        public virtual void UpdateTransform(bool force=false)
         {
             // If there are no parent options, nothing to do
             if (parentOptions.Count == 0)
@@ -255,7 +273,7 @@ namespace Microsoft.SpatialAlignment
             else
             {
                 // Actually apply the parent
-                ApplyParent(parentOption);
+                ApplyParent(parentOption, force: force);
 
                 // Resolved
                 State = AlignmentState.Tracking;
