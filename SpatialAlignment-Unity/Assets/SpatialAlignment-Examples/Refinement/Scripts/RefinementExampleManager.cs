@@ -151,6 +151,9 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                 case AddAnchorStep.Finishing:
 
+                    // Large scale model is now placed
+                    largeScaleModel.RefinementMode = RefinementMode.Placed;
+
                     // Unsubscribe from anchor events
                     UnsubscribeAnchor(newAnchor);
 
@@ -381,6 +384,9 @@ namespace Microsoft.SpatialAlignment.Persistence
                 Debug.LogWarning($"{nameof(CancelAddAnchor)} called but in {mode}");
                 return;
             }
+
+            // Put large scale model back in placed mode
+            largeScaleModel.RefinementMode = RefinementMode.Placed;
 
             // Unsubscribe from anchor events
             UnsubscribeAnchor(newAnchor);
