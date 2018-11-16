@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.XR.WSA;
 
 namespace Microsoft.SpatialAlignment.Persistence
 {
@@ -130,6 +131,9 @@ namespace Microsoft.SpatialAlignment.Persistence
 
 
                 case AddAnchorStep.RefiningModel:
+
+                    // Add a WorldAnchor to the anchor so it stays in place
+                    newAnchor.gameObject.AddComponent<WorldAnchor>();
 
                     // Done placing anchor
                     newAnchor.RefinementMode = RefinementMode.Placed;
