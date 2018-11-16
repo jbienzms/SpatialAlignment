@@ -37,7 +37,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Vector3).IsAssignableFrom(objectType);
+            return objectType == typeof(Vector3);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

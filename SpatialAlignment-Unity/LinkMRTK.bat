@@ -44,8 +44,8 @@ ECHO =                               Linking MRTK                               
 ECHO ===============================================================================
 ECHO.
 mklink /J "Assets\HoloToolkit" "%MRTKSource%\Assets\HoloToolkit"
-mklink /J "Assets\HoloToolkit-Examples" "%MRTKSource%\Assets\HoloToolkit-Examples"
-mklink /J "Assets\HoloToolkit-Preview" "%MRTKSource%\Assets\HoloToolkit-Preview"
+REM mklink /J "Assets\HoloToolkit-Examples" "%MRTKSource%\Assets\HoloToolkit-Examples"
+REM mklink /J "Assets\HoloToolkit-Preview" "%MRTKSource%\Assets\HoloToolkit-Preview"
 ECHO.
 
 PAUSE
