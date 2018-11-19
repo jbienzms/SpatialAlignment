@@ -19,7 +19,7 @@ IF ERRORLEVEL == 2 GOTO End
 :SpatialAlignment
 
 SET /p SpatialAlignmentSource=SpatialAlignment for Unity Path? 
-IF NOT EXIST "%SpatialAlignmentSource%\Assets\mcs.rsp" (
+IF NOT EXIST "%SpatialAlignmentSource%\Assets\SpatialAlignment\SpatialFrame.cs" (
 ECHO.
 ECHO SpatialAlignment for Unity not found at %SpatialAlignmentSource%
 ECHO.
