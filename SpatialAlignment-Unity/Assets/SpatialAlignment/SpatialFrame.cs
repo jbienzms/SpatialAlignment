@@ -91,7 +91,10 @@ namespace Microsoft.SpatialAlignment
         /// </remarks>
         public virtual string Id
         {
-            get => id;
+            get
+            {
+                return id;
+            }
             set
             {
                 if (id != value)

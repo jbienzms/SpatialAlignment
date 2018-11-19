@@ -275,12 +275,12 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Gets or sets the ID of the anchor to load.
         /// </summary>
-        public string AnchorId { get => anchorId; set => anchorId = value; }
+        public string AnchorId { get { return anchorId; } set { anchorId = value; } }
 
         /// <summary>
         /// Gets or sets a value that indicates if the anchor should be loaded when the behavior starts.
         /// </summary>
-        public bool LoadOnStart { get => loadOnStart; set => loadOnStart = value; }
+        public bool LoadOnStart { get { return loadOnStart; } set { loadOnStart = value; } }
         #endregion // Public Properties
     }
 }

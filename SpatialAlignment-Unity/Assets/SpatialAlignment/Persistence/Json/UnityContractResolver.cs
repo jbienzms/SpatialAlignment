@@ -103,7 +103,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
         /// components. Otherwise a new <see cref="GameObject"/> will be created
         /// for each new component.
         /// </remarks>
-        public GameObject CreationContext { get => creationContext; set => creationContext = value; }
+        public GameObject CreationContext { get { return creationContext; } set { creationContext = value; } }
         #endregion // Public Properties
     }
 }

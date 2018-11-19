@@ -450,37 +450,37 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Gets or sets the prefab to instantiate when an AppBar is needed.
         /// </summary>
-        public AppBar AppBarPrefab { get => appBarPrefab; set => appBarPrefab = value; }
+        public AppBar AppBarPrefab { get { return appBarPrefab; } set { appBarPrefab = value; } }
 
         /// <summary>
         /// Gets or sets the prefab to instantiate when a bounding box is needed.
         /// </summary>
-        public BoundingBox BoundingBoxPrefab { get => boundingBoxPrefab; set => boundingBoxPrefab = value; }
+        public BoundingBox BoundingBoxPrefab { get { return boundingBoxPrefab; } set { boundingBoxPrefab = value; } }
 
         /// <summary>
         /// Gets or sets the manipulation modes that should be supported.
         /// </summary>
-        public ManipulationMode ManipulationMode { get => manipulationMode; set => manipulationMode = value; }
+        public ManipulationMode ManipulationMode { get { return manipulationMode; } set { manipulationMode = value; } }
 
         /// <summary>
         /// Gets or sets a constraint for rotation along an axis.
         /// </summary>
-        public AxisConstraint RotationConstraint { get => rotationConstraint; set => rotationConstraint = value; }
+        public AxisConstraint RotationConstraint { get { return rotationConstraint; } set { rotationConstraint = value; } }
 
         /// <summary>
         /// Gets or sets the current mode of the model.
         /// </summary>
-        public RefinementMode RefinementMode { get => refinementMode; set => refinementMode = value; }
+        public RefinementMode RefinementMode { get { return refinementMode; } set { refinementMode = value; } }
 
         /// <summary>
         /// Gets or sets whether to use a bounding box rig when in refinement mode.
         /// </summary>
-        public bool UseBoundingBoxRig { get => useBoundingBoxRig; set => useBoundingBoxRig = value; }
+        public bool UseBoundingBoxRig { get { return useBoundingBoxRig; } set { useBoundingBoxRig = value; } }
 
         /// <summary>
         /// Gets or sets Whether to use two hand manipulation when in refinement mode.
         /// </summary>
-        public bool UseTwoHand { get => useTwoHand; set => useTwoHand = value; }
+        public bool UseTwoHand { get { return useTwoHand; } set { useTwoHand = value; } }
         #endregion // Public Properties
 
         #region Public Events

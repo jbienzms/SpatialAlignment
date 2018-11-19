@@ -478,17 +478,17 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// <summary>
         /// Gets or sets the container for all refining anchors.
         /// </summary>
-        public GameObject AnchorContainer { get => anchorContainer; set => anchorContainer = value; }
+        public GameObject AnchorContainer { get { return anchorContainer; } set { anchorContainer = value; } }
 
         /// <summary>
         /// Gets or sets The prefab used represent an anchor.
         /// </summary>
-        public GameObject AnchorPrefab { get => anchorPrefab; set => anchorPrefab = value; }
+        public GameObject AnchorPrefab { get { return anchorPrefab; } set { anchorPrefab = value; } }
 
         /// <summary>
         /// Gets or sets the large-scale model.
         /// </summary>
-        public RefinableModel LargeScaleModel { get => largeScaleModel; set => largeScaleModel = value; }
+        public RefinableModel LargeScaleModel { get { return largeScaleModel; } set { largeScaleModel = value; } }
         #endregion // Public Properties
     }
 }
