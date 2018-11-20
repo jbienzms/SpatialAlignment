@@ -26,6 +26,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace Microsoft.SpatialAlignment
@@ -33,30 +34,37 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// Provides configuration options for aligning an object to a parent.
     /// </summary>
+    [DataContract]
     [Serializable]
     public class ParentAlignmentOptions
     {
         #region Member Variables
+        [DataMember]
         [SerializeField]
         [Tooltip("The spatial frame that serves as the parent.")]
         private SpatialFrame frame;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("The minimum accuracy of the parent alignment for it to be considered valid. Zero means always valid.")]
         private Vector3 minimumAccuracy = Vector3.zero;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("The minimum state of the parent alignment for it to be considered valid. Unresolved means always valid.")]
         private AlignmentState minimuState = AlignmentState.Resolved;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Position to use when a child of this parent.")]
         private Vector3 position = Vector3.zero;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Rotation to use when a child of this parent.")]
         private Vector3 rotation = Vector3.zero;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Scale to use when a child of this parent.")]
         private Vector3 scale = Vector3.one;

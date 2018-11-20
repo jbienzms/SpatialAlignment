@@ -40,7 +40,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
     public class JsonStore : ISpatialAlignmentStore
     {
         #region Member Variables
-        private SpatialFrameCollection frames = new SpatialFrameCollection();
+        private List<SpatialFrame> frames = new List<SpatialFrame>();
         #endregion // Member Variables
 
         #region Internal Methods
@@ -51,6 +51,10 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
 
             // Make pretty
             settings.Formatting = Formatting.Indented;
+
+            // Preserve references since MultiParent alignment does reference
+            // other frames
+            settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
 
             // Use custom contract resolver (handles Unity-specific instantiation)
             settings.ContractResolver = new SpatialContractResolver();
@@ -96,10 +100,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             JsonSerializer ser = CreateSerializer();
 
             // Deserialize a list of frames
-            var loadedFrames = ser.Deserialize<List<SpatialFrame>>(reader);
-
-            // Add each frame to the lookup table
-            frames.AddRange(loadedFrames);
+            frames = ser.Deserialize<List<SpatialFrame>>(reader);
 
             // No tasks to await yet. May move portions of this
             // method into a parallel task.
@@ -112,9 +113,8 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Validate
             if (string.IsNullOrEmpty(id)) throw new ArgumentException(nameof(id));
 
-            // Try to get from lookup table
-            SpatialFrame frame = null;
-            if (frames.Contains(id)) { frame = frames[id]; }
+            // Try to get from collection
+            SpatialFrame frame = frames.Where(f => f.Id == id).FirstOrDefault();
 
             // Return as result
             return Task.FromResult(frame);
@@ -149,7 +149,8 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Validate
             if (frame == null) throw new ArgumentNullException(nameof(frame));
 
-            // Add it into the lookup table
+            // TODO: Verify unique
+            // Add it into the list
             frames.Add(frame);
 
             // Done

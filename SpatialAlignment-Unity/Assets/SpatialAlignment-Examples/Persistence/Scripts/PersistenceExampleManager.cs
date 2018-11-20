@@ -36,45 +36,148 @@ namespace Microsoft.SpatialAlignment.Persistence
     public class PersistenceExampleManager : MonoBehaviour
     {
         #region Constants
-        private const string SampleData = @"
-		[
-		  {
-			""id"": ""Parent1"",
-			""AlignmentStrategy"": {
-			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-			  ""currentAccuracy"": {
-				""x"": 0.0,
-				""y"": 0.0,
-				""z"": 0.0
-			  },
-			  ""currentState"": ""Resolved""
-			}
-		  },
-		  {
-			""id"": ""Parent2"",
-			""AlignmentStrategy"": {
-			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-			  ""currentAccuracy"": {
-				""x"": 0.0,
-				""y"": 0.0,
-				""z"": 0.0
-			  },
-			  ""currentState"": ""Resolved""
-			}
-		},
-		  {
-			""id"": ""Parent3"",
-			""AlignmentStrategy"": {
-			  ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-			  ""currentAccuracy"": {
-				""x"": 0.0,
-				""y"": 0.0,
-				""z"": 0.0
-			  },
-			  ""currentState"": ""Resolved""
-			}
-		  }
-		]";
+        private const string SampleData = @"{
+  ""$id"": ""1"",
+  ""$values"": [
+    {
+      ""$id"": ""2"",
+      ""id"": ""Parent1"",
+      ""AlignmentStrategy"": {
+        ""$id"": ""3"",
+        ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
+        ""currentAccuracy"": {
+          ""x"": 0.0,
+          ""y"": 0.0,
+          ""z"": 0.0
+        },
+        ""currentState"": ""Resolved""
+      }
+    },
+    {
+      ""$id"": ""4"",
+      ""id"": ""Parent2"",
+      ""AlignmentStrategy"": {
+        ""$id"": ""5"",
+        ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
+        ""currentAccuracy"": {
+          ""x"": 0.0,
+          ""y"": 0.0,
+          ""z"": 0.0
+        },
+        ""currentState"": ""Resolved""
+      }
+    },
+    {
+      ""$id"": ""6"",
+      ""id"": ""Parent3"",
+      ""AlignmentStrategy"": {
+        ""$id"": ""7"",
+        ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
+        ""currentAccuracy"": {
+          ""x"": 0.0,
+          ""y"": 0.0,
+          ""z"": 0.0
+        },
+        ""currentState"": ""Resolved""
+      }
+    },
+    {
+      ""$id"": ""8"",
+      ""id"": ""ChildFrame"",
+      ""AlignmentStrategy"": {
+        ""$id"": ""9"",
+        ""$type"": ""Microsoft.SpatialAlignment.MultiParentAlignment, Assembly-CSharp"",
+        ""parentOptions"": {
+          ""$id"": ""10"",
+          ""$values"": [
+            {
+              ""$id"": ""11"",
+              ""frame"": {
+                ""$ref"": ""2""
+              },
+              ""minimumAccuracy"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""minimuState"": ""Resolved"",
+              ""position"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""rotation"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""scale"": {
+                ""x"": 0.3,
+                ""y"": 0.3,
+                ""z"": 0.3
+              }
+            },
+            {
+              ""$id"": ""12"",
+              ""frame"": {
+                ""$ref"": ""4""
+              },
+              ""minimumAccuracy"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""minimuState"": ""Resolved"",
+              ""position"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""rotation"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""scale"": {
+                ""x"": 0.3,
+                ""y"": 0.3,
+                ""z"": 0.3
+              }
+            },
+            {
+              ""$id"": ""13"",
+              ""frame"": {
+                ""$ref"": ""6""
+              },
+              ""minimumAccuracy"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""minimuState"": ""Resolved"",
+              ""position"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""rotation"": {
+                ""x"": 0.0,
+                ""y"": 0.0,
+                ""z"": 0.0
+              },
+              ""scale"": {
+                ""x"": 0.3,
+                ""y"": 0.3,
+                ""z"": 0.3
+              }
+            }
+          ]
+        },
+        ""updateFrequency"": 1.0
+      }
+    }
+  ]
+}";
         #endregion // Constants
 
         #region Member Variables

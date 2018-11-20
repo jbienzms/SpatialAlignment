@@ -27,6 +27,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace Microsoft.SpatialAlignment
@@ -39,6 +40,7 @@ namespace Microsoft.SpatialAlignment
     /// the transform of the Unity parent GameObject has no impact on alignment unless it is
     /// added to the <see cref="ParentOptions"/> collection.
     /// </remarks>
+    [DataContract]
     public class MultiParentAlignment : AlignmentStrategy
     {
         #region Member Variables
@@ -47,6 +49,7 @@ namespace Microsoft.SpatialAlignment
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [DataMember]
         [SerializeField]
         [Tooltip("The list of parent alignment options.")]
         private List<ParentAlignmentOptions> parentOptions = new List<ParentAlignmentOptions>();
@@ -55,6 +58,7 @@ namespace Microsoft.SpatialAlignment
         [Tooltip("The transform that will serve as the frame of reference when calculating modes like NearestNeighbor. If blank, the main camera transform will be used.")]
         private Transform referenceTransform;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("The time between updates (in seconds). If zero, alignment is updated every frame.")]
         private float updateFrequency = 2.00f;
