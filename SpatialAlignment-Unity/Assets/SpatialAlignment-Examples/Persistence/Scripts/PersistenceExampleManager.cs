@@ -191,36 +191,14 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         private async Task LoadAsync()
         {
-            using (StringReader sr = new StringReader(SampleData))
-            {
-                using (JsonTextReader jr = new JsonTextReader(sr))
-                {
-                    await store.LoadDocumentAsync(jr);
-                }
-            }
-
-            // Debug.Log($"Loaded {} frames.");
+            Frames = await store.LoadFramesAsync(SampleData);
+            Debug.Log($"Loaded {Frames.Count} frames.");
         }
 
         private async Task SaveAsync()
         {
-            string result = null;
-            foreach (var frame in Frames)
-            {
-                await store.SaveFrameAsync(frame);
-            }
-
-            using (StringWriter sw = new StringWriter())
-            {
-                using (JsonTextWriter jw = new JsonTextWriter(sw))
-                {
-                    await store.SaveDocumentAsync(jw);
-                    result = sw.ToString();
-                }
-            }
-
+            string result = await store.SaveFramesAsync(Frames);
             Debug.Log(result);
-
         }
 
         // Start is called before the first frame update
