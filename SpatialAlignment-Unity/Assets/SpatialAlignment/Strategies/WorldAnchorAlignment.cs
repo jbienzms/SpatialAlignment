@@ -27,6 +27,7 @@ using Microsoft.SpatialAlignment.Persistence;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.XR.WSA;
@@ -37,6 +38,7 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// An alignment strategy that attaches the object to a HoloLens world anchor.
     /// </summary>
+    [DataContract]
     public class WorldAnchorAlignment : AlignmentStrategy, INativePersistence
     {
         #region Member Variables
@@ -45,10 +47,12 @@ namespace Microsoft.SpatialAlignment
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [DataMember]
         [SerializeField]
         [Tooltip("The ID of the anchor to load.")]
         private string anchorId;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Whether the anchor should be loaded when the behavior starts.")]
         private bool loadOnStart = false;

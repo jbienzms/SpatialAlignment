@@ -79,6 +79,15 @@ namespace Microsoft.SpatialAlignment.Persistence
   {
     ""$id"": ""4"",
     ""alignmentStrategy"": {
+      ""$type"": ""Microsoft.SpatialAlignment.WorldAnchorAlignment, Assembly-CSharp"",
+      ""anchorId"": ""Parent4Anchor"",
+      ""loadOnStart"": false
+    },
+    ""id"": ""Parent4""
+  },
+  {
+    ""$id"": ""5"",
+    ""alignmentStrategy"": {
       ""$type"": ""Microsoft.SpatialAlignment.MultiParentAlignment, Assembly-CSharp"",
       ""parentOptions"": [
         {
@@ -136,6 +145,32 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
           ""frame"": {
             ""$ref"": ""3""
+          },
+          ""minimumAccuracy"": {
+            ""x"": 0.0,
+            ""y"": 0.0,
+            ""z"": 0.0
+          },
+          ""minimuState"": ""Resolved"",
+          ""position"": {
+            ""x"": 0.0,
+            ""y"": 0.0,
+            ""z"": 0.0
+          },
+          ""rotation"": {
+            ""x"": 0.0,
+            ""y"": 0.0,
+            ""z"": 0.0
+          },
+          ""scale"": {
+            ""x"": 0.3,
+            ""y"": 0.3,
+            ""z"": 0.3
+          }
+        },
+        {
+          ""frame"": {
+            ""$ref"": ""4""
           },
           ""minimumAccuracy"": {
             ""x"": 0.0,
