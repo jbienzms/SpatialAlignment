@@ -45,7 +45,7 @@ namespace Microsoft.SpatialAlignment
     /// more than one frame of reference. The <see cref="ISpatialFrame"/> interface is used
     /// to represent one of potentially many frames of reference.
     /// </remarks>
-    [DataContract]
+    [JsonObject(IsReference = true, MemberSerialization = MemberSerialization.OptIn)]
     public class SpatialFrame : MonoBehaviour
     {
         #region Constants
@@ -53,7 +53,6 @@ namespace Microsoft.SpatialAlignment
         #endregion // Constants
 
         #region Unity Inspector Variables
-        [DataMember]
         [SerializeField]
         [Tooltip("A unique ID for the spatial frame.")]
         private string id;
@@ -110,7 +109,7 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Gets the <see cref="IAlignmentStrategy"/> that is being used to align the frame.
         /// </summary>
-        [DataMember]
+        [JsonProperty("alignmentStrategy")]
         public virtual IAlignmentStrategy AlignmentStrategy
         {
             get
@@ -129,6 +128,7 @@ namespace Microsoft.SpatialAlignment
         /// <remarks>
         /// A unique ID for the frame.
         /// </remarks>
+        [JsonProperty("id")]
         public virtual string Id
         {
             get

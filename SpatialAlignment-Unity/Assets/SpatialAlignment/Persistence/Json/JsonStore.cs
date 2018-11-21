@@ -49,10 +49,6 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // Make pretty
             settings.Formatting = Formatting.Indented;
 
-            // Preserve references since MultiParent alignment does reference
-            // other frames
-            settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
-
             // Use custom contract resolver (handles Unity-specific instantiation)
             settings.ContractResolver = new SpatialContractResolver();
 

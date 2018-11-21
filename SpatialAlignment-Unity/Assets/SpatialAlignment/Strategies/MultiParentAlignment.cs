@@ -256,8 +256,8 @@ namespace Microsoft.SpatialAlignment
             // If there are no parent options, nothing to do
             if (parentOptions.Count == 0)
             {
-                State = AlignmentState.Error;
-                Debug.LogError($"{nameof(MultiParentAlignment)}: No parent options to select from.");
+                State = AlignmentState.Inhibited;
+                Debug.LogWarning($"{nameof(MultiParentAlignment)}: No parent options to select from.");
                 return;
             }
 
