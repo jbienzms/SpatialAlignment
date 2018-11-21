@@ -197,14 +197,19 @@ namespace Microsoft.SpatialAlignment
                 return false;
             }
 
-            // Make sure we have access to the anchor store
-            await EnsureAnchorStoreAsync();
-
             // If there was an existing anchor, unload it
             if (anchor != null) { UnloadAnchor(); }
 
+            // The anchor store is not accessible in the editor
+            #if !UNITY_EDITOR && UNITY_WSA
+
+            // Make sure we have access to the anchor store
+            await EnsureAnchorStoreAsync();
+
             // Now try to load the anchor itself
             anchor = anchorStore.Load(anchorId, this.gameObject);
+
+            #endif // !UNITY_EDITOR && UNITY_WSA
 
             // If still not loaded, log and fail
             if (anchor == null)
@@ -239,14 +244,19 @@ namespace Microsoft.SpatialAlignment
                 throw new InvalidOperationException($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
             }
 
-            // Make sure we have access to the anchor store
-            await EnsureAnchorStoreAsync();
-
             // If there is no anchor, create it
             if (anchor == null) { NewAnchor(); }
 
+            // The anchor store is not accessible in the editor
+            #if !UNITY_EDITOR && UNITY_WSA
+
+            // Make sure we have access to the anchor store
+            await EnsureAnchorStoreAsync();
+
             // Now try to save the anchor itself
             anchorStore.Save(anchorId, anchor);
+
+            #endif // !UNITY_EDITOR && UNITY_WSA
         }
 
         /// <summary>
