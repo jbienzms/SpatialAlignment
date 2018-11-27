@@ -5,7 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/SpatialAlignment-Examples/MultiParent/Scenes/SA-MultiParent.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 0
+    path: Assets/SpatialAlignment-Examples/Refinement/Scenes/SA-Refinement.unity
+    guid: d27038cdd451d8a43a2ad88ec74ecaa1
+  - enabled: 1
+    path: Assets/SpatialAlignment-Examples/Refinement/Scenes/SA-RefinementBuilding.unity
+    guid: 837c6309740d54c4684247b8a6af900c
   m_configObjects: {}

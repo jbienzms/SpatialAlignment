@@ -27,6 +27,7 @@ using Microsoft.SpatialAlignment.Persistence;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.XR.WSA;
@@ -37,6 +38,7 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// An alignment strategy that attaches the object to a HoloLens world anchor.
     /// </summary>
+    [DataContract]
     public class WorldAnchorAlignment : AlignmentStrategy, INativePersistence
     {
         #region Member Variables
@@ -45,13 +47,15 @@ namespace Microsoft.SpatialAlignment
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [DataMember]
         [SerializeField]
         [Tooltip("The ID of the anchor to load.")]
         private string anchorId;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Whether the anchor should be loaded when the behavior starts.")]
-        private bool loadOnStart = true;
+        private bool loadOnStart = false;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -88,6 +92,45 @@ namespace Microsoft.SpatialAlignment
                 throw new UnauthorizedAccessException($"{nameof(WorldAnchorAlignment)}: {nameof(WorldAnchorStore)} could not be acquired.");
             }
         }
+
+        /// <summary>
+        /// Sets the internal anchor to a new one.
+        /// </summary>
+        private void NewAnchor()
+        {
+            // Unload any existing
+            if (anchor != null)
+            {
+                UnloadAnchor();
+            }
+
+            // Create a new one
+            anchor = gameObject.AddComponent<WorldAnchor>();
+
+            // Subscribe to events
+            SubscribeAnchor();
+        }
+
+        /// <summary>
+        /// Subscribe to anchor events.
+        /// </summary>
+        private void SubscribeAnchor()
+        {
+            // Subscribe to anchor events
+            anchor.OnTrackingChanged += Anchor_OnTrackingChanged;
+
+            // Update state based on anchor state
+            State = (anchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
+        }
+
+        /// <summary>
+        /// Unsubscribe from anchor events.
+        /// </summary>
+        private void UnsubscribeAnchor()
+        {
+            // Unsubscribe from events
+            anchor.OnTrackingChanged -= Anchor_OnTrackingChanged;
+        }
         #endregion // Internal Methods
 
         #region INativePersistence Members
@@ -112,21 +155,31 @@ namespace Microsoft.SpatialAlignment
 
         #region Unity Overrides
         /// <inheritdoc />
-        protected virtual void OnDestroy()
+        protected override void OnDisable()
         {
+            // Make sure the anchor is unloaded
             UnloadAnchor();
+
+            // Pass on to base
+            base.OnDisable();
         }
 
         /// <inheritdoc />
-        protected override void Start()
+        protected virtual void OnEnable()
         {
-            // Call base first
-            base.Start();
+            // Pass to base first
+            base.OnEnable();
 
-            // Load?
+            // Load or create new?
             if (loadOnStart)
             {
+                // Try to load
                 var t = TryLoadAnchorAsync();
+            }
+            else
+            {
+                // Create a new one
+                NewAnchor();
             }
         }
         #endregion // Unity Overrides
@@ -140,21 +193,27 @@ namespace Microsoft.SpatialAlignment
         /// </returns>
         public async Task<bool> TryLoadAnchorAsync()
         {
-            // If the anchor is already loaded, we're good
-            if (anchor != null) { return true; }
-
             // Validate the ID
             if (string.IsNullOrEmpty(anchorId))
             {
                 State = AlignmentState.Error;
-                throw new InvalidOperationException($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
+                Debug.LogError($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
+                return false;
             }
+
+            // If there was an existing anchor, unload it
+            if (anchor != null) { UnloadAnchor(); }
+
+            // The anchor store is not accessible in the editor
+            #if !UNITY_EDITOR && UNITY_WSA
 
             // Make sure we have access to the anchor store
             await EnsureAnchorStoreAsync();
 
             // Now try to load the anchor itself
             anchor = anchorStore.Load(anchorId, this.gameObject);
+
+            #endif // !UNITY_EDITOR && UNITY_WSA
 
             // If still not loaded, log and fail
             if (anchor == null)
@@ -165,11 +224,8 @@ namespace Microsoft.SpatialAlignment
             }
             else
             {
-                // Subscribe to anchor events
-                anchor.OnTrackingChanged += Anchor_OnTrackingChanged;
-
-                // Update state based on anchor state
-                State = (anchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
+                // Subscribe
+                SubscribeAnchor();
 
                 // Loaded!
                 return true;
@@ -186,23 +242,25 @@ namespace Microsoft.SpatialAlignment
         /// </returns>
         public async Task SaveAnchorAsync()
         {
-            // Make sure the anchor is created
-            if (anchor == null)
-            {
-                anchor = this.gameObject.AddComponent<WorldAnchor>();
-            }
-
             // Validate the ID
             if (string.IsNullOrEmpty(anchorId))
             {
                 throw new InvalidOperationException($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
             }
 
+            // If there is no anchor, create it
+            if (anchor == null) { NewAnchor(); }
+
+            // The anchor store is not accessible in the editor
+            #if !UNITY_EDITOR && UNITY_WSA
+
             // Make sure we have access to the anchor store
             await EnsureAnchorStoreAsync();
 
             // Now try to save the anchor itself
             anchorStore.Save(anchorId, anchor);
+
+            #endif // !UNITY_EDITOR && UNITY_WSA
         }
 
         /// <summary>
@@ -213,11 +271,11 @@ namespace Microsoft.SpatialAlignment
             // Make sure we have an anchor to unload
             if (anchor == null) { return; }
 
-            // Unsubscribe from events
-            anchor.OnTrackingChanged -= Anchor_OnTrackingChanged;
+            // Unsubscribe from anchor events
+            UnsubscribeAnchor();
 
             // Destroy the anchor (which also removes it from the game object)
-            DestroyImmediate(anchor);
+            Destroy(anchor);
 
             // Reset the reference
             anchor = null;
@@ -231,12 +289,12 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Gets or sets the ID of the anchor to load.
         /// </summary>
-        public string AnchorId { get => anchorId; set => anchorId = value; }
+        public string AnchorId { get { return anchorId; } set { anchorId = value; } }
 
         /// <summary>
         /// Gets or sets a value that indicates if the anchor should be loaded when the behavior starts.
         /// </summary>
-        public bool LoadOnStart { get => loadOnStart; set => loadOnStart = value; }
+        public bool LoadOnStart { get { return loadOnStart; } set { loadOnStart = value; } }
         #endregion // Public Properties
     }
 }

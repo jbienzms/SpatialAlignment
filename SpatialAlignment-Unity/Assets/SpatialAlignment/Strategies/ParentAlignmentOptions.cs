@@ -26,6 +26,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace Microsoft.SpatialAlignment
@@ -33,30 +34,37 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// Provides configuration options for aligning an object to a parent.
     /// </summary>
+    [DataContract]
     [Serializable]
     public class ParentAlignmentOptions
     {
         #region Member Variables
+        [DataMember]
         [SerializeField]
         [Tooltip("The spatial frame that serves as the parent.")]
         private SpatialFrame frame;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("The minimum accuracy of the parent alignment for it to be considered valid. Zero means always valid.")]
         private Vector3 minimumAccuracy = Vector3.zero;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("The minimum state of the parent alignment for it to be considered valid. Unresolved means always valid.")]
         private AlignmentState minimuState = AlignmentState.Resolved;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Position to use when a child of this parent.")]
         private Vector3 position = Vector3.zero;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Rotation to use when a child of this parent.")]
         private Vector3 rotation = Vector3.zero;
 
+        [DataMember]
         [SerializeField]
         [Tooltip("Scale to use when a child of this parent.")]
         private Vector3 scale = Vector3.one;
@@ -145,7 +153,7 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Gets or sets the spatial frame that serves as the parent.
         /// </summary>
-        public SpatialFrame Frame { get => frame; set => frame = value; }
+        public SpatialFrame Frame { get { return frame; } set { frame = value; } }
 
         /// <summary>
         /// Gets or sets the minimum accuracy of the parent alignment for it to be considered
@@ -158,7 +166,7 @@ namespace Microsoft.SpatialAlignment
         /// return an <see cref="IAlignmentStrategy.Accuracy">Accuracy</see> of this level or
         /// higher to be considered valid.
         /// </remarks>
-        public Vector3 MinimumAccuracy { get => minimumAccuracy; set => minimumAccuracy = value; }
+        public Vector3 MinimumAccuracy { get { return minimumAccuracy; } set { minimumAccuracy = value; } }
 
         /// <summary>
         /// Gets or sets the minimum state of the parent alignment for it to be considered valid.
@@ -171,22 +179,22 @@ namespace Microsoft.SpatialAlignment
         /// return a <see cref="IAlignmentStrategy.State">State</see> of this level or higher
         /// to be considered valid.
         /// </remarks>
-        public AlignmentState MinimumState { get => minimuState; set => minimuState = value; }
+        public AlignmentState MinimumState { get { return minimuState; } set { minimuState = value; } }
 
         /// <summary>
         /// Gets or sets the position to use when a child of this parent.
         /// </summary>
-        public Vector3 Position { get => position; set => position = value; }
+        public Vector3 Position { get { return position; } set { position = value; } }
 
         /// <summary>
         /// Gets or sets the rotation to use when a child of this parent.
         /// </summary>
-        public Vector3 Rotation { get => rotation; set => rotation = value; }
+        public Vector3 Rotation { get { return rotation; } set { rotation = value; } }
 
         /// <summary>
         /// Gets or sets an optional scale offset from the parent.
         /// </summary>
-        public Vector3 Scale { get => scale; set => scale = value; }
+        public Vector3 Scale { get { return scale; } set { scale = value; } }
         #endregion // Public Properties
     }
 }

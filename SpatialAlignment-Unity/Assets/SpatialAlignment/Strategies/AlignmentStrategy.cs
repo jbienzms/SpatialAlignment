@@ -48,6 +48,21 @@ namespace Microsoft.SpatialAlignment
         protected virtual void Awake() {}
 
         /// <summary>
+        /// Called when the script is being destroyed.
+        /// </summary>
+        protected virtual void OnDestroy() { }
+
+        /// <summary>
+        /// Called each time the script is disabled.
+        /// </summary>
+        protected virtual void OnDisable() { }
+
+        /// <summary>
+        /// Called each time the script is enabled.
+        /// </summary>
+        protected virtual void OnEnable() { }
+
+        /// <summary>
         /// Start is called before the first frame update.
         /// </summary>
         protected virtual void Start() {}

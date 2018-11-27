@@ -45,15 +45,48 @@ namespace Microsoft.SpatialAlignment
     /// more than one frame of reference. The <see cref="ISpatialFrame"/> interface is used
     /// to represent one of potentially many frames of reference.
     /// </remarks>
-    [DataContract]
+    [JsonObject(IsReference = true, MemberSerialization = MemberSerialization.OptIn)]
     public class SpatialFrame : MonoBehaviour
     {
+        #region Constants
+        private const string DEFAULT_GO_NAME = "New Game Object";
+        #endregion // Constants
+
         #region Unity Inspector Variables
-        [DataMember]
         [SerializeField]
         [Tooltip("A unique ID for the spatial frame.")]
         private string id;
         #endregion // Unity Inspector Variables
+
+        #region Internal Methods
+        /// <summary>
+        /// Attempts to updates the GameObject name to match the frame ID, but
+        /// only if the GameObject name hasn't been customized.
+        /// has a default name.
+        /// </summary>
+        /// <param name="oldId">
+        /// The old ID.
+        /// </param>
+        /// <param name="newId">
+        /// The new ID.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if the GameObject name was updated; otherwise <c>false</c>.
+        /// </returns>
+        private bool TryUpdateGameObjectName(string oldId, string newId)
+        {
+            // Is it the default name or the old ID?
+            if (gameObject.name == DEFAULT_GO_NAME || gameObject.name == oldId)
+            {
+                gameObject.name = newId;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion // Internal Methods
 
         #region Overridables / Event Triggers
         /// <summary>
@@ -65,12 +98,18 @@ namespace Microsoft.SpatialAlignment
         }
         #endregion // Overridables / Event Triggers
 
+        #region Unity Overrides
+        protected virtual void Start()
+        {
+            // Optionally update game object name
+            TryUpdateGameObjectName(null, id);
+        }
+        #endregion // Unity Overrides
         #region Public Properties
         /// <summary>
         /// Gets the <see cref="IAlignmentStrategy"/> that is being used to align the frame.
         /// </summary>
-        [DataMember]
-        // [JsonProperty(ItemConverterType = typeof(AlignmentStrategyConverter))]
+        [JsonProperty("alignmentStrategy")]
         public virtual IAlignmentStrategy AlignmentStrategy
         {
             get
@@ -89,14 +128,20 @@ namespace Microsoft.SpatialAlignment
         /// <remarks>
         /// A unique ID for the frame.
         /// </remarks>
+        [JsonProperty("id")]
         public virtual string Id
         {
-            get => id;
+            get
+            {
+                return id;
+            }
             set
             {
                 if (id != value)
                 {
+                    string oldId = id;
                     id = value;
+                    TryUpdateGameObjectName(oldId, id);
                     OnIdChanged();
                 }
             }

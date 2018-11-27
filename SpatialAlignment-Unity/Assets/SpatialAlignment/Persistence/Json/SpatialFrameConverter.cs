@@ -37,7 +37,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(SpatialFrame).IsAssignableFrom(objectType);
+            return objectType == typeof(SpatialFrame);
         }
 
         public override bool CanWrite => false; // Only use for read operations, not write operations.

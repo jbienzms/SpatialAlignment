@@ -28,6 +28,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -37,12 +38,8 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
     /// <summary>
     /// A class that can load and save spatial alignment data using json.
     /// </summary>
-    public class JsonStore : ISpatialAlignmentStore
+    public class JsonStore
     {
-        #region Member Variables
-        private SpatialFrameCollection frames = new SpatialFrameCollection();
-        #endregion // Member Variables
-
         #region Internal Methods
         private JsonSerializer CreateSerializer()
         {
@@ -71,62 +68,90 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
         }
         #endregion // Internal Methods
 
+
+        #region Public Methods
         /// <summary>
-        /// Loads an entire json document into serialization frames.
+        /// Loads an entire json document into spatial frames.
         /// </summary>
         /// <param name="reader">
         /// The reader used to read the document.
         /// </param>
         /// <returns>
-        /// A <see cref="Task"/> that represents the operation.
+        /// A <see cref="Task"/> that yields the loaded frames.
         /// </returns>
-        public Task LoadDocumentAsync(JsonReader reader)
+        public async Task<List<SpatialFrame>> LoadFramesAsync(JsonReader reader)
         {
             // Validate
             if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-            // Unload all existing objects
-            foreach (var frame in frames)
-            {
-                GameObject.DestroyImmediate(frame.gameObject);
-            }
-            frames.Clear();
-
             // Create the serializer
             JsonSerializer ser = CreateSerializer();
 
-            // Deserialize a list of frames
-            var loadedFrames = ser.Deserialize<List<SpatialFrame>>(reader);
+            // Deserialize the list of frames
+            List<SpatialFrame> frames = ser.Deserialize<List<SpatialFrame>>(reader);
 
-            // Add each frame to the lookup table
-            frames.AddRange(loadedFrames);
+            // If any of the alignment strategies uses native persistence,
+            // load them now
+            if (frames != null)
+            {
+                foreach (SpatialFrame frame in frames)
+                {
+                    INativePersistence nativePersist = frame.AlignmentStrategy as INativePersistence;
+                    if (nativePersist != null)
+                    {
+                        await nativePersist.LoadNativeAsync();
+                    }
+                }
+            }
 
-            // No tasks to await yet. May move portions of this
-            // method into a parallel task.
-            return Task.CompletedTask;
+            // Return loaded frames
+            return frames;
         }
 
-        /// <inheritdoc />
-        public Task<SpatialFrame> LoadFrameAsync(string id)
+        /// <summary>
+        /// Loads a json fragment into spatial frames.
+        /// </summary>
+        /// <param name="json">
+        /// The string json fragment.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that yields the loaded frames.
+        /// </returns>
+        public Task<List<SpatialFrame>> LoadFramesAsync(string json)
         {
             // Validate
-            if (string.IsNullOrEmpty(id)) throw new ArgumentException(nameof(id));
+            if (string.IsNullOrEmpty(json)) throw new ArgumentException(nameof(json));
 
-            // Try to get from lookup table
-            SpatialFrame frame = null;
-            if (frames.Contains(id)) { frame = frames[id]; }
-
-            // Return as result
-            return Task.FromResult(frame);
+            // Deserialize
+            using (StringReader sr = new StringReader(json))
+            {
+                using (JsonTextReader jr = new JsonTextReader(sr))
+                {
+                    return LoadFramesAsync(jr);
+                }
+            }
         }
 
-        public async Task SaveDocumentAsync(JsonWriter writer)
+        /// <summary>
+        /// Saves the list of frames using the specified writer.
+        /// </summary>
+        /// <param name="frames">
+        /// The list of frames to save.
+        /// </param>
+        /// <param name="writer">
+        /// The <see cref="JsonWriter"/> used to save the frames.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        public async Task SaveFramesAsync(List<SpatialFrame> frames, JsonWriter writer)
         {
             // Validate
+            if (frames == null) throw new ArgumentNullException(nameof(frames));
             if (writer == null) throw new ArgumentNullException(nameof(writer));
 
             // If any of the alignment strategies uses native persistence,
-            // save them first.
+            // save them now
             foreach (SpatialFrame frame in frames)
             {
                 INativePersistence np = frame.AlignmentStrategy as INativePersistence;
@@ -143,17 +168,30 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             ser.Serialize(writer, frames);
         }
 
-        /// <inheritdoc />
-        public Task SaveFrameAsync(SpatialFrame frame)
+        /// <summary>
+        /// Saves the list of frames to a json string.
+        /// </summary>
+        /// <param name="frames">
+        /// The list of frames to save.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that yields the json string.
+        /// </returns>
+        public async Task<string> SaveFramesAsync(List<SpatialFrame> frames)
         {
             // Validate
-            if (frame == null) throw new ArgumentNullException(nameof(frame));
+            if (frames == null) throw new ArgumentNullException(nameof(frames));
 
-            // Add it into the lookup table
-            frames.Add(frame);
-
-            // Done
-            return Task.CompletedTask;
+            // Serialize
+            using (StringWriter sw = new StringWriter())
+            {
+                using (JsonTextWriter jw = new JsonTextWriter(sw))
+                {
+                    await SaveFramesAsync(frames, jw);
+                    return sw.ToString();
+                }
+            }
         }
+        #endregion // Public Methods
     }
 }
