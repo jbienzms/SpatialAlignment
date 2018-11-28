@@ -39,7 +39,7 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// Defines the various modes of a <see cref="RefinableModel"/>.
     /// </summary>
-    public enum RefinementMode
+    public enum RefinableModelMode
     {
         /// <summary>
         /// The model is in the default "placed" mode.
@@ -64,15 +64,13 @@ namespace Microsoft.SpatialAlignment
     /// updated by the user interactively.
     /// </summary>
     [RequireComponent(typeof(Collider))]
-    public class RefinableModel : InteractionReceiver
+    public class RefinableModel : RefinementController
     {
         #region Member Variables
         private BoundingBoxRig boundingBoxRig;
         private Collider modelCollider;
         private bool firstUpdate = true;
-        private RefinementMode lastMode;
-        private Vector3 lastPosition;
-        private Quaternion lastRotation;
+        private RefinableModelMode lastMode;
         private TapToPlace tapToPlace;
         private TwoHandManipulatable twoHandManipulatable;
         private bool wasBeingPlaced;
@@ -90,7 +88,7 @@ namespace Microsoft.SpatialAlignment
 
         [SerializeField]
         [Tooltip("The refinement mode of the current model.")]
-        private RefinementMode refinementMode;
+        private RefinableModelMode refinementMode;
 
         [SerializeField]
         [Tooltip("Whether to use bounding box when in refinement mode.")]
@@ -260,62 +258,39 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// Restores the last transform to the current transform.
-        /// </summary>
-        private void RestoreLastTransform()
-        {
-            transform.position = lastPosition;
-            transform.rotation = lastRotation;
-        }
-
-        /// <summary>
-        /// Saves the current transform as the last transform.
-        /// </summary>
-        private void SaveLastTransform()
-        {
-            lastPosition = transform.position;
-            lastRotation = transform.rotation;
-        }
-
-        /// <summary>
         /// Switches the UI and interactive elements of the model to enable
         /// the specified mode.
         /// </summary>
         /// <param name="newMode">
         /// The mode to switch to.
         /// </param>
-        protected virtual void SwitchMode(RefinementMode newMode)
+        protected virtual void SwitchMode(RefinableModelMode newMode)
         {
             switch (newMode)
             {
-                case RefinementMode.Placed:
+                case RefinableModelMode.Placed:
 
                     // Disable all components
                     DisableBoundingBox();
                     DisableTapToPlace();
                     DisableTwoHand();
+
                     break;
 
-                case RefinementMode.Placing:
+                case RefinableModelMode.Placing:
 
                     // Disable bounds and hands
                     DisableBoundingBox();
                     DisableTwoHand();
 
-                    // Save transform in case of cancellation
-                    SaveLastTransform();
-
                     // Enable Tap to Place
                     EnableTapToPlace();
                     break;
 
-                case RefinementMode.Refining:
+                case RefinableModelMode.Refining:
 
                     // Disable TapToPlace
                     DisableTapToPlace();
-
-                    // Save transform in case of cancellation
-                    SaveLastTransform();
 
                     // Enable which components?
                     if (useBoundingBoxRig) { EnableBoundingBox(); }
@@ -336,6 +311,29 @@ namespace Microsoft.SpatialAlignment
         #endregion // Internal Methods
 
         #region Overrides / Event Handlers
+
+        protected override void OnRefinementCanceled()
+        {
+            base.OnRefinementCanceled();
+            RefinementMode = RefinableModelMode.Placed;
+        }
+
+        protected override void OnRefinementFinished()
+        {
+            RefinementMode = RefinableModelMode.Placed;
+            base.OnRefinementFinished();
+        }
+
+        protected override void OnRefinementStarted()
+        {
+            base.OnRefinementStarted();
+            if (refinementMode == RefinableModelMode.Placed)
+            {
+                refinementMode = RefinableModelMode.Placing;
+            }
+        }
+
+        /*
         /// <inheritdoc />
         protected override void InputClicked(GameObject obj, InputClickedEventData eventData)
         {
@@ -352,25 +350,10 @@ namespace Microsoft.SpatialAlignment
                 CancelRefinement();
             }
         }
+        */
         #endregion // Overrides / Event Handlers
 
         #region Overridables / Event Triggers
-        /// <summary>
-        /// Called when the user has canceled refining the model.
-        /// </summary>
-        protected virtual void OnCanceledRefinement()
-        {
-            CanceledRefinement?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// Called when the user has finished refining the model.
-        /// </summary>
-        protected virtual void OnFinishedRefinement()
-        {
-            FinishedRefinement?.Invoke(this, EventArgs.Empty);
-        }
-
         /// <summary>
         /// Called when the value of the <see cref="RefinementMode"/> property has
         /// changed.
@@ -382,11 +365,12 @@ namespace Microsoft.SpatialAlignment
         #endregion // Overridables / Event Triggers
 
         #region Unity Overrides
-        /// <summary>
-        /// Start is called before the first frame update
-        /// </summary>
-        protected virtual void Start()
+        /// <inheritdoc />
+        protected override void Start()
         {
+            // Pass to base first
+            base.Start();
+
             // Gather dependencies
             GatherDependencies();
 
@@ -395,11 +379,12 @@ namespace Microsoft.SpatialAlignment
             SwitchMode(refinementMode);
         }
 
-        /// <summary>
-        /// Update is called once per frame
-        /// </summary>
-        protected virtual void Update()
+        /// <inheritdoc />
+        protected override void Update()
         {
+            // Pass to base first
+            base.Update();
+
             // Check for a mode change from editor inspector
             if ((lastMode != refinementMode) || (firstUpdate))
             {
@@ -412,39 +397,12 @@ namespace Microsoft.SpatialAlignment
             {
                 if ((wasBeingPlaced) && (!tapToPlace.IsBeingPlaced))
                 {
-                    SwitchMode(RefinementMode.Placed);
+                    SwitchMode(RefinableModelMode.Placed);
                 }
                 wasBeingPlaced = tapToPlace.IsBeingPlaced;
             }
         }
         #endregion // Unity Overrides
-
-        #region Public Methods
-        /// <summary>
-        /// Notifies that the user has canceled refining the model.
-        /// </summary>
-        public void CancelRefinement()
-        {
-            if (refinementMode != RefinementMode.Placed)
-            {
-                RestoreLastTransform();
-                RefinementMode = RefinementMode.Placed;
-                OnCanceledRefinement();
-            }
-        }
-
-        /// <summary>
-        /// Notifies that the user has finished refining the model.
-        /// </summary>
-        public void FinishRefinement()
-        {
-            if (refinementMode != RefinementMode.Placed)
-            {
-                RefinementMode = RefinementMode.Placed;
-                OnFinishedRefinement();
-            }
-        }
-        #endregion // Public Methods
 
         #region Public Properties
         /// <summary>
@@ -470,7 +428,20 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Gets or sets the current mode of the model.
         /// </summary>
-        public RefinementMode RefinementMode { get { return refinementMode; } set { refinementMode = value; } }
+        public RefinableModelMode RefinementMode
+        {
+            get
+            {
+                return refinementMode;
+            }
+            set
+            {
+                if (refinementMode != value)
+                {
+                    SwitchMode(value);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets whether to use a bounding box rig when in refinement mode.
@@ -484,16 +455,6 @@ namespace Microsoft.SpatialAlignment
         #endregion // Public Properties
 
         #region Public Events
-        /// <summary>
-        /// Raised when the user has canceled refining the model.
-        /// </summary>
-        public event EventHandler CanceledRefinement;
-
-        /// <summary>
-        /// Raised when the user has finished refining the model.
-        /// </summary>
-        public event EventHandler FinishedRefinement;
-
         /// <summary>
         /// Raised when the value of the <see cref="RefinementMode"/> property has
         /// changed.

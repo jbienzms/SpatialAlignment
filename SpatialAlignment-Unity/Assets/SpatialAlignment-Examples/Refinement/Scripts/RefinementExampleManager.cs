@@ -119,14 +119,14 @@ namespace Microsoft.SpatialAlignment.Persistence
                     SubscribeAnchor(newAnchor);
 
                     // Put the anchor in placement mode
-                    newAnchor.RefinementMode = RefinementMode.Placing;
+                    newAnchor.RefinementMode = RefinableModelMode.Placing;
                     break;
 
 
                 case AddAnchorStep.RefiningAnchor:
 
                     // Now refining anchor
-                    newAnchor.RefinementMode = RefinementMode.Refining;
+                    newAnchor.RefinementMode = RefinableModelMode.Refining;
                     break;
 
 
@@ -136,7 +136,7 @@ namespace Microsoft.SpatialAlignment.Persistence
                     newAnchor.gameObject.AddComponent<WorldAnchor>();
 
                     // Done placing anchor
-                    newAnchor.RefinementMode = RefinementMode.Placed;
+                    newAnchor.RefinementMode = RefinableModelMode.Placed;
 
                     // Show the model
                     ShowModel();
@@ -149,14 +149,14 @@ namespace Microsoft.SpatialAlignment.Persistence
                     largeScaleFrame.transform.parent = null;
 
                     // Put the model in refining mode
-                    largeScaleModel.RefinementMode = RefinementMode.Refining;
+                    largeScaleModel.RefinementMode = RefinableModelMode.Refining;
                     break;
 
 
                 case AddAnchorStep.Finishing:
 
                     // Large scale model is now placed
-                    largeScaleModel.RefinementMode = RefinementMode.Placed;
+                    largeScaleModel.RefinementMode = RefinableModelMode.Placed;
 
                     // Unsubscribe from anchor events
                     UnsubscribeAnchor(newAnchor);
@@ -257,8 +257,8 @@ namespace Microsoft.SpatialAlignment.Persistence
             else
             {
                 // Subscribe to refinement events
-                largeScaleModel.CanceledRefinement += LargeScaleModel_CanceledRefinement;
-                largeScaleModel.FinishedRefinement += LargeScaleModel_FinishedRefinement;
+                largeScaleModel.RefinementCanceled += LargeScaleModel_CanceledRefinement;
+                largeScaleModel.RefinementFinished += LargeScaleModel_FinishedRefinement;
 
                 // Attempt to get the frame
                 largeScaleFrame = largeScaleModel.GetComponent<SpatialFrame>();
@@ -286,16 +286,16 @@ namespace Microsoft.SpatialAlignment.Persistence
         private void SubscribeAnchor(RefinableModel anchor)
         {
             // Subscribe from refinement events
-            anchor.CanceledRefinement += Anchor_CanceledRefinement;
-            anchor.FinishedRefinement += Anchor_FinishedRefinement;
+            anchor.RefinementCanceled += Anchor_CanceledRefinement;
+            anchor.RefinementFinished += Anchor_FinishedRefinement;
             anchor.RefinementModeChanged += Anchor_RefinementModeChanged;
         }
 
         private void UnsubscribeAnchor(RefinableModel anchor)
         {
             // Unsubscribe from refinement events
-            anchor.CanceledRefinement -= Anchor_CanceledRefinement;
-            anchor.FinishedRefinement -= Anchor_FinishedRefinement;
+            anchor.RefinementCanceled -= Anchor_CanceledRefinement;
+            anchor.RefinementFinished -= Anchor_FinishedRefinement;
             anchor.RefinementModeChanged -= Anchor_RefinementModeChanged;
         }
         #endregion // Internal Methods
@@ -323,7 +323,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
             // If we are placing an anchor and it's now placed,
             // go on to the next step.
-            if ((anchorStep == AddAnchorStep.PlacingAnchor) && (newAnchor.RefinementMode == RefinementMode.Placed))
+            if ((anchorStep == AddAnchorStep.PlacingAnchor) && (newAnchor.RefinementMode == RefinableModelMode.Placed))
             {
                 NextStep();
             }
@@ -390,7 +390,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
 
             // Put large scale model back in placed mode
-            largeScaleModel.RefinementMode = RefinementMode.Placed;
+            largeScaleModel.RefinementMode = RefinableModelMode.Placed;
 
             // Unsubscribe from anchor events
             UnsubscribeAnchor(newAnchor);
