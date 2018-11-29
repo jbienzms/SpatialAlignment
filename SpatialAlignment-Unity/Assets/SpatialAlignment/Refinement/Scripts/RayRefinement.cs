@@ -80,11 +80,13 @@ namespace Microsoft.SpatialAlignment
         #endregion // Constants
 
         #region Member Variables
-        private RayRefinementStep currentStep;		// What step we're on in the refinement
-        private GameObject modelOrigin;				// GameObject instance representing the models origin
+        private RayRefinementStep currentStep;      // What step we're on in the refinement
         private GameObject modelDirection;          // GameObject instance representing the models direction
-        private GameObject placementOrigin;         // GameObject instance representing the placement origin
+        private LineRenderer modelLine;             // Used to render a line pointing from the model origin in the model direction
+        private GameObject modelOrigin;				// GameObject instance representing the models origin
         private GameObject placementDirection;      // GameObject instance representing the placement direction
+        private LineRenderer placementLine;         // Used to render a line pointing from the placement origin in the placement direction
+        private GameObject placementOrigin;         // GameObject instance representing the placement origin
         private Interpolator targetInterpolator;    // Interpolator used to move the current target
         private bool targetPlaced;					// Whether or not the current target has been placed
         #endregion // Member Variables
@@ -112,6 +114,33 @@ namespace Microsoft.SpatialAlignment
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
+        /// <summary>
+        /// Adds a line renderer to the parent and formats it.
+        /// </summary>
+        /// <param name="parent">
+        /// The parent where the line renderer should be added.
+        /// </param>
+        /// <returns>
+        /// The added line renderer
+        /// </returns>
+        private LineRenderer AddLine(GameObject parent)
+        {
+            // Create the line renderer
+            LineRenderer line = parent.EnsureComponent<LineRenderer>();
+
+            // Set the number of points
+            line.positionCount = 2;
+
+            // TODO: Format the line
+            line.startColor = Color.green;
+            line.startWidth = 4;
+            line.endColor = Color.green;
+            line.endWidth = 4;
+
+            // Done!
+            return line;
+        }
+
         /// <summary>
         /// Destroys the object and releases the reference to it.
         /// </summary>
@@ -185,6 +214,9 @@ namespace Microsoft.SpatialAlignment
                     // Create the target
                     CreateTarget(directionPrefab, ref modelDirection, currentStep.ToString());
 
+                    // Add line renderer
+                    modelLine = AddLine(modelDirection);
+
                     break;
 
 
@@ -200,6 +232,9 @@ namespace Microsoft.SpatialAlignment
 
                     // Create the target
                     CreateTarget(directionPrefab, ref placementDirection, currentStep.ToString());
+
+                    // Add line renderer
+                    placementLine = AddLine(placementDirection);
 
                     break;
 
@@ -233,6 +268,8 @@ namespace Microsoft.SpatialAlignment
             Cleanup(ref modelDirection);
             Cleanup(ref placementOrigin);
             Cleanup(ref placementDirection);
+            modelLine = null;
+            placementLine = null;
             targetInterpolator = null;
         }
         #endregion // Internal Methods
@@ -344,7 +381,8 @@ namespace Microsoft.SpatialAlignment
                 // Tell the target to move to the new position
                 targetInterpolator.SetTargetPosition(hitInfo.point);
 
-                // If the current target is a direction target, we need to orientate it too
+                // If the current target is a direction target, we need to
+                // orientate it and update the line renderer too
                 if (isDirection)
                 {
                     // Get the origin that matches this direction
@@ -355,6 +393,12 @@ namespace Microsoft.SpatialAlignment
 
                     // Rotate the target to point away from the origin
                     targetInterpolator.SetTargetRotation(Quaternion.FromToRotation(transform.up, relativePos));
+
+                    // Get the line renderer
+                    LineRenderer line = (isModel ? modelLine : placementLine);
+
+                    // Update the points
+                    line.SetPositions(new Vector3[] { origin.position, transform.position });
                 }
 
                 // Target has been placed
