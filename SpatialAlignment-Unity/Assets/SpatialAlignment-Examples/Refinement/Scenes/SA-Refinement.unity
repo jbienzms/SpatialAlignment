@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -221,6 +221,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1000011070707148, guid: 3eddd1c29199313478dd3f912bfab2ab, type: 3}
+      propertyPath: m_Name
+      value: InputManager
+      objectReference: {fileID: 0}
     - target: {fileID: 4000011656901714, guid: 3eddd1c29199313478dd3f912bfab2ab, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -265,10 +269,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1000011070707148, guid: 3eddd1c29199313478dd3f912bfab2ab, type: 3}
-      propertyPath: m_Name
-      value: InputManager
-      objectReference: {fileID: 0}
     - target: {fileID: 114742747811649402, guid: 3eddd1c29199313478dd3f912bfab2ab,
         type: 3}
       propertyPath: Cursor
@@ -288,6 +288,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1850730992894404, guid: d29bc40b7f3df26479d6a0aac211c355, type: 3}
+      propertyPath: m_Name
+      value: MixedRealityCameraParent
+      objectReference: {fileID: 0}
     - target: {fileID: 4541142303025740, guid: d29bc40b7f3df26479d6a0aac211c355, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -331,10 +335,6 @@ PrefabInstance:
     - target: {fileID: 4541142303025740, guid: d29bc40b7f3df26479d6a0aac211c355, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1850730992894404, guid: d29bc40b7f3df26479d6a0aac211c355, type: 3}
-      propertyPath: m_Name
-      value: MixedRealityCameraParent
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d29bc40b7f3df26479d6a0aac211c355, type: 3}
@@ -345,6 +345,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1000010302963436, guid: 2ed75ffdf9031c94e8bce4b3d17b9928, type: 3}
+      propertyPath: m_Name
+      value: SpatialMapping
+      objectReference: {fileID: 0}
     - target: {fileID: 4000013298573622, guid: 2ed75ffdf9031c94e8bce4b3d17b9928, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -388,10 +392,6 @@ PrefabInstance:
     - target: {fileID: 4000013298573622, guid: 2ed75ffdf9031c94e8bce4b3d17b9928, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1000010302963436, guid: 2ed75ffdf9031c94e8bce4b3d17b9928, type: 3}
-      propertyPath: m_Name
-      value: SpatialMapping
       objectReference: {fileID: 0}
     - target: {fileID: 114000011154029958, guid: 2ed75ffdf9031c94e8bce4b3d17b9928,
         type: 3}
@@ -609,21 +609,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 404797277}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a5bb127cefd14d48861c04fc787a0d7, type: 3}
+  m_Script: {fileID: 11500000, guid: f42398d4a8c3e96498875ceeb1048a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactables: []
-  Targets: []
-  lockFocus: 0
-  manipulationMode: 5
-  rotationConstraint: 2
-  refinementMode: 0
-  useBoundingBoxRig: 0
-  useTwoHand: 1
-  appBarPrefab: {fileID: 114050950401502068, guid: aa610ada334bff640a535f0d23a9a15c,
-    type: 3}
-  boundingBoxPrefab: {fileID: 114030465538688920, guid: 865a8ded6c47efd4285f04f3aebe99e9,
-    type: 3}
+  refineOnStart: 1
+  directionPrefab: {fileID: 0}
+  maxDistance: 3
+  modelLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  originPrefab: {fileID: 0}
+  placementLayers:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &992500263
 GameObject:
   m_ObjectHideFlags: 0
@@ -749,7 +747,7 @@ MonoBehaviour:
   anchorContainer: {fileID: 97103547}
   anchorPrefab: {fileID: 6140007148329196893, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
     type: 3}
-  largeScaleModel: {fileID: 404797284}
+  largeScaleModel: {fileID: 404797277}
 --- !u!4 &1034952783
 Transform:
   m_ObjectHideFlags: 0
@@ -1029,6 +1027,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1000012072213228, guid: a611e772ef8ddf64d8106a9cbb70f31c, type: 3}
+      propertyPath: m_Name
+      value: DefaultCursor
+      objectReference: {fileID: 0}
     - target: {fileID: 4000011792100794, guid: a611e772ef8ddf64d8106a9cbb70f31c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1072,10 +1074,6 @@ PrefabInstance:
     - target: {fileID: 4000011792100794, guid: a611e772ef8ddf64d8106a9cbb70f31c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1000012072213228, guid: a611e772ef8ddf64d8106a9cbb70f31c, type: 3}
-      propertyPath: m_Name
-      value: DefaultCursor
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a611e772ef8ddf64d8106a9cbb70f31c, type: 3}
@@ -1249,6 +1247,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6140007148329196893, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
+        type: 3}
+      propertyPath: m_Name
+      value: RefinableAnchor
+      objectReference: {fileID: 0}
+    - target: {fileID: 6140007148329196893, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6140007148329025917, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1304,11 +1312,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6140007148329196893, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
-        type: 3}
-      propertyPath: m_Name
-      value: RefinableAnchor
-      objectReference: {fileID: 0}
     - target: {fileID: 6140007148329196883, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
         type: 3}
       propertyPath: m_Enabled
@@ -1322,11 +1325,6 @@ PrefabInstance:
     - target: {fileID: 6140007148329196887, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
         type: 3}
       propertyPath: mode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6140007148329196893, guid: 65fa06b8557cfec4aa35d0d5913ccc38,
-        type: 3}
-      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2677089888787947171, guid: 65fa06b8557cfec4aa35d0d5913ccc38,

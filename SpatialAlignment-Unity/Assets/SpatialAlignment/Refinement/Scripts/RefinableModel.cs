@@ -436,10 +436,7 @@ namespace Microsoft.SpatialAlignment
             }
             set
             {
-                if (refinementMode != value)
-                {
-                    SwitchMode(value);
-                }
+                refinementMode = value;
             }
         }
 

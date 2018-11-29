@@ -61,6 +61,7 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         #region Member Variables
         private SpatialFrame largeScaleFrame;
+        private RefinementController largeScaleRefinement;
         private RefinementExampleMode mode;
         private MultiParentAlignment multiParent;
         private RefinableModel newAnchor;
@@ -79,7 +80,7 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         [SerializeField]
         [Tooltip("The large-scale model.")]
-        private RefinableModel largeScaleModel;
+        private GameObject largeScaleModel;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -149,14 +150,14 @@ namespace Microsoft.SpatialAlignment.Persistence
                     largeScaleFrame.transform.parent = null;
 
                     // Put the model in refining mode
-                    largeScaleModel.RefinementMode = RefinableModelMode.Refining;
+                    largeScaleRefinement.StartRefinement();
                     break;
 
 
                 case AddAnchorStep.Finishing:
 
                     // Large scale model is now placed
-                    largeScaleModel.RefinementMode = RefinableModelMode.Placed;
+                    largeScaleRefinement.FinishRefinement();
 
                     // Unsubscribe from anchor events
                     UnsubscribeAnchor(newAnchor);
@@ -256,9 +257,18 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
             else
             {
+                // Make sure large scale has a refinement controller
+                largeScaleRefinement = largeScaleModel.GetComponent<RefinementController>();
+
+                // If none is found, use ray-based refinement
+                if (largeScaleRefinement == null)
+                {
+                    largeScaleRefinement = largeScaleModel.AddComponent<RayRefinement>();
+                }
+
                 // Subscribe to refinement events
-                largeScaleModel.RefinementCanceled += LargeScaleModel_CanceledRefinement;
-                largeScaleModel.RefinementFinished += LargeScaleModel_FinishedRefinement;
+                largeScaleRefinement.RefinementCanceled += LargeScaleRefinement_RefinementCanceled;
+                largeScaleRefinement.RefinementFinished += LargeScaleRefinement_RefinementFinished;
 
                 // Attempt to get the frame
                 largeScaleFrame = largeScaleModel.GetComponent<SpatialFrame>();
@@ -329,7 +339,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
-        private void LargeScaleModel_CanceledRefinement(object sender, System.EventArgs e)
+        private void LargeScaleRefinement_RefinementCanceled(object sender, System.EventArgs e)
         {
             // Cancel adding anchor
             if (mode == RefinementExampleMode.AddAnchor)
@@ -338,7 +348,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
-        private void LargeScaleModel_FinishedRefinement(object sender, System.EventArgs e)
+        private void LargeScaleRefinement_RefinementFinished(object sender, System.EventArgs e)
         {
             // If adding an anchor, go on to the next step
             if (mode == RefinementExampleMode.AddAnchor)
@@ -389,8 +399,8 @@ namespace Microsoft.SpatialAlignment.Persistence
                 return;
             }
 
-            // Put large scale model back in placed mode
-            largeScaleModel.RefinementMode = RefinableModelMode.Placed;
+            // Cancel refinement of the large scale model
+            largeScaleRefinement.CancelRefinement();
 
             // Unsubscribe from anchor events
             UnsubscribeAnchor(newAnchor);
@@ -488,7 +498,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// <summary>
         /// Gets or sets the large-scale model.
         /// </summary>
-        public RefinableModel LargeScaleModel { get { return largeScaleModel; } set { largeScaleModel = value; } }
+        public GameObject LargeScaleModel { get { return largeScaleModel; } set { largeScaleModel = value; } }
         #endregion // Public Properties
     }
 }
