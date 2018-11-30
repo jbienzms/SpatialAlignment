@@ -175,9 +175,6 @@ namespace Microsoft.SpatialAlignment
             // Create prefab
             target = GameObject.Instantiate(prefab);
 
-            // Make it a (temporary) child
-            target.transform.SetParent(this.transform, worldPositionStays: true);
-
             // Make sure it's active (in case inactive due to auto generation)
             target.SetActive(true);
 
@@ -264,10 +261,10 @@ namespace Microsoft.SpatialAlignment
                     float placementAngle = Mathf.Atan2(placementDirectionWorld.x - placementOriginWorld.x, placementDirectionWorld.z - placementOriginWorld.z) * Mathf.Rad2Deg;
 
                     // Calculate the model -> placement position offset
-                    Vector3 offset = modelOriginWorld - placementOriginWorld;
+                    Vector3 offset = placementOriginWorld - modelOriginWorld;
 
                     // Calculate the model -> placement rotation offset
-                    float rotation = modelAngle - placementAngle;
+                    float rotation = placementAngle - modelAngle;
 
                     // Update parent position to align origins
                     gameObject.transform.Translate(offset);
