@@ -30,6 +30,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Microsoft.SpatialAlignment
 {
@@ -97,8 +98,12 @@ namespace Microsoft.SpatialAlignment
         private GameObject directionPrefab;
 
         [SerializeField]
+        [Tooltip("The prefab used to generate a line. If one is not specified, a default will be used.")]
+        private LineRenderer linePrefab;
+
+        [SerializeField]
         [Tooltip("Maximum distance from the user to consider when selecting model and placement points.")]
-        private float maxDistance = 3.0f;
+        private float maxDistance = 4.5f;
 
         [SerializeField]
         [Tooltip("The layers that represent the model.")]
@@ -126,16 +131,13 @@ namespace Microsoft.SpatialAlignment
         private LineRenderer AddLine(GameObject parent)
         {
             // Create the line renderer
-            LineRenderer line = parent.EnsureComponent<LineRenderer>();
+            LineRenderer line = Instantiate(linePrefab, parent.transform);
+
+            // Make sure it's active (in case disabled due to auto generation)
+            line.gameObject.SetActive(true);
 
             // Set the number of points
             line.positionCount = 2;
-
-            // TODO: Format the line
-            line.startColor = Color.green;
-            line.startWidth = 4;
-            line.endColor = Color.green;
-            line.endWidth = 4;
 
             // Done!
             return line;
@@ -172,6 +174,12 @@ namespace Microsoft.SpatialAlignment
         {
             // Create prefab
             target = GameObject.Instantiate(prefab);
+
+            // Make it a (temporary) child
+            target.transform.SetParent(this.transform, worldPositionStays: true);
+
+            // Make sure it's active (in case inactive due to auto generation)
+            target.SetActive(true);
 
             // Name it
             target.name = name;
@@ -241,7 +249,31 @@ namespace Microsoft.SpatialAlignment
 
                 case RayRefinementStep.Refinement:
 
-                    // TODO: Calculate and Apply
+                    // Get transform positions
+                    Vector3 modelOriginWorld = modelOrigin.transform.position;
+                    // Vector3 modelOriginLocal = modelOrigin.transform.localPosition;
+                    Vector3 modelDirectionWorld = modelDirection.transform.position;
+                    // Vector3 modelDirectionLocal = modelDirection.transform.localPosition;
+                    Vector3 placementOriginWorld = placementOrigin.transform.position;
+                    Vector3 placementDirectionWorld = placementDirection.transform.position;
+
+                    // Calculate the model angle
+                    float modelAngle = Mathf.Atan2(modelDirectionWorld.x - modelOriginWorld.x, modelDirectionWorld.z - modelOriginWorld.z) * Mathf.Rad2Deg;
+
+                    // Calculate the placement angle
+                    float placementAngle = Mathf.Atan2(placementDirectionWorld.x - placementOriginWorld.x, placementDirectionWorld.z - placementOriginWorld.z) * Mathf.Rad2Deg;
+
+                    // Calculate the model -> placement position offset
+                    Vector3 offset = modelOriginWorld - placementOriginWorld;
+
+                    // Calculate the model -> placement rotation offset
+                    float rotation = modelAngle - placementAngle;
+
+                    // Update parent position to align origins
+                    gameObject.transform.Translate(offset);
+
+                    // Update parent rotation, but around model origin
+                    gameObject.transform.RotateAround(modelOriginWorld, Vector3.up, rotation);
 
                     break;
 
@@ -330,23 +362,40 @@ namespace Microsoft.SpatialAlignment
             if (placementLayers == 0)
             {
                 // If SpatialMappingManager is valid, use its layer mask
-                // Otherwise, use all default raycast layers.
-                int mask = (SpatialMappingManager.Instance != null ? SpatialMappingManager.Instance.LayerMask : Physics.DefaultRaycastLayers);
+                // Otherwise, use the 'Default' layer.
+                int mask = (SpatialMappingManager.Instance != null ? SpatialMappingManager.Instance.LayerMask : 1 << 0);
                 placementLayers = mask;
             }
 
-            // If no prefabs have been specified, create something default
+            // If any prefab has not been specified, create something default
+            if (linePrefab == null)
+            {
+                GameObject lineGO = new GameObject();
+                linePrefab = lineGO.AddComponent<LineRenderer>();
+                linePrefab.shadowCastingMode = ShadowCastingMode.Off;
+                linePrefab.receiveShadows = false;
+                linePrefab.allowOcclusionWhenDynamic = false;
+                linePrefab.startWidth = 0.02f;
+                linePrefab.endWidth = 0.02f;
+                linePrefab.numCapVertices = 1;
+                linePrefab.alignment = LineAlignment.View;
+                lineGO.SetActive(false);
+            }
             if (originPrefab == null)
             {
                 originPrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                originPrefab.transform.SetParent(transform, worldPositionStays: true);
                 originPrefab.GetComponent<Collider>().enabled = false;
                 originPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
+                originPrefab.SetActive(false);
             }
             if (directionPrefab == null)
             {
                 directionPrefab = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                directionPrefab.transform.SetParent(transform, worldPositionStays: true);
                 directionPrefab.GetComponent<Collider>().enabled = false;
                 directionPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
+                directionPrefab.SetActive(false);
             }
 
             // Pass to base to complete startup
@@ -374,35 +423,38 @@ namespace Microsoft.SpatialAlignment
             // Get camera transform
             Transform cameraTransform = CameraCache.Main.transform;
 
-            // Try to find a point on one of the layers
+            // Try to find a new position on the current layer
             RaycastHit hitInfo;
             if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hitInfo, maxDistance, layers))
             {
                 // Tell the target to move to the new position
                 targetInterpolator.SetTargetPosition(hitInfo.point);
 
-                // If the current target is a direction target, we need to
-                // orientate it and update the line renderer too
-                if (isDirection)
-                {
-                    // Get the origin that matches this direction
-                    Transform origin = (isModel ? modelOrigin.transform : placementOrigin.transform);
-
-                    // Calculate the relative offset between the two
-                    Vector3 relativePos = hitInfo.point - origin.position;
-
-                    // Rotate the target to point away from the origin
-                    targetInterpolator.SetTargetRotation(Quaternion.FromToRotation(transform.up, relativePos));
-
-                    // Get the line renderer
-                    LineRenderer line = (isModel ? modelLine : placementLine);
-
-                    // Update the points
-                    line.SetPositions(new Vector3[] { origin.position, transform.position });
-                }
-
                 // Target has been placed
                 targetPlaced = true;
+            }
+
+            // If the current target is a direction target, we need to
+            // orientate it and update the line renderer too
+            if (isDirection)
+            {
+                // Get this directions transform
+                Transform direction = (isModel ? modelDirection.transform : placementDirection.transform);
+
+                // Get the transform of the origin that matches this direction
+                Transform origin = (isModel ? modelOrigin.transform : placementOrigin.transform);
+
+                // Calculate the relative offset between the two
+                Vector3 relativePos = direction.position - origin.position;
+
+                // Rotate the target direction to point away from the origin
+                targetInterpolator.SetTargetRotation(Quaternion.FromToRotation(transform.up, relativePos));
+
+                // Get the line renderer
+                LineRenderer line = (isModel ? modelLine : placementLine);
+
+                // Update the points
+                line.SetPositions(new Vector3[] { origin.position, direction.position });
             }
         }
         #endregion // Unity Overrides
@@ -415,6 +467,14 @@ namespace Microsoft.SpatialAlignment
         /// If one is not specified, a capsule will be used.
         /// </remarks>
         public GameObject DirectionPrefab { get { return directionPrefab; } set { directionPrefab = value; } }
+
+        /// <summary>
+        /// Gets or sets the prefab used to generate a line.
+        /// </summary>
+        /// <remarks>
+        /// If one is not specified, a default will be used.
+        /// </remarks>
+        public LineRenderer LinePrefab { get { return linePrefab; } set { linePrefab = value; } }
 
         /// <summary>
         /// Gets or sets the maximum distance from the user to consider when
