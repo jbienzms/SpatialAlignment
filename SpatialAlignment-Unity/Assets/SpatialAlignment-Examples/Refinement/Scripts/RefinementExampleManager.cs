@@ -46,7 +46,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
             New,
             PlacingAnchor,
-            RefiningAnchor,
+            // RefiningAnchor,
             RefiningModel,
             Finishing,
             Done,
@@ -124,11 +124,11 @@ namespace Microsoft.SpatialAlignment.Persistence
                     break;
 
 
-                case AddAnchorStep.RefiningAnchor:
+                //case AddAnchorStep.RefiningAnchor:
 
-                    // Now refining anchor
-                    newAnchor.RefinementMode = RefinableModelMode.Refining;
-                    break;
+                //    // Now refining anchor
+                //    newAnchor.RefinementMode = RefinableModelMode.Refining;
+                //    break;
 
 
                 case AddAnchorStep.RefiningModel:

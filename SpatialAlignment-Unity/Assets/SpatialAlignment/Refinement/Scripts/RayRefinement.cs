@@ -211,6 +211,9 @@ namespace Microsoft.SpatialAlignment
                     // Create the target
                     CreateTarget(originPrefab, ref modelOrigin, currentStep.ToString());
 
+                    // Parent the target
+                    modelOrigin.transform.SetParent(this.transform, worldPositionStays: true);
+
                     break;
 
 
@@ -218,6 +221,9 @@ namespace Microsoft.SpatialAlignment
 
                     // Create the target
                     CreateTarget(directionPrefab, ref modelDirection, currentStep.ToString());
+
+                    // Parent the target
+                    modelDirection.transform.SetParent(this.transform, worldPositionStays: true);
 
                     // Add line renderer
                     modelLine = AddLine(modelDirection);
@@ -264,13 +270,16 @@ namespace Microsoft.SpatialAlignment
                     Vector3 offset = placementOriginWorld - modelOriginWorld;
 
                     // Calculate the model -> placement rotation offset
-                    float rotation = placementAngle - modelAngle;
+                    float rotation = (placementAngle - modelAngle);
 
                     // Update parent position to align origins
                     gameObject.transform.Translate(offset);
 
-                    // Update parent rotation, but around model origin
-                    gameObject.transform.RotateAround(modelOriginWorld, Vector3.up, rotation);
+                    // Update parent rotation, but around placement origin
+                    gameObject.transform.RotateAround(placementOriginWorld, Vector3.up, rotation);
+
+                    // Finish refinement
+                    FinishRefinement();
 
                     break;
 
