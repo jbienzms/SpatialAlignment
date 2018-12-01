@@ -138,10 +138,6 @@
     <Compile Include="Assets\HoloToolkit\UX\Scripts\Collections\Editor\CollectionEditor.cs" />
     <Compile Include="Assets\HoloToolkit\UX\Scripts\Editor\CompoundButtonSaveInterceptor.cs" />
     <Compile Include="Assets\HoloToolkit\UX\Scripts\Editor\KeyboardInputFieldEditor.cs" />
-    <Compile Include="Assets\HoloToolkit-Examples\Medical\Editor\VolumeInformationEditor.cs" />
-    <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\Scripts\SpatialSync\MarkerGeneration3D\Editor\MarkerGeneration3DEditor.cs" />
-    <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\Scripts\Utilities\Editor\PlatformSwitcherEditor.cs" />
-    <Compile Include="Assets\HoloToolkit-Preview\SpectatorView\UnityARKitPlugin\Plugins\iOS\UnityARKit\Editor\UnityARBuildPostprocessor.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
@@ -414,9 +410,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit/Utilities/Scripts/GLTF/Plugins/JsonNet/Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="QRCodesTrackerPlugin.Placeholder">
-      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/HoloToolkit-Preview/QRTracker/Plugins/QRCodesTrackerPlugin.Placeholder.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.Advertisements">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/PackageCache/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>

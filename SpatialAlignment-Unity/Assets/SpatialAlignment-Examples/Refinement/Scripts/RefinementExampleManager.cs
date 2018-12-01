@@ -56,6 +56,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
             None,
             AddAnchor,
+            AddAnchorCancel,
             EditingAnchor,
         }
 
@@ -402,8 +403,14 @@ namespace Microsoft.SpatialAlignment.Persistence
                 return;
             }
 
-            // Cancel refinement of the large scale model
-            largeScaleRefinement.CancelRefinement();
+            // Now canceling
+            mode = RefinementExampleMode.AddAnchorCancel;
+
+            // Cancel refinement of the large scale model if in progress
+            if (largeScaleRefinement.IsRefining)
+            {
+                largeScaleRefinement.CancelRefinement();
+            }
 
             // Unsubscribe from anchor events
             UnsubscribeAnchor(newAnchor);
