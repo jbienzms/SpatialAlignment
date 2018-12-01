@@ -5,12 +5,17 @@ ModelImporter:
   fileIDToRecycleName:
     100000: //RootNode
     100002: Simplygon_Proxy_011d7255-d5fd-4503-bf7a-c0f44a13720d
+    100004: Simplygon_Proxy_d9f501da-e084-49e5-9b0f-a1cc5fe4a15c
     400000: //RootNode
     400002: Simplygon_Proxy_011d7255-d5fd-4503-bf7a-c0f44a13720d
+    400004: Simplygon_Proxy_d9f501da-e084-49e5-9b0f-a1cc5fe4a15c
     2100000: SimplygonMaterial
     2300000: Simplygon_Proxy_011d7255-d5fd-4503-bf7a-c0f44a13720d
+    2300002: Simplygon_Proxy_d9f501da-e084-49e5-9b0f-a1cc5fe4a15c
     3300000: Simplygon_Proxy_011d7255-d5fd-4503-bf7a-c0f44a13720d
+    3300002: Simplygon_Proxy_d9f501da-e084-49e5-9b0f-a1cc5fe4a15c
     4300000: Simplygon_Proxy_011d7255-d5fd-4503-bf7a-c0f44a13720d
+    4300002: Simplygon_Proxy_d9f501da-e084-49e5-9b0f-a1cc5fe4a15c
   externalObjects:
   - first:
       type: UnityEngine:Material

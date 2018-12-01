@@ -460,6 +460,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: Parent3
+--- !u!1 &722041392 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100004, guid: 924d98aafe80bf149a5626f2319a4e19,
+    type: 3}
+  m_PrefabInstance: {fileID: 1190320660}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &722041393
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722041392}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Convex: 0
+  m_CookingOptions: 14
+  m_Mesh: {fileID: 4300002, guid: 924d98aafe80bf149a5626f2319a4e19, type: 3}
 --- !u!1 &992500263
 GameObject:
   m_ObjectHideFlags: 0
@@ -724,7 +744,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 924d98aafe80bf149a5626f2319a4e19, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 924d98aafe80bf149a5626f2319a4e19, type: 3}
       propertyPath: m_LocalPosition.z
@@ -770,26 +790,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1190320660}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1190320662 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 100002, guid: 924d98aafe80bf149a5626f2319a4e19,
-    type: 3}
-  m_PrefabInstance: {fileID: 1190320660}
-  m_PrefabAsset: {fileID: 0}
---- !u!64 &1190320663
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1190320662}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 4300000, guid: 924d98aafe80bf149a5626f2319a4e19, type: 3}
 --- !u!1 &1231208087
 GameObject:
   m_ObjectHideFlags: 0
@@ -1019,7 +1019,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1707357403}
-  - component: {fileID: 1707357402}
   - component: {fileID: 1707357401}
   - component: {fileID: 1707357400}
   - component: {fileID: 1707357399}
@@ -1043,6 +1042,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   refineOnStart: 0
+  autoHideMeshes: 1
   directionPrefab: {fileID: 3882863017087187430, guid: 8e43969e520e5d149b6ca084446340d7,
     type: 3}
   linePrefab: {fileID: 8062754497135014639, guid: 10f42e7657b039e4c87ca690a6515329,
@@ -1083,20 +1083,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentOptions: []
   referenceTransform: {fileID: 0}
-  updateFrequency: 1
---- !u!65 &1707357402
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1707357398}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 17.123638, y: 1, z: 20.473433}
-  m_Center: {x: 0.1323719, y: 0, z: -0.6232023}
+  updateFrequency: 2
 --- !u!4 &1707357403
 Transform:
   m_ObjectHideFlags: 0

@@ -29,6 +29,7 @@ using HoloToolkit.Unity.SpatialMapping;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -89,10 +90,14 @@ namespace Microsoft.SpatialAlignment
         private LineRenderer placementLine;         // Used to render a line pointing from the placement origin in the placement direction
         private GameObject placementOrigin;         // GameObject instance representing the placement origin
         private Interpolator targetInterpolator;    // Interpolator used to move the current target
-        private bool targetPlaced;					// Whether or not the current target has been placed
+        private bool targetPlaced;                  // Whether or not the current target has been placed
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [SerializeField]
+        [Tooltip("Whether to automatically show and hide the mesh during placement.")]
+        private bool autoHideMeshes = true;
+
         [SerializeField]
         [Tooltip("The prefab used to represent a direction. If one is not specified, a capsule will be used.")]
         private GameObject directionPrefab;
@@ -233,6 +238,13 @@ namespace Microsoft.SpatialAlignment
 
                 case RayRefinementStep.PlacementOrigin:
 
+                    // Hide meshes?
+                    if (autoHideMeshes)
+                    {
+                        modelLine.enabled = false;
+                        this.gameObject.SetMeshesEnabled(enabled: false, inChildren: true);
+                    }
+
                     // Create the target
                     CreateTarget(originPrefab, ref placementOrigin, currentStep.ToString());
 
@@ -251,6 +263,13 @@ namespace Microsoft.SpatialAlignment
 
 
                 case RayRefinementStep.Refinement:
+
+                    // Re-show meshes?
+                    if (autoHideMeshes)
+                    {
+                        modelLine.enabled = true;
+                        this.gameObject.SetMeshesEnabled(enabled: true, inChildren: true);
+                    }
 
                     // Get transform positions
                     Vector3 modelOriginWorld = modelOrigin.transform.position;
@@ -466,6 +485,11 @@ namespace Microsoft.SpatialAlignment
         #endregion // Unity Overrides
 
         #region Public Properties
+        /// <summary>
+        /// Gets or sets whether to automatically show and hide the mesh during placement.
+        /// </summary>
+        public bool AutoHideMeshes { get { return autoHideMeshes; } set { autoHideMeshes = value; } }
+
         /// <summary>
         /// Gets or sets the prefab used to represent a direction.
         /// </summary>

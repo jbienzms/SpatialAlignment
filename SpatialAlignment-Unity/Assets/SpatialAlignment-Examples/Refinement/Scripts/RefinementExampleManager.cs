@@ -156,8 +156,11 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                 case AddAnchorStep.Finishing:
 
-                    // Large scale model is now placed
-                    largeScaleRefinement.FinishRefinement();
+                    // Finish refinement if still in progress
+                    if (largeScaleRefinement.IsRefining)
+                    {
+                        largeScaleRefinement.FinishRefinement();
+                    }
 
                     // Unsubscribe from anchor events
                     UnsubscribeAnchor(newAnchor);
