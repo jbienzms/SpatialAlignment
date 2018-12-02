@@ -77,6 +77,8 @@ namespace Microsoft.SpatialAlignment
     /// </summary>
     public class RayRefinement : RefinementController, IInputClickHandler
     {
+        private Vector3 keepLocation; // HACK:
+
         #region Constants
         private const float DEF_SCALE = 0.05f;
         #endregion // Constants
@@ -292,10 +294,12 @@ namespace Microsoft.SpatialAlignment
                     float rotation = (placementAngle - modelAngle);
 
                     // Update parent position to align origins
-                    gameObject.transform.Translate(offset);
+                    gameObject.transform.position += offset;
 
                     // Update parent rotation, but around placement origin
                     gameObject.transform.RotateAround(placementOriginWorld, Vector3.up, rotation);
+
+                    // HACK: keepLocation = placementOriginWorld;
 
                     // Finish refinement
                     FinishRefinement();
@@ -323,8 +327,10 @@ namespace Microsoft.SpatialAlignment
             // Cleanup resources
             Cleanup(ref modelOrigin);
             Cleanup(ref modelDirection);
-            Cleanup(ref placementOrigin);
-            Cleanup(ref placementDirection);
+            // HACK:
+            //Cleanup(ref placementOrigin);
+            //Cleanup(ref placementDirection);
+
             modelLine = null;
             placementLine = null;
             targetInterpolator = null;
@@ -432,6 +438,12 @@ namespace Microsoft.SpatialAlignment
         {
             // Pass to base first
             base.Update();
+
+            // HACK:
+            if (keepLocation != Vector3.zero)
+            {
+                gameObject.transform.RotateAround(keepLocation, Vector3.up, Time.deltaTime * 20);
+            }
 
             // If not moving targets, nothing to do
             if (currentStep == RayRefinementStep.None || currentStep == RayRefinementStep.Refinement) { return; }

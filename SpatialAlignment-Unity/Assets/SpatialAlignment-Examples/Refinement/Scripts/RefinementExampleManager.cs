@@ -478,6 +478,58 @@ namespace Microsoft.SpatialAlignment.Persistence
         }
 
         /// <summary>
+        /// Removes the specified anchor option.
+        /// </summary>
+        /// <param name="parentOption">
+        /// The option to remove.
+        /// </param>
+        public void RemoveAnchor(ParentAlignmentOptions parentOption)
+        {
+            // Validate
+            if (parentOption == null) throw new ArgumentNullException(nameof(parentOption));
+
+            // Remove
+            if (multiParent.ParentOptions.Contains(parentOption))
+            {
+                // If it's the current option, unparent
+                if (multiParent.CurrentParent == parentOption)
+                {
+                    LargeScaleModel.transform.parent = null;
+                }
+
+                // Remove the option
+                multiParent.ParentOptions.Remove(parentOption);
+
+                // Destroy the frame (and it's strategy) on the next tick
+                Destroy(parentOption.Frame.gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Removes the last anchor that was created.
+        /// </summary>
+        public void RemoveLastAnchor()
+        {
+            int lastIndex = multiParent.ParentOptions.Count - 1;
+            if (lastIndex >= 0)
+            {
+                RemoveAnchor(multiParent.ParentOptions[lastIndex]);
+            }
+        }
+
+        /// <summary>
+        /// Removes all anchors.
+        /// </summary>
+        public void ResetAnchors()
+        {
+            for (int i = multiParent.ParentOptions.Count -1; i >= 0; i--)
+            {
+                // Remove the anchor option
+                RemoveAnchor(multiParent.ParentOptions[i]);
+            }
+        }
+
+        /// <summary>
         /// Shows all refinement anchors.
         /// </summary>
         public void ShowAnchors()
