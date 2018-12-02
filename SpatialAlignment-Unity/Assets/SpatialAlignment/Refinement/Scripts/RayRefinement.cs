@@ -77,14 +77,13 @@ namespace Microsoft.SpatialAlignment
     /// </summary>
     public class RayRefinement : RefinementController, IInputClickHandler
     {
-        private Vector3 keepLocation; // HACK:
-
         #region Constants
         private const float DEF_SCALE = 0.05f;
         #endregion // Constants
 
         #region Member Variables
         private RayRefinementStep currentStep;      // What step we're on in the refinement
+        private Vector3 lastTargetPosition;			// The last position where a target was placed
         private GameObject modelDirection;          // GameObject instance representing the models direction
         private LineRenderer modelLine;             // Used to render a line pointing from the model origin in the model direction
         private GameObject modelOrigin;				// GameObject instance representing the models origin
@@ -181,6 +180,10 @@ namespace Microsoft.SpatialAlignment
         {
             // Create prefab
             target = GameObject.Instantiate(prefab);
+
+            // Start this target at the same location as the last target
+            // or near the user if there is no last target position
+            target.transform.position = (lastTargetPosition != Vector3.zero ? lastTargetPosition : CameraCache.Main.transform.position);
 
             // Make sure it's active (in case inactive due to auto generation)
             target.SetActive(true);
@@ -299,8 +302,6 @@ namespace Microsoft.SpatialAlignment
                     // Update parent rotation, but around placement origin
                     gameObject.transform.RotateAround(placementOriginWorld, Vector3.up, rotation);
 
-                    // HACK: keepLocation = placementOriginWorld;
-
                     // Finish refinement
                     FinishRefinement();
 
@@ -327,10 +328,11 @@ namespace Microsoft.SpatialAlignment
             // Cleanup resources
             Cleanup(ref modelOrigin);
             Cleanup(ref modelDirection);
-            // HACK:
-            //Cleanup(ref placementOrigin);
-            //Cleanup(ref placementDirection);
+            Cleanup(ref placementOrigin);
+            Cleanup(ref placementDirection);
 
+            // Reset placeholders
+            lastTargetPosition = Vector3.zero;
             modelLine = null;
             placementLine = null;
             targetInterpolator = null;
@@ -439,12 +441,6 @@ namespace Microsoft.SpatialAlignment
             // Pass to base first
             base.Update();
 
-            // HACK:
-            if (keepLocation != Vector3.zero)
-            {
-                gameObject.transform.RotateAround(keepLocation, Vector3.up, Time.deltaTime * 20);
-            }
-
             // If not moving targets, nothing to do
             if (currentStep == RayRefinementStep.None || currentStep == RayRefinementStep.Refinement) { return; }
 
@@ -464,8 +460,11 @@ namespace Microsoft.SpatialAlignment
             RaycastHit hitInfo;
             if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hitInfo, maxDistance, layers))
             {
+                // Store new position as last
+                lastTargetPosition = hitInfo.point;
+
                 // Tell the target to move to the new position
-                targetInterpolator.SetTargetPosition(hitInfo.point);
+                targetInterpolator.SetTargetPosition(lastTargetPosition);
 
                 // Target has been placed
                 targetPlaced = true;
