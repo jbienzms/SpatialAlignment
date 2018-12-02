@@ -340,6 +340,7 @@ namespace Microsoft.SpatialAlignment
         #endregion // Internal Methods
 
         #region Overrides / Event Handlers
+        /// <inheritdoc />
         protected virtual void OnInputClicked(InputClickedEventData eventData)
         {
             // If the current target has been successfully placed at least
@@ -353,12 +354,14 @@ namespace Microsoft.SpatialAlignment
             eventData.Use();
         }
 
+        /// <inheritdoc />
         protected override void OnRefinementCanceled()
         {
             StopAndCleanup();
             base.OnRefinementCanceled();
         }
 
+        /// <inheritdoc />
         protected override void OnRefinementFinished()
         {
             // Cleanup resources
@@ -368,6 +371,7 @@ namespace Microsoft.SpatialAlignment
             base.OnRefinementFinished();
         }
 
+        /// <inheritdoc />
         protected override void OnRefinementStarted()
         {
             // Capture input handler (released in StopAndCleanup)

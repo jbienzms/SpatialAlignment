@@ -76,6 +76,10 @@ MonoBehaviour:
     KeyCode: 91
   - Keyword: Reset Anchors
     KeyCode: 93
+  - Keyword: Remove Current Anchor
+    KeyCode: 92
+  - Keyword: Split View
+    KeyCode: 39
   recognitionConfidenceLevel: 0
 --- !u!114 &1633407209877629856
 MonoBehaviour:
@@ -181,6 +185,40 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 1633407209877629886}
           m_MethodName: ResetAnchors
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - Keyword: Remove Current Anchor
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1633407209877629886}
+          m_MethodName: RemoveCurrentAnchor
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - Keyword: Split View
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1633407209877629886}
+          m_MethodName: SplitView
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}

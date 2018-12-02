@@ -584,7 +584,6 @@
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinableModel.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinementController.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialAlignmentManager.cs" />
-    <Compile Include="Assets\SpatialAlignment\SpatialExtensions.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrame.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrameCollection.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\AlignmentStrategy.cs" />
@@ -593,6 +592,8 @@
     <Compile Include="Assets\SpatialAlignment\Strategies\ParentAlignmentOptions.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\SimulatedAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\WorldAnchorAlignment.cs" />
+    <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SpatialExtensions.cs" />
+    <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SplitViewManager.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <None Include="Assets\HoloToolkit\Utilities\Scripts\GLTF\Shaders\GLTFConstant.cginc" />

@@ -35,8 +35,6 @@ using UnityEngine.XR.WSA;
 
 namespace Microsoft.SpatialAlignment.Persistence
 {
-
-
     /// <summary>
     /// An example manager that shows how to add and edit refinement anchors.
     /// </summary>
@@ -506,6 +504,17 @@ namespace Microsoft.SpatialAlignment.Persistence
         }
 
         /// <summary>
+        /// Removes the current active anchor.
+        /// </summary>
+        public void RemoveCurrentAnchor()
+        {
+            if (multiParent.CurrentParent != null)
+            {
+                RemoveAnchor(multiParent.CurrentParent);
+            }
+        }
+
+        /// <summary>
         /// Removes the last anchor that was created.
         /// </summary>
         public void RemoveLastAnchor()
@@ -543,6 +552,21 @@ namespace Microsoft.SpatialAlignment.Persistence
         public void ShowModel()
         {
             largeScaleModel.gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Toggles on and off split view.
+        /// </summary>
+        public void SplitView()
+        {
+            if (SplitViewManager.Instance.Mode == SplitViewMode.Unoccluded)
+            {
+                SplitViewManager.Instance.Mode = SplitViewMode.OccludedRight;
+            }
+            else
+            {
+                SplitViewManager.Instance.Mode = SplitViewMode.Unoccluded;
+            }
         }
         #endregion // Public Methods
 
