@@ -119,8 +119,14 @@ namespace Microsoft.SpatialAlignment
             // Subscribe to anchor events
             anchor.OnTrackingChanged += Anchor_OnTrackingChanged;
 
+            #if UNITY_EDITOR
+            // The anchor store will never be available in the editor, so
+            // when in the editor just pretend that the anchor is resolved
+            State = AlignmentState.Resolved;
+            #else
             // Update state based on anchor state
             State = (anchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
+            #endif
         }
 
         /// <summary>

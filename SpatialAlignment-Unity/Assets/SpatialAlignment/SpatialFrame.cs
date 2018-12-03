@@ -105,6 +105,7 @@ namespace Microsoft.SpatialAlignment
             TryUpdateGameObjectName(null, id);
         }
         #endregion // Unity Overrides
+
         #region Public Properties
         /// <summary>
         /// Gets the <see cref="IAlignmentStrategy"/> that is being used to align the frame.

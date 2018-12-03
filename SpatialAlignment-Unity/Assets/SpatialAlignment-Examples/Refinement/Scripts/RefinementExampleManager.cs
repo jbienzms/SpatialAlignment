@@ -35,8 +35,6 @@ using UnityEngine.XR.WSA;
 
 namespace Microsoft.SpatialAlignment.Persistence
 {
-
-
     /// <summary>
     /// An example manager that shows how to add and edit refinement anchors.
     /// </summary>
@@ -46,7 +44,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
             New,
             PlacingAnchor,
-            RefiningAnchor,
+            // RefiningAnchor,
             RefiningModel,
             Finishing,
             Done,
@@ -56,11 +54,13 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
             None,
             AddAnchor,
+            AddAnchorCancel,
             EditingAnchor,
         }
 
         #region Member Variables
         private SpatialFrame largeScaleFrame;
+        private RefinementController largeScaleRefinement;
         private RefinementExampleMode mode;
         private MultiParentAlignment multiParent;
         private RefinableModel newAnchor;
@@ -79,7 +79,7 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         [SerializeField]
         [Tooltip("The large-scale model.")]
-        private RefinableModel largeScaleModel;
+        private GameObject largeScaleModel;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -119,15 +119,15 @@ namespace Microsoft.SpatialAlignment.Persistence
                     SubscribeAnchor(newAnchor);
 
                     // Put the anchor in placement mode
-                    newAnchor.RefinementMode = RefinementMode.Placing;
+                    newAnchor.RefinementMode = RefinableModelMode.Placing;
                     break;
 
 
-                case AddAnchorStep.RefiningAnchor:
+                //case AddAnchorStep.RefiningAnchor:
 
-                    // Now refining anchor
-                    newAnchor.RefinementMode = RefinementMode.Refining;
-                    break;
+                //    // Now refining anchor
+                //    newAnchor.RefinementMode = RefinableModelMode.Refining;
+                //    break;
 
 
                 case AddAnchorStep.RefiningModel:
@@ -136,7 +136,7 @@ namespace Microsoft.SpatialAlignment.Persistence
                     newAnchor.gameObject.AddComponent<WorldAnchor>();
 
                     // Done placing anchor
-                    newAnchor.RefinementMode = RefinementMode.Placed;
+                    newAnchor.RefinementMode = RefinableModelMode.Placed;
 
                     // Show the model
                     ShowModel();
@@ -149,14 +149,17 @@ namespace Microsoft.SpatialAlignment.Persistence
                     largeScaleFrame.transform.parent = null;
 
                     // Put the model in refining mode
-                    largeScaleModel.RefinementMode = RefinementMode.Refining;
+                    largeScaleRefinement.StartRefinement();
                     break;
 
 
                 case AddAnchorStep.Finishing:
 
-                    // Large scale model is now placed
-                    largeScaleModel.RefinementMode = RefinementMode.Placed;
+                    // Finish refinement if still in progress
+                    if (largeScaleRefinement.IsRefining)
+                    {
+                        largeScaleRefinement.FinishRefinement();
+                    }
 
                     // Unsubscribe from anchor events
                     UnsubscribeAnchor(newAnchor);
@@ -256,9 +259,18 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
             else
             {
+                // Make sure large scale has a refinement controller
+                largeScaleRefinement = largeScaleModel.GetComponent<RefinementController>();
+
+                // If none is found, use ray-based refinement
+                if (largeScaleRefinement == null)
+                {
+                    largeScaleRefinement = largeScaleModel.AddComponent<RayRefinement>();
+                }
+
                 // Subscribe to refinement events
-                largeScaleModel.CanceledRefinement += LargeScaleModel_CanceledRefinement;
-                largeScaleModel.FinishedRefinement += LargeScaleModel_FinishedRefinement;
+                largeScaleRefinement.RefinementCanceled += LargeScaleRefinement_RefinementCanceled;
+                largeScaleRefinement.RefinementFinished += LargeScaleRefinement_RefinementFinished;
 
                 // Attempt to get the frame
                 largeScaleFrame = largeScaleModel.GetComponent<SpatialFrame>();
@@ -286,16 +298,16 @@ namespace Microsoft.SpatialAlignment.Persistence
         private void SubscribeAnchor(RefinableModel anchor)
         {
             // Subscribe from refinement events
-            anchor.CanceledRefinement += Anchor_CanceledRefinement;
-            anchor.FinishedRefinement += Anchor_FinishedRefinement;
+            anchor.RefinementCanceled += Anchor_CanceledRefinement;
+            anchor.RefinementFinished += Anchor_FinishedRefinement;
             anchor.RefinementModeChanged += Anchor_RefinementModeChanged;
         }
 
         private void UnsubscribeAnchor(RefinableModel anchor)
         {
             // Unsubscribe from refinement events
-            anchor.CanceledRefinement -= Anchor_CanceledRefinement;
-            anchor.FinishedRefinement -= Anchor_FinishedRefinement;
+            anchor.RefinementCanceled -= Anchor_CanceledRefinement;
+            anchor.RefinementFinished -= Anchor_FinishedRefinement;
             anchor.RefinementModeChanged -= Anchor_RefinementModeChanged;
         }
         #endregion // Internal Methods
@@ -323,13 +335,13 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
             // If we are placing an anchor and it's now placed,
             // go on to the next step.
-            if ((anchorStep == AddAnchorStep.PlacingAnchor) && (newAnchor.RefinementMode == RefinementMode.Placed))
+            if ((anchorStep == AddAnchorStep.PlacingAnchor) && (newAnchor.RefinementMode == RefinableModelMode.Placed))
             {
                 NextStep();
             }
         }
 
-        private void LargeScaleModel_CanceledRefinement(object sender, System.EventArgs e)
+        private void LargeScaleRefinement_RefinementCanceled(object sender, System.EventArgs e)
         {
             // Cancel adding anchor
             if (mode == RefinementExampleMode.AddAnchor)
@@ -338,7 +350,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
-        private void LargeScaleModel_FinishedRefinement(object sender, System.EventArgs e)
+        private void LargeScaleRefinement_RefinementFinished(object sender, System.EventArgs e)
         {
             // If adding an anchor, go on to the next step
             if (mode == RefinementExampleMode.AddAnchor)
@@ -389,8 +401,14 @@ namespace Microsoft.SpatialAlignment.Persistence
                 return;
             }
 
-            // Put large scale model back in placed mode
-            largeScaleModel.RefinementMode = RefinementMode.Placed;
+            // Now canceling
+            mode = RefinementExampleMode.AddAnchorCancel;
+
+            // Cancel refinement of the large scale model if in progress
+            if (largeScaleRefinement.IsRefining)
+            {
+                largeScaleRefinement.CancelRefinement();
+            }
 
             // Unsubscribe from anchor events
             UnsubscribeAnchor(newAnchor);
@@ -458,6 +476,69 @@ namespace Microsoft.SpatialAlignment.Persistence
         }
 
         /// <summary>
+        /// Removes the specified anchor option.
+        /// </summary>
+        /// <param name="parentOption">
+        /// The option to remove.
+        /// </param>
+        public void RemoveAnchor(ParentAlignmentOptions parentOption)
+        {
+            // Validate
+            if (parentOption == null) throw new ArgumentNullException(nameof(parentOption));
+
+            // Remove
+            if (multiParent.ParentOptions.Contains(parentOption))
+            {
+                // If it's the current option, unparent
+                if (multiParent.CurrentParent == parentOption)
+                {
+                    LargeScaleModel.transform.parent = null;
+                }
+
+                // Remove the option
+                multiParent.ParentOptions.Remove(parentOption);
+
+                // Destroy the frame (and it's strategy) on the next tick
+                Destroy(parentOption.Frame.gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Removes the current active anchor.
+        /// </summary>
+        public void RemoveCurrentAnchor()
+        {
+            if (multiParent.CurrentParent != null)
+            {
+                RemoveAnchor(multiParent.CurrentParent);
+            }
+        }
+
+        /// <summary>
+        /// Removes the last anchor that was created.
+        /// </summary>
+        public void RemoveLastAnchor()
+        {
+            int lastIndex = multiParent.ParentOptions.Count - 1;
+            if (lastIndex >= 0)
+            {
+                RemoveAnchor(multiParent.ParentOptions[lastIndex]);
+            }
+        }
+
+        /// <summary>
+        /// Removes all anchors.
+        /// </summary>
+        public void ResetAnchors()
+        {
+            for (int i = multiParent.ParentOptions.Count -1; i >= 0; i--)
+            {
+                // Remove the anchor option
+                RemoveAnchor(multiParent.ParentOptions[i]);
+            }
+        }
+
+        /// <summary>
         /// Shows all refinement anchors.
         /// </summary>
         public void ShowAnchors()
@@ -471,6 +552,21 @@ namespace Microsoft.SpatialAlignment.Persistence
         public void ShowModel()
         {
             largeScaleModel.gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Toggles on and off split view.
+        /// </summary>
+        public void SplitView()
+        {
+            if (SplitViewManager.Instance.Mode == SplitViewMode.Unoccluded)
+            {
+                SplitViewManager.Instance.Mode = SplitViewMode.OccludedRight;
+            }
+            else
+            {
+                SplitViewManager.Instance.Mode = SplitViewMode.Unoccluded;
+            }
         }
         #endregion // Public Methods
 
@@ -488,7 +584,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// <summary>
         /// Gets or sets the large-scale model.
         /// </summary>
-        public RefinableModel LargeScaleModel { get { return largeScaleModel; } set { largeScaleModel = value; } }
+        public GameObject LargeScaleModel { get { return largeScaleModel; } set { largeScaleModel = value; } }
         #endregion // Public Properties
     }
 }
