@@ -99,13 +99,13 @@ namespace Microsoft.SpatialAlignment
 
                 case SplitViewMode.OccludedTop:
 
-                    transform.localPosition = new Vector3(0f, -0.5f, startingZ);
+                    transform.localPosition = new Vector3(0f, 0.5f, startingZ);
                     meshRenderer.enabled = true;
                     break;
 
                 case SplitViewMode.OccludedBottom:
 
-                    transform.localPosition = new Vector3(0f, 0.5f, startingZ);
+                    transform.localPosition = new Vector3(0f, -0.5f, startingZ);
                     meshRenderer.enabled = true;
                     break;
 
