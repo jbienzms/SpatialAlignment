@@ -24,13 +24,19 @@ Two of the greatest challenges with spatial alignment are:
 1.  Initial placement (and rotation) of objects to match up with the physical world
 2.  Accounting for drift that accumulates over distance (a challenge that is present in all large-scale tracking systems)
 
-This reference architecture includes components to help address both. To help with accurate alignment, an extensible system of *Refinement Controllers* is provided. In version 1.0 there is one refinement controller included called **RayRefinement**. **RayRefinement** allows a virtual model and a physical space to be aligned by selecting the corresponding origin points and a direction.
+This reference architecture includes components to help address both. To help with accurate alignment, an extensible system of *Refinement Controllers* is provided. Version 1.0 there includes one refinement controller called **RayRefinement**. **RayRefinement** aligns a virtual model and a physical space by selecting corresponding origin points and directions.
 
+![](External/ReadMeImages/Align-RayRefine.gif)
 
-**TODO: RayRefinement Video**    
+To help compensate for drift, *Multi-Parent* alignment offers the ability to apply different positional and rotational offsets at each parent.
 
+![](External/ReadMeImages/Align-Refine.png)
 
+This ability can be combined with a *Refinement Controller* to bring large-scale models back into alignment when viewed from different locations. 
 
+The video below demonstrates using **RayRefinement** to align a [Matterport 3D](https://matterport.com/) scan of a building and keep that scan in alignment.
+
+[![](External/ReadMeImages/Align-MPScanVideo.jpg)](https://youtu.be/IINWbBeIRL0)
 
 ##### Persistence
 
