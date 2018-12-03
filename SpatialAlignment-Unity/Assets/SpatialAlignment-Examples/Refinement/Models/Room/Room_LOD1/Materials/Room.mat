@@ -9,14 +9,14 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Room
   m_Shader: {fileID: 4800000, guid: d45c0efca53019e43891b0f610f8146e, type: 3}
-  m_ShaderKeywords: _BORDER_LIGHT_USES_HOVER_COLOR _HOVER_LIGHT _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+  m_ShaderKeywords: _ALPHATEST_ON _BORDER_LIGHT_USES_HOVER_COLOR _HOVER_LIGHT _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
     _SPECULAR_HIGHLIGHTS
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: 2450
   stringTagMap:
-    RenderType: Opaque
+    RenderType: TransparentCutout
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -75,7 +75,7 @@ Material:
     - _ClippingPlaneBorderWidth: 0.025
     - _ColorWriteMask: 15
     - _CullMode: 2
-    - _CustomMode: 0
+    - _CustomMode: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DirectionalLight: 0
@@ -97,7 +97,7 @@ Material:
     - _HoverLightOpaque: 0
     - _InnerGlow: 0
     - _Metallic: 0
-    - _Mode: 0
+    - _Mode: 1
     - _NearPlaneFade: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02

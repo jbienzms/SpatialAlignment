@@ -357,7 +357,16 @@ namespace Microsoft.SpatialAlignment
         /// <inheritdoc />
         protected override void OnRefinementCanceled()
         {
+            // Re-show meshes?
+            if (autoHideMeshes)
+            {
+                this.gameObject.SetMeshesEnabled(enabled: true, inChildren: true);
+            }
+
+            // Cleanup resources
             StopAndCleanup();
+
+            // Pass to base to finish
             base.OnRefinementCanceled();
         }
 
