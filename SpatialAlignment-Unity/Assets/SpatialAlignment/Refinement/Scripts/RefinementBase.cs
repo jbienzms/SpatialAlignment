@@ -30,6 +30,41 @@ using UnityEngine;
 
 namespace Microsoft.SpatialAlignment
 {
+    /// <summary>
+    /// Defines the directions that can be used in a refinement.
+    /// </summary>
+    public enum RefinementDirection
+    {
+        /// <summary>
+        /// Forward.
+        /// </summary>
+        Forward,
+
+        /// <summary>
+        /// Back.
+        /// </summary>
+        Back,
+
+        /// <summary>
+        /// Down.
+        /// </summary>
+        Down,
+
+        /// <summary>
+        /// Left.
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// Right
+        /// </summary>
+        Right,
+
+        /// <summary>
+        /// Up.
+        /// </summary>
+        Up,
+    }
 
     /// <summary>
     /// The base class for a behavior that provides cancelable refinement of the

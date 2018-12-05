@@ -1007,7 +1007,7 @@ PrefabInstance:
     - target: {fileID: 8995443699713571242, guid: 8afc416d88cbd0f4eb92a8fcdf7246cc,
         type: 3}
       propertyPath: m_Name
-      value: NudgeBackward
+      value: NudgeBack
       objectReference: {fileID: 0}
     - target: {fileID: 8995443699713598858, guid: 8afc416d88cbd0f4eb92a8fcdf7246cc,
         type: 3}
@@ -1067,7 +1067,7 @@ PrefabInstance:
     - target: {fileID: 8995443699713571240, guid: 8afc416d88cbd0f4eb92a8fcdf7246cc,
         type: 3}
       propertyPath: m_Name
-      value: Backward
+      value: Back
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8afc416d88cbd0f4eb92a8fcdf7246cc, type: 3}
