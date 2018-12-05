@@ -835,6 +835,7 @@
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\SpatialFrameConverter.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\UnityContractResolver.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\Vector3Converter.cs" />
+    <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\NudgeController.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\NudgeRefinement.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RayRefinement.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinableModel.cs" />
