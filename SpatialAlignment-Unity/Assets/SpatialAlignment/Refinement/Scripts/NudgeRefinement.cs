@@ -58,11 +58,15 @@ namespace Microsoft.SpatialAlignment
     /// </summary>
     public class NudgeRefinement : RefinementBase
     {
-        #region Constants
-
-        #endregion // Constants
+        #region Member Variables
+        private NudgeController controller;     // The controller instance, if using one.
+        #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [SerializeField]
+        [Tooltip("The prefab to instantiate when showing a UX controller.")]
+        private NudgeController controllerPrefab;
+
         [SerializeField]
         [Tooltip("The amount to move in directional operations.")]
         private float directionAmount = 0.01f;
@@ -82,13 +86,54 @@ namespace Microsoft.SpatialAlignment
         [SerializeField]
         [Tooltip("The axis that should be considered Up for rotation operations.")]
         private RefinementDirection upDirection = RefinementDirection.Up;
+
+        [SerializeField]
+        [Tooltip("Whether to display the UX controller when performing refinement.")]
+        private bool useController = true;
         #endregion // Unity Inspector Variables
 
+        #region Internal Methods
+        /// <summary>
+        /// Creates the controller instance.
+        /// </summary>
+        protected virtual void CreateController()
+        {
+            if (controller != null)
+            {
+                Debug.LogWarning($"{nameof(CreateController)} called but controller is already created.");
+                return;
+            }
+
+            if (controllerPrefab == null)
+            {
+                Debug.LogWarning($"{nameof(CreateController)} called but {nameof(ControllerPrefab)} is not defined.");
+                return;
+            }
+
+            // Instantiate
+            controller = Instantiate(controllerPrefab);
+        }
+
+        /// <summary>
+        /// Destroys the controller instance.
+        /// </summary>
+        protected virtual void DestroyController()
+        {
+            if (controller != null)
+            {
+                Destroy(controller);
+                controller = null;
+            }
+        }
+        #endregion // Internal Methods
 
         #region Overrides / Event Handlers
         /// <inheritdoc />
         protected override void OnRefinementCanceled()
         {
+            // Destroy the controller
+            DestroyController();
+
             // Pass to base to finish
             base.OnRefinementCanceled();
         }
@@ -96,6 +141,9 @@ namespace Microsoft.SpatialAlignment
         /// <inheritdoc />
         protected override void OnRefinementFinished()
         {
+            // Destroy the controller
+            DestroyController();
+
             // Pass to base to notify of finished refinement
             base.OnRefinementFinished();
         }
@@ -103,6 +151,23 @@ namespace Microsoft.SpatialAlignment
         /// <inheritdoc />
         protected override void OnRefinementStarted()
         {
+            // Using a controller?
+            if (useController)
+            {
+                // Create the controller
+                CreateController();
+
+                // If created, configure
+                if (controller != null)
+                {
+                    // Link to our instance
+                    controller.Refinement = this;
+
+                    // Show the controller
+                    ShowController();
+                }
+            }
+
             // Pass to base to notify
             base.OnRefinementStarted();
         }
@@ -110,23 +175,62 @@ namespace Microsoft.SpatialAlignment
 
         #region Unity Overrides
         /// <inheritdoc />
-        protected override void Start()
+        protected override void OnDestroy()
         {
+            // If we have a controller, destroy it too
+            DestroyController();
 
-            // Pass to base to complete startup
-            base.Start();
+            // Pass to base
+            base.OnDestroy();
         }
 
         /// <inheritdoc />
-        protected override void Update()
+        protected override void OnDisable()
         {
-            // Pass to base first
-            base.Update();
+            // If we have a controller, hide it
+            if (controller != null)
+            {
+                HideController();
+            }
 
+            // Pass to base
+            base.OnDisable();
         }
+
+        /// <inheritdoc />
+        protected override void OnEnable()
+        {
+            // If we have a controller and we are refining, show it
+            if ((controller != null) && (IsRefining))
+            {
+                ShowController();
+            }
+
+            // Pass to base
+            base.OnEnable();
+        }
+
         #endregion // Unity Overrides
 
         #region Public Methods
+        /// <summary>
+        /// Hides the controller, if one is in use.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation deactivates the controllers GameObject.
+        /// </remarks>
+        public virtual void HideController()
+        {
+            if (controller == null)
+            {
+                Debug.LogWarning($"{nameof(HideController)} called but no controller is in use.");
+                return;
+            }
+
+            // Deactivate
+            controller.gameObject.SetActive(false);
+        }
+
         /// <summary>
         /// Nudges the transform in the specified direction.
         /// </summary>
@@ -166,9 +270,37 @@ namespace Microsoft.SpatialAlignment
             // Update the rotation
             gameObject.transform.Rotate(upDirection.ToVector(), angle, space);
         }
+
+        /// <summary>
+        /// Shows the controller, if one is in use.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation activates the controllers GameObject.
+        /// </remarks>
+        public virtual void ShowController()
+        {
+            if (controller == null)
+            {
+                Debug.LogWarning($"{nameof(ShowController)} called but no controller is in use.");
+                return;
+            }
+
+            // Deactivate
+            controller.gameObject.SetActive(true);
+        }
         #endregion // Public Methods
 
         #region Public Properties
+        /// <summary>
+        /// Gets the UX controller instance, if one is active.
+        /// </summary>
+        public NudgeController Controller { get => controller; protected set => controller = value; }
+
+        /// <summary>
+        /// Gets or sets the prefab to instantiate when showing a UX controller.
+        /// </summary>
+        public NudgeController ControllerPrefab { get { return controllerPrefab; } set { controllerPrefab = value; } }
+
         /// <summary>
         /// Gets or sets the amount to move in directional operations.
         /// </summary>
@@ -184,6 +316,17 @@ namespace Microsoft.SpatialAlignment
         /// The default is <see cref="RefinementDirection.Forward"/>.
         /// </remarks>
         public RefinementDirection ForwardDirection { get { return forwardDirection; } set { forwardDirection = value; } }
+
+        /// <summary>
+        /// Gets a value that indicates if the controller is currently shown.
+        /// </summary>
+        public virtual bool IsControllerShown
+        {
+            get
+            {
+                return ((controller != null) && (controller.isActiveAndEnabled));
+            }
+        }
 
         /// <summary>
         /// Gets or sets the amount to rotate in rotational operations.
@@ -208,6 +351,11 @@ namespace Microsoft.SpatialAlignment
         /// The default is <see cref="RefinementDirection.Up"/>.
         /// </remarks>
         public RefinementDirection UpDirection { get { return upDirection; } set { upDirection = value; } }
+
+        /// <summary>
+        /// Gets or sets whether to display the UX controller when performing refinement.
+        /// </summary>
+        public bool UseController { get { return useController; } set { useController = value; } }
         #endregion // Public Properties
     }
 }

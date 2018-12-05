@@ -39,16 +39,6 @@ namespace Microsoft.SpatialAlignment
     /// </summary>
     public class NudgeController : InteractionReceiver
     {
-        #region Nested Types
-        private enum NudgeAction
-        {
-            Direction,
-            Rotation,
-            Finish,
-            Cancel
-        };
-        #endregion // Nested Types
-
         #region Unity Inspector Variables
         [SerializeField]
         [Tooltip("The nudge refinement instance to control.")]
@@ -64,24 +54,32 @@ namespace Microsoft.SpatialAlignment
                 return;
             }
 
-            // What action?
-            NudgeAction action;
-            RefinementDirection direction;
-            NudgeRotation rotation;
-
+            // Execute action and direction based on name
             switch (obj.name)
             {
-                case "Ok":
-                    action = NudgeAction.Finish;
+                case "Finish":
+                    refinement.FinishRefinement();
                     break;
                 case "Cancel":
-                    action = NudgeAction.Cancel;
+                    refinement.CancelRefinement();
                     break;
-
+                case "Up":
+                case "Down":
+                case "Left":
+                case "Right":
+                case "Forward":
+                case "Back":
+                    RefinementDirection direction;
+                    Enum.TryParse<RefinementDirection>(obj.name, out direction);
+                    refinement.Nudge(direction);
+                    break;
+                case "RotateLeft":
+                    refinement.Nudge(NudgeRotation.Left);
+                    break;
+                case "RotateRight":
+                    refinement.Nudge(NudgeRotation.Right);
+                    break;
             }
-
-            Debug.Log(obj.name + " : InputUp");
-            txt.text = obj.name + " : InputUp";
         }
         #endregion // Overrides / Event Handlers
 

@@ -137,7 +137,33 @@ namespace Microsoft.SpatialAlignment
         #endregion // Overrides / Event Handlers
 
         #region Unity Overrides
-        // Start is called before the first frame update
+        /// <summary>
+        /// This function is called after all frame updates for the last frame of the object’s existence.
+        /// </summary>
+        protected virtual void OnDestroy()
+        {
+
+        }
+
+        /// <summary>
+        /// This function is called when the behavior becomes disabled or inactive.
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+
+        }
+
+        /// <summary>
+        /// Only called if the Object is active, this function is called just after the object is enabled.
+        /// </summary>
+        protected virtual void OnEnable()
+        {
+
+        }
+
+        /// <summary>
+        /// Start is called before the first frame update.
+        /// </summary>
         protected virtual void Start()
         {
             if (refineOnStart)
@@ -146,7 +172,9 @@ namespace Microsoft.SpatialAlignment
             }
         }
 
-        // Update is called once per frame
+        /// <summary>
+        /// Update is called once per frame.
+        /// </summary>
         protected virtual void Update()
         {
 
