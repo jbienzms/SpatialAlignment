@@ -117,11 +117,14 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Destroys the controller instance.
         /// </summary>
+        /// <remarks>
+        /// The default implementation destroys the prefabs GameObject.
+        /// </remarks>
         protected virtual void DestroyController()
         {
             if (controller != null)
             {
-                Destroy(controller);
+                Destroy(controller.gameObject);
                 controller = null;
             }
         }
