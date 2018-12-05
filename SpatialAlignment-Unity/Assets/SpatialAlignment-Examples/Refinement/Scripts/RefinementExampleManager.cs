@@ -60,7 +60,7 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         #region Member Variables
         private SpatialFrame largeScaleFrame;
-        private RefinementController largeScaleRefinement;
+        private RefinementBase largeScaleRefinement;
         private RefinementExampleMode mode;
         private MultiParentAlignment multiParent;
         private RefinableModel newAnchor;
@@ -260,7 +260,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             else
             {
                 // Make sure large scale has a refinement controller
-                largeScaleRefinement = largeScaleModel.GetComponent<RefinementController>();
+                largeScaleRefinement = largeScaleModel.GetComponent<RefinementBase>();
 
                 // If none is found, use ray-based refinement
                 if (largeScaleRefinement == null)

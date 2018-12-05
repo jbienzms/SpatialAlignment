@@ -35,7 +35,7 @@ namespace Microsoft.SpatialAlignment
     /// The base class for a behavior that provides cancelable refinement of the
     /// transform of an object.
     /// </summary>
-    public class RefinementController : MonoBehaviour
+    public class RefinementBase : MonoBehaviour
     {
         #region Member Variables
         private bool isRefining;

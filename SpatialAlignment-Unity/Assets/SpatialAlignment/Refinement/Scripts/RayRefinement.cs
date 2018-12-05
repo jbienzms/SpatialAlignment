@@ -75,7 +75,7 @@ namespace Microsoft.SpatialAlignment
     /// A controller that refines the transform based on an origin point and
     /// a direction.
     /// </summary>
-    public class RayRefinement : RefinementController, IInputClickHandler
+    public class RayRefinement : RefinementBase, IInputClickHandler
     {
         #region Constants
         private const float DEF_SCALE = 0.05f;

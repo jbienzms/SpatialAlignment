@@ -837,7 +837,7 @@
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\Vector3Converter.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RayRefinement.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinableModel.cs" />
-    <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinementController.cs" />
+    <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinementBase.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialAlignmentManager.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrame.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrameCollection.cs" />
