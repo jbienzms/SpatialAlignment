@@ -23,6 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using HoloToolkit.Unity;
 using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
 using System;
@@ -44,8 +45,8 @@ namespace Microsoft.SpatialAlignment.Persistence
         {
             New,
             PlacingAnchor,
-            // RefiningAnchor,
-            RefiningModel,
+            ModelRay,
+            ModelNudge,
             Finishing,
             Done,
         }
@@ -130,7 +131,7 @@ namespace Microsoft.SpatialAlignment.Persistence
                 //    break;
 
 
-                case AddAnchorStep.RefiningModel:
+                case AddAnchorStep.ModelRay:
 
                     // Add a WorldAnchor to the anchor so it stays in place
                     newAnchor.gameObject.AddComponent<WorldAnchor>();
@@ -148,17 +149,41 @@ namespace Microsoft.SpatialAlignment.Persistence
                     // Detach from any current parent (if there is one)
                     largeScaleFrame.transform.parent = null;
 
-                    // Put the model in refining mode
+                    // Create and subscribe to RayRefinement
+                    largeScaleRefinement = SubscribeRefinement<RayRefinement>();
+
+                    // Start the new refining mode
                     largeScaleRefinement.StartRefinement();
                     break;
 
+                case AddAnchorStep.ModelNudge:
+
+                    // Unsubscribe from RayRefinement
+                    UnsubscribeRefinement<RayRefinement>();
+
+                    // Create and subscribe to NudgeRefinement
+                    largeScaleRefinement = SubscribeRefinement<NudgeRefinement>();
+
+                    // Start the new refining mode
+                    largeScaleRefinement.StartRefinement();
+                    break;
 
                 case AddAnchorStep.Finishing:
 
                     // Finish refinement if still in progress
-                    if (largeScaleRefinement.IsRefining)
+                    if (largeScaleRefinement != null)
                     {
-                        largeScaleRefinement.FinishRefinement();
+                        // Finish refinement of the large scale model if in progress
+                        if (largeScaleRefinement.IsRefining)
+                        {
+                            largeScaleRefinement.FinishRefinement();
+                        }
+
+                        // Unsubscribe from refinement events
+                        UnsubscribeRefinement(largeScaleRefinement);
+
+                        // No current large scale refinement
+                        largeScaleRefinement = null;
                     }
 
                     // Unsubscribe from anchor events
@@ -259,19 +284,6 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
             else
             {
-                // Make sure large scale has a refinement controller
-                largeScaleRefinement = largeScaleModel.GetComponent<RefinementBase>();
-
-                // If none is found, use ray-based refinement
-                if (largeScaleRefinement == null)
-                {
-                    largeScaleRefinement = largeScaleModel.AddComponent<RayRefinement>();
-                }
-
-                // Subscribe to refinement events
-                largeScaleRefinement.RefinementCanceled += LargeScaleRefinement_RefinementCanceled;
-                largeScaleRefinement.RefinementFinished += LargeScaleRefinement_RefinementFinished;
-
                 // Attempt to get the frame
                 largeScaleFrame = largeScaleModel.GetComponent<SpatialFrame>();
             }
@@ -303,12 +315,44 @@ namespace Microsoft.SpatialAlignment.Persistence
             anchor.RefinementModeChanged += Anchor_RefinementModeChanged;
         }
 
+        private TRefinement SubscribeRefinement<TRefinement>() where TRefinement : RefinementBase
+        {
+            // If refinement doesn't exist, add it
+            TRefinement refinement = largeScaleModel.EnsureComponent<TRefinement>();
+
+            // Subscribe to refinement events
+            refinement.RefinementCanceled += LargeScaleRefinement_RefinementCanceled;
+            refinement.RefinementFinished += LargeScaleRefinement_RefinementFinished;
+
+            // Return the refinement
+            return refinement;
+        }
+
         private void UnsubscribeAnchor(RefinableModel anchor)
         {
             // Unsubscribe from refinement events
             anchor.RefinementCanceled -= Anchor_CanceledRefinement;
             anchor.RefinementFinished -= Anchor_FinishedRefinement;
             anchor.RefinementModeChanged -= Anchor_RefinementModeChanged;
+        }
+
+        private void UnsubscribeRefinement(RefinementBase refinement)
+        {
+            if (refinement == null) throw new ArgumentNullException(nameof(refinement));
+            refinement.RefinementCanceled -= LargeScaleRefinement_RefinementCanceled;
+            refinement.RefinementFinished -= LargeScaleRefinement_RefinementFinished;
+        }
+
+        private void UnsubscribeRefinement<TRefinement>() where TRefinement : RefinementBase
+        {
+            // Attempt to get the refinement
+            TRefinement refinement = largeScaleModel.GetComponent<TRefinement>();
+
+            // If found, unsubscribe from refinement events
+            if (refinement != null)
+            {
+                UnsubscribeRefinement(refinement);
+            }
         }
         #endregion // Internal Methods
 
@@ -404,10 +448,19 @@ namespace Microsoft.SpatialAlignment.Persistence
             // Now canceling
             mode = RefinementExampleMode.AddAnchorCancel;
 
-            // Cancel refinement of the large scale model if in progress
-            if (largeScaleRefinement.IsRefining)
+            if (largeScaleRefinement != null)
             {
-                largeScaleRefinement.CancelRefinement();
+                // Cancel refinement of the large scale model if in progress
+                if (largeScaleRefinement.IsRefining)
+                {
+                    largeScaleRefinement.CancelRefinement();
+                }
+
+                // Unsubscribe from refinement events
+                UnsubscribeRefinement(largeScaleRefinement);
+
+                // No current large scale refinement
+                largeScaleRefinement = null;
             }
 
             // Unsubscribe from anchor events

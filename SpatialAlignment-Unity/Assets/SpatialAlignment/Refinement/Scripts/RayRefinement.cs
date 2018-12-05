@@ -343,6 +343,9 @@ namespace Microsoft.SpatialAlignment
         /// <inheritdoc />
         protected virtual void OnInputClicked(InputClickedEventData eventData)
         {
+            // If we're not refining, ignore
+            if (!IsRefining) { return; }
+
             // If the current target has been successfully placed at least
             // once, move on to the next step
             if (targetPlaced)

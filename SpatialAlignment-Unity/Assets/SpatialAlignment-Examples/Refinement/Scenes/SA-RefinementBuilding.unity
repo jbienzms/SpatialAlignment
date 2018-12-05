@@ -935,6 +935,7 @@ GameObject:
   - component: {fileID: 1707357401}
   - component: {fileID: 1707357400}
   - component: {fileID: 1707357399}
+  - component: {fileID: 1707357402}
   m_Layer: 0
   m_Name: LargeScaleComplex
   m_TagString: Untagged
@@ -997,6 +998,27 @@ MonoBehaviour:
   parentOptions: []
   referenceTransform: {fileID: 0}
   updateFrequency: 2
+--- !u!114 &1707357402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1707357398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2885058528f56942a057ce91bede070, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  refineOnStart: 0
+  controllerPrefab: {fileID: 1469530028792937992, guid: f16944cb4f51ca045bc297eb5098241a,
+    type: 3}
+  directionAmount: 0.01
+  forwardDirection: 0
+  rotationAmount: 3.6
+  space: 1
+  upDirection: 5
+  useController: 1
 --- !u!4 &1707357403
 Transform:
   m_ObjectHideFlags: 0
