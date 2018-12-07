@@ -77,7 +77,7 @@ namespace Microsoft.SpatialAlignment
 
         [SerializeField]
         [Tooltip("The amount to rotate in rotational operations.")]
-        private float rotationAmount = 3.6f;
+        private float rotationAmount = 1.8f;
 
         [SerializeField]
         [Tooltip("The coordinate system to use when performing operations.")]
@@ -327,7 +327,7 @@ namespace Microsoft.SpatialAlignment
         /// Gets or sets the amount to rotate in rotational operations.
         /// </summary>
         /// <remarks>
-        /// The default is 3.6 Euler.
+        /// The default is 1.8 Euler.
         /// </remarks>
         public float RotationAmount { get { return rotationAmount; } set { rotationAmount = value; } }
 

@@ -104,118 +104,118 @@ namespace Microsoft.SpatialAlignment
         /// </returns>
         static public RefinementDirection RelativeTo(this RefinementDirection direction, RefinementDirection relative)
         {
-            switch (direction)
+            switch (relative)
             {
-                case RefinementDirection.Forward:
-                    switch (relative)
+                case RefinementDirection.Forward: // Facing Forward
+                    switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Forward;
+                            return RefinementDirection.Forward; // Facing Forward Looking Forward is Forward
                         case RefinementDirection.Back:
-                            return RefinementDirection.Back;
+                            return RefinementDirection.Back;    // Facing Forward Looking Back is Back
                         case RefinementDirection.Down:
-                            return RefinementDirection.Down;
+                            return RefinementDirection.Down;    // Facing Forward Looking Down is Down
                         case RefinementDirection.Left:
-                            return RefinementDirection.Left;
+                            return RefinementDirection.Left;    // Facing Forward Looking Left is Left
                         case RefinementDirection.Right:
-                            return RefinementDirection.Right;
+                            return RefinementDirection.Right;   // Facing Forward Looking Right is Right
                         case RefinementDirection.Up:
-                            return RefinementDirection.Up;
+                            return RefinementDirection.Up;      // Facing Forward Looking Up is Up
                         default:
                             throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {relative}");
                     }
 
-                case RefinementDirection.Back:
-                    switch (relative)
+                case RefinementDirection.Back: // Back Looking
+                    switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Back;
+                            return RefinementDirection.Back;    // Facing Back Looking Forward is Back
                         case RefinementDirection.Back:
-                            return RefinementDirection.Forward;
+                            return RefinementDirection.Forward; // Facing Back Looking Back is Forward
                         case RefinementDirection.Down:
-                            return RefinementDirection.Down;
+                            return RefinementDirection.Down;    // Facing Back Looking Down is Down
                         case RefinementDirection.Left:
-                            return RefinementDirection.Right;
+                            return RefinementDirection.Right;   // Facing Back Looking Left is Right
                         case RefinementDirection.Right:
-                            return RefinementDirection.Left;
+                            return RefinementDirection.Left;    // Facing Back Looking Right is Left
                         case RefinementDirection.Up:
-                            return RefinementDirection.Up;
+                            return RefinementDirection.Up;      // Facing Back Looking Up is Up
                         default:
                             throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {relative}");
                     }
 
-                case RefinementDirection.Down:
-                    switch (relative)
+                case RefinementDirection.Down: // Facing Down
+                    switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Down;
+                            return RefinementDirection.Down;    // Facing Down Looking Forward is Down
                         case RefinementDirection.Back:
-                            return RefinementDirection.Up;
+                            return RefinementDirection.Up;      // Facing Back Looking Back is Up
                         case RefinementDirection.Down:
-                            return RefinementDirection.Back;
+                            return RefinementDirection.Back;    // Facing Down Looking Down is Back
                         case RefinementDirection.Left:
-                            return RefinementDirection.Left;
+                            return RefinementDirection.Left;    // Facing Down Looking Left is Left
                         case RefinementDirection.Right:
-                            return RefinementDirection.Right;
+                            return RefinementDirection.Right;   // Facing Down Looking Right is Right
                         case RefinementDirection.Up:
-                            return RefinementDirection.Forward;
+                            return RefinementDirection.Forward; // Facing Down Looking Up is Forward
                         default:
                             throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {relative}");
                     }
 
-                case RefinementDirection.Left:
-                    switch (relative)
+                case RefinementDirection.Left: // Facing Left
+                    switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Left;
+                            return RefinementDirection.Left;    // Facing Left Looking Forward is Left
                         case RefinementDirection.Back:
-                            return RefinementDirection.Right;
+                            return RefinementDirection.Right;   // Facing Left Looking Back is Right
                         case RefinementDirection.Down:
-                            return RefinementDirection.Down;
+                            return RefinementDirection.Down;    // Facing Left Looking Down is Down
                         case RefinementDirection.Left:
-                            return RefinementDirection.Back;
+                            return RefinementDirection.Back;    // Facing Left Looking Left is Back
                         case RefinementDirection.Right:
-                            return RefinementDirection.Forward;
+                            return RefinementDirection.Forward; // Facing Left Looking Right is Forward
                         case RefinementDirection.Up:
-                            return RefinementDirection.Up;
+                            return RefinementDirection.Up;      // Facing Left Looking Up is Up
                         default:
                             throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {relative}");
                     }
 
-                case RefinementDirection.Right:
-                    switch (relative)
+                case RefinementDirection.Right: // Facing Right
+                    switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Right;
+                            return RefinementDirection.Right;	// Facing Right Looking Forward is Forward
                         case RefinementDirection.Back:
-                            return RefinementDirection.Left;
+                            return RefinementDirection.Left;    // Facing Right Looking Back is Left
                         case RefinementDirection.Down:
-                            return RefinementDirection.Down;
+                            return RefinementDirection.Down;    // Facing Right Looking Down is Down
                         case RefinementDirection.Left:
-                            return RefinementDirection.Forward;
+                            return RefinementDirection.Forward; // Facing Right Looking Left is Forward
                         case RefinementDirection.Right:
-                            return RefinementDirection.Back;
+                            return RefinementDirection.Back;    // Facing Right Looking Right is Back
                         case RefinementDirection.Up:
-                            return RefinementDirection.Up;
+                            return RefinementDirection.Up;      // Facing Right Looking Up is Up
                         default:
                             throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {relative}");
                     }
 
-                case RefinementDirection.Up:
-                    switch (relative)
+                case RefinementDirection.Up: // Facing Up
+                    switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Up;
+                            return RefinementDirection.Up;		// Facing Up Looking Forward is Up
                         case RefinementDirection.Back:
-                            return RefinementDirection.Down;
+                            return RefinementDirection.Down;	// Facing Up Looking Back is Down
                         case RefinementDirection.Down:
-                            return RefinementDirection.Forward;
+                            return RefinementDirection.Forward; // Facing Up Looking Down is Forward
                         case RefinementDirection.Left:
-                            return RefinementDirection.Left;
+                            return RefinementDirection.Left;    // Facing Up Looking Left is Left
                         case RefinementDirection.Right:
-                            return RefinementDirection.Right;
+                            return RefinementDirection.Right;   // Facing Up Looking Right is Right
                         case RefinementDirection.Up:
-                            return RefinementDirection.Back;
+                            return RefinementDirection.Back;    // Facing Up Looking Up is Back
                         default:
                             throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {relative}");
                     }

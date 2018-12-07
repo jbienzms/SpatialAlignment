@@ -504,7 +504,7 @@ MonoBehaviour:
     type: 3}
   directionAmount: 0.01
   forwardDirection: 0
-  rotationAmount: 3.6
+  rotationAmount: 1.8
   space: 1
   upDirection: 5
   useController: 1
