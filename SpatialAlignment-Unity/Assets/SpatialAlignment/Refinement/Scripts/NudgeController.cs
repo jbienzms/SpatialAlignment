@@ -65,15 +65,15 @@ namespace Microsoft.SpatialAlignment
                 forward = refinement.TargetTransform.InverseTransformDirection(transform.forward);
             }
 
-            // Normalize the forward direction
-            Vector3 normForward = forward.normalized;
+            // Get the absolute axis for the forward direction (snaps to axis only)
+            forward = forward.AbsoluteAxis();
 
-            // Round the normalized vector to 0 decimal places
-            Vector3 roundedForward = normForward.Round();
+            // Normalize it toward 1.0
+            forward = forward.normalized;
 
             // Try to convert the vector to a direction
             RefinementDirection direction;
-            if (roundedForward.TryGetDirection(out direction))
+            if (forward.TryGetDirection(out direction))
             {
                 return direction;
             }

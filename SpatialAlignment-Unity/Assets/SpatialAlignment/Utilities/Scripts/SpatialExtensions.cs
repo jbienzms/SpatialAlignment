@@ -312,6 +312,44 @@ namespace Microsoft.SpatialAlignment
 
         #region Vector Extensions
         /// <summary>
+        /// Returns a new <see cref="Vector3"/> that contains only the greatest
+        /// absolute value on any axis.
+        /// </summary>
+        /// <param name="vector">
+        /// The vector to obtain the absolute axis for.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Vector3"/> with the greatest absolute axis.
+        /// If any two axis are exactly equal, this method returns
+        /// <see cref="Vector3.zero"/>.
+        /// </returns>
+        static public Vector3 AbsoluteAxis(this Vector3 vector)
+        {
+            // Placeholder
+            Vector3 result = Vector3.zero;
+
+            // Get the absolute value of the incoming vector
+            Vector3 abs = new Vector3(Mathf.Abs(vector.x), Mathf.Abs(vector.y), Mathf.Abs(vector.z));
+
+            // Select larges axis
+            if ((abs.x > abs.y) && (abs.x > abs.z))
+            {
+                result.x = vector.x;
+            }
+            else if ((abs.y > abs.x) && (abs.y > abs.z))
+            {
+                result.y = vector.y;
+            }
+            else if ((abs.z > abs.x) && (abs.z > abs.y))
+            {
+                result.z = vector.z;
+            }
+
+            // Done
+            return result;
+        }
+
+        /// <summary>
         /// Rounds a <see cref="Vector3"/>.
         /// </summary>
         /// <param name="vector">
@@ -323,7 +361,7 @@ namespace Microsoft.SpatialAlignment
         /// <returns>
         /// The rounded vector.
         /// </returns>
-        public static Vector3 Round(this Vector3 vector, int decimalPlaces = 0)
+        static public Vector3 Round(this Vector3 vector, int decimalPlaces = 0)
         {
             float multiplier = 1;
             if (decimalPlaces > 0)
