@@ -212,7 +212,6 @@ namespace Microsoft.SpatialAlignment
             // Pass to base
             base.OnEnable();
         }
-
         #endregion // Unity Overrides
 
         #region Public Methods
@@ -248,15 +247,8 @@ namespace Microsoft.SpatialAlignment
             // Create the offset
             Vector3 offset = actualDireciton.ToVector() * directionAmount;
 
-            // Update the position
-            if (space == Space.World)
-            {
-                gameObject.transform.position += offset;
-            }
-            else
-            {
-                gameObject.transform.localPosition += offset;
-            }
+            // Update the position using the correct coordinate space (local vs world)
+            TargetTransform.Translate(offset, space);
         }
 
         /// <summary>
@@ -271,7 +263,7 @@ namespace Microsoft.SpatialAlignment
             float angle = (rotation == NudgeRotation.Left ? -rotationAmount : rotationAmount);
 
             // Update the rotation
-            gameObject.transform.Rotate(upDirection.ToVector(), angle, space);
+            TargetTransform.Rotate(upDirection.ToVector(), angle, space);
         }
 
         /// <summary>

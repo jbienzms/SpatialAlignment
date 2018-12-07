@@ -254,6 +254,87 @@ namespace Microsoft.SpatialAlignment
                     throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {direction}");
             }
         }
+
+        /// <summary>
+        /// Attempts to convert a <see cref="Vector3"/> into a <see cref="RefinementDirection"/>.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> to convert.
+        /// </param>
+        /// <param name="direction">
+        /// The output <see cref="RefinementDirection"/> if successfully converted.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if the conversion was successful; otherwise <c>false</c>.
+        /// </returns>
+        static public bool TryGetDirection(this Vector3 vector, out RefinementDirection direction)
+        {
+            // Default to forward
+            direction = RefinementDirection.Forward;
+
+            // What is the vector?
+            if (vector == Vector3.back)
+            {
+                direction = RefinementDirection.Back;
+                return true;
+            }
+            else if(vector == Vector3.down)
+            {
+                direction = RefinementDirection.Down;
+                return true;
+            }
+            else if (vector == Vector3.forward)
+            {
+                direction = RefinementDirection.Forward;
+                return true;
+            }
+            else if (vector == Vector3.left)
+            {
+                direction = RefinementDirection.Left;
+                return true;
+            }
+            else if (vector == Vector3.right)
+            {
+                direction = RefinementDirection.Right;
+                return true;
+            }
+            else if (vector == Vector3.up)
+            {
+                direction = RefinementDirection.Up;
+                return true;
+            }
+
+            // No conversion possible
+            return false;
+        }
         #endregion // RefinementDirection Extensions
+
+
+        #region Vector Extensions
+        /// <summary>
+        /// Rounds a <see cref="Vector3"/>.
+        /// </summary>
+        /// <param name="vector">
+        /// The vector to round
+        /// </param>
+        /// <param name="decimalPlaces">
+        /// The number of decimal places to round to. The default is 0.
+        /// </param>
+        /// <returns>
+        /// The rounded vector.
+        /// </returns>
+        public static Vector3 Round(this Vector3 vector, int decimalPlaces = 0)
+        {
+            float multiplier = 1;
+            if (decimalPlaces > 0)
+            {
+                multiplier = Mathf.Pow(10f, decimalPlaces);
+            }
+            return new Vector3(
+                       Mathf.Round(vector.x * multiplier) / multiplier,
+                       Mathf.Round(vector.y * multiplier) / multiplier,
+                       Mathf.Round(vector.z * multiplier) / multiplier);
+        }
+        #endregion // Vector Extensions
     }
 }

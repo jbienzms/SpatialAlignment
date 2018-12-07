@@ -222,7 +222,7 @@ namespace Microsoft.SpatialAlignment
                     CreateTarget(originPrefab, ref modelOrigin, currentStep.ToString());
 
                     // Parent the target
-                    modelOrigin.transform.SetParent(this.transform, worldPositionStays: true);
+                    modelOrigin.transform.SetParent(TargetTransform, worldPositionStays: true);
 
                     break;
 
@@ -233,7 +233,7 @@ namespace Microsoft.SpatialAlignment
                     CreateTarget(directionPrefab, ref modelDirection, currentStep.ToString());
 
                     // Parent the target
-                    modelDirection.transform.SetParent(this.transform, worldPositionStays: true);
+                    modelDirection.transform.SetParent(TargetTransform, worldPositionStays: true);
 
                     // Add line renderer
                     modelLine = AddLine(modelDirection);
@@ -278,9 +278,7 @@ namespace Microsoft.SpatialAlignment
 
                     // Get transform positions
                     Vector3 modelOriginWorld = modelOrigin.transform.position;
-                    // Vector3 modelOriginLocal = modelOrigin.transform.localPosition;
                     Vector3 modelDirectionWorld = modelDirection.transform.position;
-                    // Vector3 modelDirectionLocal = modelDirection.transform.localPosition;
                     Vector3 placementOriginWorld = placementOrigin.transform.position;
                     Vector3 placementDirectionWorld = placementDirection.transform.position;
 
@@ -297,10 +295,10 @@ namespace Microsoft.SpatialAlignment
                     float rotation = (placementAngle - modelAngle);
 
                     // Update parent position to align origins
-                    gameObject.transform.position += offset;
+                    TargetTransform.position += offset;
 
                     // Update parent rotation, but around placement origin
-                    gameObject.transform.RotateAround(placementOriginWorld, Vector3.up, rotation);
+                    TargetTransform.RotateAround(placementOriginWorld, Vector3.up, rotation);
 
                     // Finish refinement
                     FinishRefinement();
@@ -433,7 +431,7 @@ namespace Microsoft.SpatialAlignment
             if (originPrefab == null)
             {
                 originPrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                originPrefab.transform.SetParent(transform, worldPositionStays: true);
+                originPrefab.transform.SetParent(TargetTransform, worldPositionStays: true);
                 originPrefab.GetComponent<Collider>().enabled = false;
                 originPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
                 originPrefab.SetActive(false);
@@ -441,7 +439,7 @@ namespace Microsoft.SpatialAlignment
             if (directionPrefab == null)
             {
                 directionPrefab = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                directionPrefab.transform.SetParent(transform, worldPositionStays: true);
+                directionPrefab.transform.SetParent(TargetTransform, worldPositionStays: true);
                 directionPrefab.GetComponent<Collider>().enabled = false;
                 directionPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
                 directionPrefab.SetActive(false);
@@ -500,7 +498,7 @@ namespace Microsoft.SpatialAlignment
                 Vector3 relativePos = direction.position - origin.position;
 
                 // Rotate the target direction to point away from the origin
-                targetInterpolator.SetTargetRotation(Quaternion.FromToRotation(transform.up, relativePos));
+                targetInterpolator.SetTargetRotation(Quaternion.FromToRotation(TargetTransform.up, relativePos));
 
                 // Get the line renderer
                 LineRenderer line = (isModel ? modelLine : placementLine);

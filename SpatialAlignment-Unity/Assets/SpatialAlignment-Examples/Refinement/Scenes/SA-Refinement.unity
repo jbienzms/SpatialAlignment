@@ -336,6 +336,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114129378875773704, guid: d29bc40b7f3df26479d6a0aac211c355,
+        type: 3}
+      propertyPath: FloorQuad
+      value: 
+      objectReference: {fileID: 1520281459093612, guid: 7272c8e73bd10ec44b3bd7cd4451165c,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d29bc40b7f3df26479d6a0aac211c355, type: 3}
 --- !u!1001 &278732485
@@ -493,6 +499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   refineOnStart: 0
+  targetTransform: {fileID: 0}
   controllerPrefab: {fileID: 1469530028792937992, guid: f16944cb4f51ca045bc297eb5098241a,
     type: 3}
   directionAmount: 0.01
@@ -575,6 +582,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   refineOnStart: 0
+  targetTransform: {fileID: 0}
   autoHideMeshes: 1
   directionPrefab: {fileID: 3882863017087187430, guid: 8e43969e520e5d149b6ca084446340d7,
     type: 3}

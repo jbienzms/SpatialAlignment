@@ -131,6 +131,7 @@ MonoBehaviour:
   Targets: []
   lockFocus: 0
   refinement: {fileID: 0}
+  useLookDirection: 1
 --- !u!65 &1848810891968837930
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -142,7 +143,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.38, z: 0.02}
+  m_Size: {x: 0.5, y: 0.45, z: 0.02}
   m_Center: {x: 0, y: 0, z: 0.17}
 --- !u!114 &6313569961156761970
 MonoBehaviour:

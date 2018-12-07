@@ -23,6 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Unity.Receivers;
 using System;
@@ -43,7 +44,44 @@ namespace Microsoft.SpatialAlignment
         [SerializeField]
         [Tooltip("The nudge refinement instance to control.")]
         private NudgeRefinement refinement;
+
+        [SerializeField]
+        [Tooltip("Whether the look direction of the controller should be used as the forward direction for nudge operations.")]
+        private bool useLookDirection = true;
         #endregion // Unity Inspector Variables
+
+        protected virtual RefinementDirection GetLookDirection()
+        {
+            // Which "forward" are we using
+            Vector3 forward;
+            if (refinement.Space == Space.World)
+            {
+                // Just use controller forward
+                forward = transform.forward;
+            }
+            else
+            {
+                // Use controller forward but in target local space
+                forward = refinement.TargetTransform.InverseTransformDirection(transform.forward);
+            }
+
+            // Normalize the forward direction
+            Vector3 normForward = forward.normalized;
+
+            // Round the normalized vector to 0 decimal places
+            Vector3 roundedForward = normForward.Round();
+
+            // Try to convert the vector to a direction
+            RefinementDirection direction;
+            if (roundedForward.TryGetDirection(out direction))
+            {
+                return direction;
+            }
+            else
+            {
+                return RefinementDirection.Forward;
+            }
+        }
 
         #region Overrides / Event Handlers
         protected override void InputUp(GameObject obj, InputEventData eventData)
@@ -52,6 +90,12 @@ namespace Microsoft.SpatialAlignment
             {
                 Debug.LogWarning($"{nameof(NudgeController)} does not have a valid {nameof(Refinement)} instance.");
                 return;
+            }
+
+            // Update forward direction to match look direction?
+            if (useLookDirection)
+            {
+                refinement.ForwardDirection = GetLookDirection();
             }
 
             // Execute action and direction based on name
@@ -88,6 +132,15 @@ namespace Microsoft.SpatialAlignment
         /// Gets or sets the nudge refinement instance to control.
         /// </summary>
         public NudgeRefinement Refinement { get { return refinement; } set { refinement = value; } }
+
+        /// <summary>
+        /// Gets or sets whether the look direction of the controller should be
+        /// used as the forward direction for nudge operations.
+        /// </summary>
+        /// <remarks>
+        /// The default is <c>true</c>.
+        /// </remarks>
+        public bool UseLookDirection { get { return useLookDirection; } set { useLookDirection = value; } }
         #endregion // Public Properties
     }
 }
