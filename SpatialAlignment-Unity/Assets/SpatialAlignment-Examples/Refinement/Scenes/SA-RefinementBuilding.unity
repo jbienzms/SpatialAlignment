@@ -1017,7 +1017,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2885058528f56942a057ce91bede070, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  refineOnStart: 1
+  refineOnStart: 0
   targetTransform: {fileID: 0}
   controllerPrefab: {fileID: 1469530028792937992, guid: f16944cb4f51ca045bc297eb5098241a,
     type: 3}
