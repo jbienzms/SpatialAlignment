@@ -64,7 +64,7 @@ namespace Microsoft.SpatialAlignment
     /// updated by the user interactively.
     /// </summary>
     [RequireComponent(typeof(Collider))]
-    public class RefinableModel : RefinementController
+    public class RefinableModel : RefinementBase
     {
         #region Member Variables
         private BoundingBoxRig boundingBoxRig;

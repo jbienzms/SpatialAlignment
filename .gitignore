@@ -299,3 +299,4 @@ FakesAssemblies/
 mixedreality-azure-samples.sln
 mixedreality-azure-samples.csproj
 mixedreality-azure-samples.Player.csproj
+*.blend1

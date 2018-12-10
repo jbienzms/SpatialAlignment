@@ -30,12 +30,47 @@ using UnityEngine;
 
 namespace Microsoft.SpatialAlignment
 {
+    /// <summary>
+    /// Defines the directions that can be used in a refinement.
+    /// </summary>
+    public enum RefinementDirection
+    {
+        /// <summary>
+        /// Forward.
+        /// </summary>
+        Forward,
+
+        /// <summary>
+        /// Back.
+        /// </summary>
+        Back,
+
+        /// <summary>
+        /// Down.
+        /// </summary>
+        Down,
+
+        /// <summary>
+        /// Left.
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// Right
+        /// </summary>
+        Right,
+
+        /// <summary>
+        /// Up.
+        /// </summary>
+        Up,
+    }
 
     /// <summary>
     /// The base class for a behavior that provides cancelable refinement of the
     /// transform of an object.
     /// </summary>
-    public class RefinementController : MonoBehaviour
+    public class RefinementBase : MonoBehaviour
     {
         #region Member Variables
         private bool isRefining;
@@ -47,6 +82,10 @@ namespace Microsoft.SpatialAlignment
         [SerializeField]
         [Tooltip("Whether to begin refining when the behavior starts.")]
         private bool refineOnStart;
+
+        [SerializeField]
+        [Tooltip("Optional transform where nudge operations will be applied. If none is specified, the transform of the applied GameObject will be used.")]
+        private Transform targetTransform;
         #endregion // Unity Inspector Variables
 
         #region Overrides / Event Handlers
@@ -87,8 +126,8 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         protected virtual void RestoreLastTransform()
         {
-            transform.position = lastPosition;
-            transform.rotation = lastRotation;
+            targetTransform.position = lastPosition;
+            targetTransform.rotation = lastRotation;
         }
 
         /// <summary>
@@ -96,13 +135,51 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         protected virtual void SaveLastTransform()
         {
-            lastPosition = transform.position;
-            lastRotation = transform.rotation;
+            lastPosition = targetTransform.position;
+            lastRotation = targetTransform.rotation;
         }
         #endregion // Overrides / Event Handlers
 
         #region Unity Overrides
-        // Start is called before the first frame update
+        /// <summary>
+        /// Awake is called when the script instance is being loaded.
+        /// </summary>
+        protected virtual void Awake()
+        {
+            // If no transform is specified, use the GameObjects transform
+            if (targetTransform == null)
+            {
+                targetTransform = gameObject.transform;
+            }
+        }
+
+        /// <summary>
+        /// This function is called after all frame updates for the last frame of the object’s existence.
+        /// </summary>
+        protected virtual void OnDestroy()
+        {
+
+        }
+
+        /// <summary>
+        /// This function is called when the behavior becomes disabled or inactive.
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+
+        }
+
+        /// <summary>
+        /// Only called if the Object is active, this function is called just after the object is enabled.
+        /// </summary>
+        protected virtual void OnEnable()
+        {
+
+        }
+
+        /// <summary>
+        /// Start is called before the first frame update.
+        /// </summary>
         protected virtual void Start()
         {
             if (refineOnStart)
@@ -111,7 +188,9 @@ namespace Microsoft.SpatialAlignment
             }
         }
 
-        // Update is called once per frame
+        /// <summary>
+        /// Update is called once per frame.
+        /// </summary>
         protected virtual void Update()
         {
 
@@ -197,6 +276,11 @@ namespace Microsoft.SpatialAlignment
         /// Gets or sets whether to begin refining when the behavior starts.
         /// </summary>
         public bool RefineOnStart { get => refineOnStart; set => refineOnStart = value; }
+
+        /// <summary>
+        /// Gets or sets an optional transform where nudge operations will be applied. If none is specified, the transform of the applied GameObject will be used.
+        /// </summary>
+        public Transform TargetTransform { get { return targetTransform; } set { targetTransform = value; } }
         #endregion // Public Properties
 
         #region Public Events
