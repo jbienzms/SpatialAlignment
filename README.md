@@ -3,9 +3,9 @@
 This reference architecture includes many helpful components for aligning and keeping virtual objects aligned with the physical world.
 
 
-### Release 1.0
+### Release 1.1
 
-Release 1.0 contains the following capabilities:
+Release 1.1 contains the following capabilities:
 
 
 #### Spatial Frames
@@ -33,9 +33,15 @@ Two of the biggest challenges that accompany spatial alignment are:
 1.  Initial placement (and rotation) of objects to match up with the physical world
 2.  Accounting for drift that accumulates over distance (a challenge that is present in all large-scale tracking systems)
 
-This reference architecture includes components to help address both. To help with accurate alignment, an extensible system of *Refinement Controllers* is provided. Version 1.0 includes one refinement controller called **RayRefinement**. **RayRefinement** aligns a virtual model to a physical place by selecting corresponding origin points and directions.
+This reference architecture includes components to help address both. To help with accurate alignment, an extensible system of *Refinement Controllers* is provided. Release 1.1 ships with two refinement controllers in the box: 
+
+- **RayRefinement** - Aligns a virtual model to a physical place by selecting corresponding origin points and directions.
 
 ![](External/ReadMeImages/Align-RayRefine.gif)
+
+- **NudgeRefinement** - Allows the user to manually "nudge" the virtual model into the correct position and rotation using a stylable 3D D-Pad controller.
+
+![](External/ReadMeImages/Align-NudgeRefine.gif)
 
 To help compensate for drift, *Multi-Parent* alignment offers the ability to apply different positional and rotational offsets at each parent.
 
@@ -67,12 +73,12 @@ To help applications save all of this data, every component in the architecture 
 
 #### Examples
 
-Release 1.0 includes the following example scenes:
+Release 1.1 includes the following example scenes:
 
 - **SA-MultiParent** - Demonstrates "hopping" between multiple parent spheres in the scene.
 - **SA-Persistence** - Demonstrates saving an entire "graph" of frames and their strategies into memory then loading them back into the scene.
 - **SA-Refinement** - Demonstrates using **RayRefinement** to place a multi-colored cube in a room.
-- **SA-RefinementBuilding** - Demonstrates using **RayRefinement** to align a Matterport 3D scan to room. (This example is shown in the video above).
+- **SA-RefinementBuilding** - Demonstrates using **RayRefinement** and **NudgeRefinement** to align a Matterport 3D scan to room. (This example is shown in the video above).
 
 
 ### Contributing
