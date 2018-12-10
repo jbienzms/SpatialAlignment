@@ -13,7 +13,7 @@ SET PackageDir=%cd%\External\UnityPackages
 
 REM Set Package Info
 SET PackageName=SpatialAlignment
-SET PackageVersion=1.0.0
+SET PackageVersion=1.1.0
 SET PackageFileName=%PackageName%-%PackageVersion%.unitypackage
 
 ECHO Packaging %PackageName% %PackageVersion%
