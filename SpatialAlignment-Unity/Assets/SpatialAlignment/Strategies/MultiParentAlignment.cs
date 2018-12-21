@@ -33,6 +33,31 @@ using UnityEngine;
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
+    /// Defines the various modes that <see cref="MultiParentAlignment"/> can
+    /// use to select and apply parent options.
+    /// </summary>
+    public enum MultiParentMode
+    {
+        /// <summary>
+        /// Only the closest valid parent will be applied.
+        /// </summary>
+        /// <remarks>
+        /// This mode has the lowest system requirements, but "hopping" may be
+        /// noticeable when switching between parents.
+        /// </remarks>
+        Closest,
+        /// <summary>
+        /// All valid parents are applied using weighted values. The weights
+        /// are calculated based on the distance from the user.
+        /// </summary>
+        /// <remarks>
+        /// This mode offers the highest accuracy at the cost of increased
+        /// calculations.
+        /// </remarks>
+        DistanceWeighted
+    }
+
+    /// <summary>
     /// A strategy that coordinates alignment based on the alignment of multiple "parent" objects.
     /// </summary>
     /// <remarks>
@@ -43,12 +68,29 @@ namespace Microsoft.SpatialAlignment
     [DataContract]
     public class MultiParentAlignment : AlignmentStrategy
     {
+        #region Nested Types
+        /// <summary>
+        /// Used when calculating parent weights.
+        /// </summary>
+        private class WeightedParent
+        {
+            public ParentAlignmentOptions Option;
+            public double InverseDistanceWeight;
+            public float Weight;
+        }
+        #endregion // Nested Types
+
         #region Member Variables
-        private ParentAlignmentOptions currentParent;
+        private List<ParentAlignmentOptions> currentParents;
         private float lastUpdateTime;
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [DataMember]
+        [SerializeField]
+        [Tooltip("The mode used for selecting and applying parent options.")]
+        MultiParentMode mode;
+
         [DataMember]
         [SerializeField]
         [Tooltip("The list of parent alignment options.")]
@@ -64,41 +106,94 @@ namespace Microsoft.SpatialAlignment
         private float updateFrequency = 2.00f;
         #endregion // Unity Inspector Variables
 
-
         #region Internal Methods
         /// <summary>
-        /// Applies the specified parent options to this object.
+        /// Applies <see cref="CurrentParents"/> transforms to the current object.
         /// </summary>
-        /// <param name="parentOption">
-        /// The parent options to apply.
-        /// </param>
         /// <param name="force">
-        /// <c>true</c> to force an update even if reusing the same option.
+        /// <c>true</c> to force an update even if cached information remains
+        /// unchanged.
         /// The default is <c>false</c>.
         /// </param>
         /// <remarks>
         /// The default implementation of this method parents the transform
         /// and applies position, rotation and scale modifications.
         /// </remarks>
-        protected virtual void ApplyParent(ParentAlignmentOptions parentOption, bool force=false)
+        protected virtual void ApplyParents(bool force=false)
         {
-            // Validate
-            if (parentOption == null) { throw new ArgumentNullException(nameof(parentOption)); }
-            if (parentOption.Frame == null) { throw new InvalidOperationException($"{nameof(parentOption.Frame)} cannot be null."); }
+            // If there are no options, warn and bail
+            if (currentParents.Count < 1)
+            {
+                State = AlignmentState.Inhibited;
+                Debug.LogWarning($"{nameof(MultiParentAlignment)}: No {nameof(CurrentParents)} available to apply.");
+                return;
+            }
 
-            // If already parented to this object, no additional work needed
-            if ((!force) && (currentParent == parentOption)) { return; }
+            // If there is only one, apply it immediately
+            if (currentParents.Count == 1)
+            {
+                // Get single parent
+                ParentAlignmentOptions parentOption = currentParents[0];
 
-            // Make our transform a child of the frame
-            this.transform.SetParent(parentOption.Frame.transform, worldPositionStays: false);
+                // Make our transform a child of the frame
+                this.transform.SetParent(parentOption.Frame.transform, worldPositionStays: false);
 
-            // Apply transform modifications
-            this.transform.localPosition = parentOption.Position;
-            this.transform.localRotation = Quaternion.Euler(parentOption.Rotation);
-            this.transform.localScale = parentOption.Scale;
+                // Apply transform modifications
+                this.transform.localPosition = parentOption.Position;
+                this.transform.localRotation = Quaternion.Euler(parentOption.Rotation);
+                this.transform.localScale = parentOption.Scale;
+            }
+            else
+            {
+                // Attempt to get the reference transform
+                Transform reference = GetReferenceTransform();
 
-            // Notify of parent change
-            CurrentParent = parentOption;
+                // If no reference transform available, we can't continue
+                if (reference == null)
+                {
+                    State = AlignmentState.Inhibited;
+                    Debug.LogWarning($"{nameof(MultiParentAlignment)}: No reference transform could be determined.");
+                    return;
+                }
+
+                // Placeholders
+                Vector3 weightedPos = Vector3.zero;
+                Vector3 weightedRotation = Vector3.zero;
+                Vector3 weightedScale = Vector3.zero;
+
+                // Determine a power factor to use for Inverse Distance Weighting
+                Double power = 2d;
+
+                // Calculate inverse distance weights for each option
+                var weightedParents = (from option in currentParents
+                                       select new WeightedParent()
+                {
+                    Option = option,
+                    InverseDistanceWeight = 1d / Math.Pow(power, option.DistanceSort(reference)),
+                }).ToList();
+
+                // Get total overall inverse distance weight
+                Double totalIDW = weightedParents.Sum(o => o.InverseDistanceWeight);
+
+                // Calculate individual weights
+                weightedParents.ForEach(o => o.Weight = (float)(o.InverseDistanceWeight / totalIDW));
+
+                // Calculate weighted offsets
+                weightedParents.ForEach(o =>
+                {
+                    weightedPos += (o.Option.Frame.transform.position + o.Option.Position).Weighted(o.Weight);
+                    weightedRotation += (o.Option.Frame.transform.rotation.eulerAngles + o.Option.Rotation).Weighted(o.Weight);
+                    weightedScale += (o.Option.Frame.transform.localScale + o.Option.Scale).Weighted(o.Weight);
+                });
+
+                // Set no parent
+                this.transform.parent = null;
+
+                // Apply offsets
+                this.transform.position = weightedPos;
+                this.transform.rotation = Quaternion.Euler(weightedRotation);
+                this.transform.localScale = weightedScale;
+            }
 
             // Done!
         }
@@ -125,48 +220,35 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// Attempts to select the best parent option based on current settings.
+        /// Selects the best parent options to use from the list of all
+        /// available <see cref="ParentOptions"/>.
         /// </summary>
         /// <returns>
-        /// The <see cref="ParentAlignmentOptions"/> that represent the best parent,
-        /// if found; otherwise <see langword = "null" />.
+        /// The list of <see cref="ParentAlignmentOptions"/> that represent
+        /// the best available options.
         /// </returns>
         /// <remarks>
-        /// The default implementation examines all options where
-        /// <see cref="ParentAlignmentOptions.IsValidTarget">IsValidTarget</see>
-        /// returns <c>true</c> and selects the top option sorted by
-        /// <see cref="ParentAlignmentOptions.SortOrder(Transform)">SortOrder</see>.
+        /// The default implementation selects options based on the current
+        /// <see cref="Mode"/> setting.
         /// </remarks>
-        protected virtual ParentAlignmentOptions SelectParent()
+        protected virtual List<ParentAlignmentOptions> SelectParents()
         {
-            // Attempt to get the reference transform
-            Transform reference = GetReferenceTransform();
-
-            // If no transform, can't continue
-            if (reference == null) { return null; }
-
-            // Placeholder
-            ParentAlignmentOptions parentOption = null;
-
-            // If only one parent option, always use that
-            if (parentOptions.Count == 1)
+            switch (mode)
             {
-                // Use only parent option, if valid
-                parentOption = (parentOptions[0].IsValidTarget() ? parentOptions[0] : null);
-            }
-            else
-            {
-                // Find the best valid parent, sorted by logic in the ParentAlignmentOption itself
-                parentOption = (from o in ParentOptions
-                                where o.IsValidTarget()
-                                orderby o.SortOrder(reference)
-                                select o
-                               ).FirstOrDefault();
+                case MultiParentMode.Closest:
+                    return (from o in ParentOptions
+                            where IsValidParent(o)
+                            orderby o.DistanceSort(GetReferenceTransform())
+                            select o).Take(1).ToList();
 
-            }
+                case MultiParentMode.DistanceWeighted:
+                    return (from o in ParentOptions
+                            where IsValidParent(o)
+                            select o).ToList();
 
-            // Done searching
-            return parentOption;
+                default:
+                    throw new InvalidOperationException($"Unknown mode: {mode}");
+            }
         }
 
         /// <summary>
@@ -206,11 +288,29 @@ namespace Microsoft.SpatialAlignment
 
         #region Overridables / Event Triggers
         /// <summary>
-        /// Called when the value of the <see cref="CurrentParent"/> property has changed.
+        /// Returns a value that indicates if the parent should be considered
+        /// valid in its current state.
         /// </summary>
-        protected virtual void OnCurrentParentChanged()
+        /// <returns>
+        /// <c>true</c> if the parent is valid; otherwise <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// The default implementation checks to make sure the
+        /// parent is meeting minimum requirements by calling
+        /// <see cref="ParentAlignmentOptions.IsMeetingRequirements"/>.
+        /// </remarks>
+        protected virtual bool IsValidParent(ParentAlignmentOptions parent)
         {
-            CurrentParentChanged?.Invoke(this, EventArgs.Empty);
+            // Meeting minimum requirements?
+            return parent.IsMeetingRequirements();
+        }
+
+        /// <summary>
+        /// Called when the value of the <see cref="CurrentParents"/> property has changed.
+        /// </summary>
+        protected virtual void OnCurrentParentsChanged()
+        {
+            CurrentParentsChanged?.Invoke(this, EventArgs.Empty);
         }
         #endregion // Overridables / Event Triggers
 
@@ -265,44 +365,59 @@ namespace Microsoft.SpatialAlignment
             ValidateParentOptions();
 
             // Use virtual method to select the best parent option
-            ParentAlignmentOptions parentOption = SelectParent();
+            CurrentParents = SelectParents();
 
-            // If no option could be found, fail
-            if (parentOption == null)
-            {
-                State = AlignmentState.Inhibited;
-                Debug.LogWarning($"{nameof(MultiParentAlignment)}: No parent could be found that meets the minimum criteria.");
-                return;
-            }
-            else
-            {
-                // Actually apply the parent
-                ApplyParent(parentOption, force: force);
+            // Actually apply the parents
+            ApplyParents(force: force);
 
-                // Resolved
-                State = AlignmentState.Tracking;
-            }
+            // Resolved
+            State = AlignmentState.Tracking;
         }
 
         #endregion // Public Methods
 
         #region Public Properties
         /// <summary>
-        /// Gets the <see cref="ParentAlignmentOptions"/> that represent the currently
-        /// selected parent.
+        /// Gets the list of currently selected <see cref="ParentAlignmentOptions"/>.
         /// </summary>
-        public virtual ParentAlignmentOptions CurrentParent
+        public List<ParentAlignmentOptions> CurrentParents
         {
             get
             {
-                return currentParent;
+                return currentParents;
             }
             protected set
             {
-                if (currentParent != value)
+                if (currentParents != value)
                 {
-                    currentParent = value;
-                    OnCurrentParentChanged();
+                    currentParents = value;
+                    OnCurrentParentsChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the mode for selecting and applying parent options.
+        /// </summary>
+        /// <remarks>
+        /// Changing this value will cause the transform to be recalculated.
+        /// </remarks>
+        public MultiParentMode Mode
+        {
+            get
+            {
+                return mode;
+            }
+            set
+            {
+                // Ensure changing
+                if (mode != value)
+                {
+                    // Store
+                    mode = value;
+
+                    // Attempt to update the transform
+                    UpdateTransform();
                 }
             }
         }
@@ -389,8 +504,10 @@ namespace Microsoft.SpatialAlignment
         #endregion // Public Properties
 
         #region Public Events
-        /// <inheritdoc />
-        public event EventHandler CurrentParentChanged;
+        /// <summary>
+        /// Raised when the value of the <see cref="CurrentParents"/> property has changed.
+        /// </summary>
+        public event EventHandler CurrentParentsChanged;
         #endregion // Public Events
     }
 }

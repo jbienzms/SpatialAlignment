@@ -542,8 +542,8 @@ namespace Microsoft.SpatialAlignment.Persistence
             // Remove
             if (multiParent.ParentOptions.Contains(parentOption))
             {
-                // If it's the current option, unparent
-                if (multiParent.CurrentParent == parentOption)
+                // If it's the current parent, unparent so we don't get destroyed too
+                if (LargeScaleModel.transform.parent == parentOption.Frame.transform)
                 {
                     LargeScaleModel.transform.parent = null;
                 }
@@ -561,9 +561,9 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// </summary>
         public void RemoveCurrentAnchor()
         {
-            if (multiParent.CurrentParent != null)
+            if (multiParent.CurrentParents.Count > 0)
             {
-                RemoveAnchor(multiParent.CurrentParent);
+                RemoveAnchor(multiParent.CurrentParents[0]);
             }
         }
 

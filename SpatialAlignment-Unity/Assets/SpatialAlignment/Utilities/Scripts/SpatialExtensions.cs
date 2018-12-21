@@ -373,6 +373,23 @@ namespace Microsoft.SpatialAlignment
                        Mathf.Round(vector.y * multiplier) / multiplier,
                        Mathf.Round(vector.z * multiplier) / multiplier);
         }
+
+        /// <summary>
+        /// Returns a weighted percentage of the specified vector.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> to calculate the weighted value for.
+        /// </param>
+        /// <param name="weight">
+        /// The weighted percentage to apply.
+        /// </param>
+        /// <returns>
+        /// The weighted <see cref="Vector3"/>.
+        /// </returns>
+        static public Vector3 Weighted(this Vector3 vector, float weight)
+        {
+            return new Vector3(vector.x * weight, vector.y * weight, vector.z * weight);
+        }
         #endregion // Vector Extensions
     }
 }

@@ -52,7 +52,7 @@ namespace Microsoft.SpatialAlignment
         [DataMember]
         [SerializeField]
         [Tooltip("The minimum state of the parent alignment for it to be considered valid. Unresolved means always valid.")]
-        private AlignmentState minimuState = AlignmentState.Resolved;
+        private AlignmentState minimumState = AlignmentState.Resolved;
 
         [DataMember]
         [SerializeField]
@@ -72,16 +72,23 @@ namespace Microsoft.SpatialAlignment
 
         #region Public Methods
         /// <summary>
-        /// Returns a value that indicates if the parent should be considered a valid target.
+        /// Returns a value that indicates if the parent is meeting current
+        /// requirements.
         /// </summary>
         /// <returns>
-        /// <c>true</c> if the parent is a valid target; otherwise <c>false</c>.
+        /// <c>true</c> if the parent is meeting requirements;
+        /// otherwise <c>false</c>.
         /// </returns>
         /// <remarks>
-        /// The default implementation makes sure the parent isn't null and also checks
-        /// <see cref="MinimumAccuracy"/> and <see cref="MinimumState"/>
+        /// The default implementation makes sure the frame isn't
+        /// <see langword = "null" />, then checks to make sure the strategy
+        /// is meeting
+        /// <see cref="ParentAlignmentOptions.MinimumAccuracy">MinimumAccuracy</see>
+        /// and
+        /// <see cref="ParentAlignmentOptions.MinimumState">MinimumState</see>
+        /// requirements.
         /// </remarks>
-        public virtual bool IsValidTarget()
+        public virtual bool IsMeetingRequirements()
         {
             // Can't be null
             if (frame == null) { return false; }
@@ -93,24 +100,19 @@ namespace Microsoft.SpatialAlignment
             if (strategy == null)
             {
                 Debug.LogWarning($"Parent frame '{frame.Id}' has no alignment strategy.");
+                return false;
             }
 
             // Check the state
-            if (minimuState > AlignmentState.Error)
+            if (minimumState > AlignmentState.Error)
             {
-                // Must have a strategy
-                if (strategy == null) { return false; }
-
                 // Strategy state must match minimum
-                if (strategy.State < minimuState) { return false; }
+                if (strategy.State < minimumState) { return false; }
             }
 
             // Check the accuracy
             if (minimumAccuracy != Vector3.zero)
             {
-                // Must have a strategy
-                if (strategy == null) { return false; }
-
                 // Strategy accuracy match minimum
                 if ((minimumAccuracy.x > 0) && (strategy.Accuracy.x > minimumAccuracy.x)) { return false; }
                 if ((minimumAccuracy.y > 0) && (strategy.Accuracy.y > minimumAccuracy.y)) { return false; }
@@ -122,7 +124,8 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// Provides a sort order for this option relative to the specified transform.
+        /// Provides a sort order for this option based on the distance
+        /// to the specified transform.
         /// </summary>
         /// <param name="reference">
         /// The reference transform to sort by.
@@ -143,7 +146,7 @@ namespace Microsoft.SpatialAlignment
         /// based on the distance to the frame of reference.
         /// </para>
         /// </remarks>
-        public virtual float SortOrder(Transform reference)
+        public virtual float DistanceSort(Transform reference)
         {
             return (frame.transform.position - reference.position).sqrMagnitude;
         }
@@ -179,7 +182,7 @@ namespace Microsoft.SpatialAlignment
         /// return a <see cref="IAlignmentStrategy.State">State</see> of this level or higher
         /// to be considered valid.
         /// </remarks>
-        public AlignmentState MinimumState { get { return minimuState; } set { minimuState = value; } }
+        public AlignmentState MinimumState { get { return minimumState; } set { minimumState = value; } }
 
         /// <summary>
         /// Gets or sets the position to use when a child of this parent.
