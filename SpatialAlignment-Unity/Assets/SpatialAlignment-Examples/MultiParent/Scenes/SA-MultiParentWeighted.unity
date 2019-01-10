@@ -444,7 +444,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acbe461e1fd0d1541aae9edae3fddc44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 1
   parentOptions:
   - frame: {fileID: 1478666017}
     minimumAccuracy: {x: 0, y: 0, z: 0}
@@ -466,6 +465,8 @@ MonoBehaviour:
     scale: {x: 0.3, y: 0.3, z: 0.3}
   referenceTransform: {fileID: 0}
   updateFrequency: 1
+  distancePower: 2
+  mode: 1
 --- !u!1 &332004587
 GameObject:
   m_ObjectHideFlags: 0

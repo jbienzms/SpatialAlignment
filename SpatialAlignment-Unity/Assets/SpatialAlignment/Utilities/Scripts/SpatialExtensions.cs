@@ -23,13 +23,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+
+#if !NO_MRTK
+using HoloToolkit.Unity;
+#endif
 
 namespace Microsoft.SpatialAlignment
 {
@@ -309,6 +312,65 @@ namespace Microsoft.SpatialAlignment
         }
         #endregion // RefinementDirection Extensions
 
+        #region Transform Extensions
+        /// <summary>
+        /// Updates the transform to match the specified world values.
+        /// </summary>
+        /// <param name="transform">
+        /// The transform to update.
+        /// </param>
+        /// <param name="position">
+        /// The updated position.
+        /// </param>
+        /// <param name="rotation">
+        /// The updated rotation.
+        /// </param>
+        /// <param name="scale">
+        /// The updated scale.
+        /// </param>
+        /// <remarks>
+        /// Animations only work in MRTK builds. In other builds animations complete immediately.
+        /// </remarks>
+        static public void AnimateTo(this Transform transform, Vector3 position, Quaternion rotation, Vector3 scale)
+        {
+            #if NO_MRTK
+            transform.position = position;
+            transform.rotation = rotation;
+            transform.localScale = scale;
+            #else
+            // Get or create Interpolator
+            Interpolator i = transform.gameObject.EnsureComponent<Interpolator>();
+
+            // Reset in case of previous action
+            i.Reset();
+
+            // Interpolate to values
+            i.SetTargetPosition(position);
+            i.SetTargetRotation(rotation);
+            i.SetTargetLocalScale(scale);
+            #endif
+        }
+
+        /// <summary>
+        /// Skips any running animation to the end.
+        /// </summary>
+        /// <param name="transform">
+        /// The transform where an animation may be running.
+        /// </param>
+        /// <remarks>
+        /// Animations only work in MRTK builds. In other builds animations complete immediately.
+        /// </remarks>
+        static public void EndAnimation(this Transform transform)
+        {
+            #if !NO_MRTK
+            // Try to get Interpolator
+            Interpolator i = transform.gameObject.GetComponent<Interpolator>();
+
+            // If found, jump to end
+            if (i != null) { i.SnapToTarget(); }
+            #endif
+        }
+        #endregion // Transform Extensions
 
         #region Vector Extensions
         /// <summary>

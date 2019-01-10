@@ -591,6 +591,7 @@
     <Compile Include="Assets\SpatialAlignment\Strategies\AlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\IAlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\MultiParentAlignment.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\MultiParentBase.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\ParentAlignmentOptions.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\SimulatedAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\WorldAnchorAlignment.cs" />
