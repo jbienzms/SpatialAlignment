@@ -37,7 +37,7 @@ using HoloToolkit.Unity;
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// Extensions methods for Unity classes.
+    /// Extension methods for Unity classes.
     /// </summary>
     static public class SpatialExtensions
     {
@@ -189,7 +189,7 @@ namespace Microsoft.SpatialAlignment
                     switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Right;	// Facing Right Looking Forward is Forward
+                            return RefinementDirection.Right;   // Facing Right Looking Forward is Forward
                         case RefinementDirection.Back:
                             return RefinementDirection.Left;    // Facing Right Looking Back is Left
                         case RefinementDirection.Down:
@@ -208,9 +208,9 @@ namespace Microsoft.SpatialAlignment
                     switch (direction)
                     {
                         case RefinementDirection.Forward:
-                            return RefinementDirection.Up;		// Facing Up Looking Forward is Up
+                            return RefinementDirection.Up;      // Facing Up Looking Forward is Up
                         case RefinementDirection.Back:
-                            return RefinementDirection.Down;	// Facing Up Looking Back is Down
+                            return RefinementDirection.Down;    // Facing Up Looking Back is Down
                         case RefinementDirection.Down:
                             return RefinementDirection.Forward; // Facing Up Looking Down is Forward
                         case RefinementDirection.Left:
@@ -281,7 +281,7 @@ namespace Microsoft.SpatialAlignment
                 direction = RefinementDirection.Back;
                 return true;
             }
-            else if(vector == Vector3.down)
+            else if (vector == Vector3.down)
             {
                 direction = RefinementDirection.Down;
                 return true;
