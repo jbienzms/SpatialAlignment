@@ -44,13 +44,28 @@ namespace Microsoft.SpatialAlignment
         #region Unity Inspector Variables
         [DataMember]
         [SerializeField]
-        [Tooltip("The source that will serve as a reference point when converting from geocentric to Unity space.")]
+        [Tooltip("The geodetic altitude the frame will be aligned to.")]
+        private float altitude;
+
+        [DataMember]
+        [SerializeField]
+        [Tooltip("The reference source used when converting between global and application 3D space.")]
         private IGeoReference geoReference;
 
         [DataMember]
         [SerializeField]
-        [Tooltip("The geocentric latitude the frame will align to.")]
+        [Tooltip("The geodetic latitude the frame will be aligned to.")]
         private float latitude;
+
+        [DataMember]
+        [SerializeField]
+        [Tooltip("The geodetic longitude the frame will be aligned to.")]
+        private float longitude;
+
+        [DataMember]
+        [SerializeField]
+        [Tooltip("Whether altitude should be considered relative to the reference altitude.")]
+        private bool relativeAltitude;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -85,7 +100,7 @@ namespace Microsoft.SpatialAlignment
                 return;
             }
 
-            // TODO: Convert our geocentric values to ECEF values
+            // TODO: Convert our own geodetic values to ECEF values
             // TODO: Set our transform based on the reference source
         }
         #endregion // Internal Methods
@@ -130,7 +145,33 @@ namespace Microsoft.SpatialAlignment
 
         #region Public Properties
         /// <summary>
-        /// Gets or sets the ID of the anchor to load.
+        /// Gets or sets the
+        /// <see cref="https://en.wikipedia.org/wiki/World_Geodetic_System">geodetic</see>
+        /// altitude the frame will be aligned to.
+        /// </summary>
+        /// <remarks>
+        /// Changing this value will cause the transform to be updated.
+        /// </remarks>
+        public float Altitude
+        {
+            get
+            {
+                return altitude;
+            }
+            set
+            {
+                // Ensure changing
+                if (altitude != value)
+                {
+                    altitude = value;
+                    UpdateTransform();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the reference source used when converting between
+        /// global and application 3D space.
         /// </summary>
         public IGeoReference GeoReference
         {
@@ -163,7 +204,9 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// Gets or sets the geocentric latitude the frame will align to.
+        /// Gets or sets the
+        /// <see cref="https://en.wikipedia.org/wiki/World_Geodetic_System">geodetic</see>
+        /// latitude the frame will be aligned to.
         /// </summary>
         /// <remarks>
         /// Changing this value will cause the transform to be updated.
@@ -180,6 +223,66 @@ namespace Microsoft.SpatialAlignment
                 if (latitude != value)
                 {
                     latitude = value;
+                    UpdateTransform();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the
+        /// <see cref="https://en.wikipedia.org/wiki/World_Geodetic_System">geodetic</see>
+        /// longitude the frame will be aligned to.
+        /// </summary>
+        /// <remarks>
+        /// Changing this value will cause the transform to be updated.
+        /// </remarks>
+        public float Longitude
+        {
+            get
+            {
+                return longitude;
+            }
+            set
+            {
+                // Ensure changing
+                if (longitude != value)
+                {
+                    longitude = value;
+                    UpdateTransform();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether <see cref="Altitude"/>
+        /// should be considered relative to <see cref="GeoReference"/>
+        /// altitude.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// If the actual altitude is not known, this property can be
+        /// used to align the frame at the same altitude as the
+        /// <see cref="GeoReference">reference</see> position (normally the
+        /// user). When this property is set to <c>true</c>,
+        /// <see cref="Altitude"/> is used as an offset above or below the
+        /// reference point.
+        /// </para>
+        /// <para>
+        /// Changing this value will cause the transform to be updated.
+        /// </para>
+        /// </remarks>
+        public bool RelativeAltitude
+        {
+            get
+            {
+                return relativeAltitude;
+            }
+            set
+            {
+                // Ensure changing
+                if (relativeAltitude != value)
+                {
+                    relativeAltitude = value;
                     UpdateTransform();
                 }
             }

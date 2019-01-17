@@ -31,32 +31,44 @@ using UnityEngine;
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// Provides a continuous "point of reference" translation
-    /// between a known GPS coordinate and its corresponding
-    /// location in Unity's coordinate system.
+    /// The interface for a class that provides continuous translation between
+    /// <see cref="https://en.wikipedia.org/wiki/World_Geodetic_System">Geodetic</see>,
+    /// <see href="https://en.wikipedia.org/wiki/ECEF">ECEF</see>, and
+    /// <see cref="https://docs.unity3d.com/ScriptReference/Transform-position.html">Local</see>
+    /// coordinate systems. Classes that implement this system can serve as a
+    /// "point of reference" when mapping between the applications temporary
+    /// local 3D space and true global 3D space.
     /// </summary>
-    /// <remarks>
-    /// <see href="https://en.wikipedia.org/wiki/Map_projection">Map Projection</see>.
-    /// <see href="http://www.movable-type.co.uk/scripts/latlong.html">Map Calculations</see>.
-    /// <see href="https://en.wikipedia.org/wiki/ECEF">Earth-Centered Earth-Fixed</see> (X,Y,Z).
-    /// </remarks>
     public interface IGeoReference
     {
+        #region Public Properties
         /// <summary>
-        /// Gets a <see cref="LocationInfo"/> that represents
-        /// the source GPS location.
+        /// Gets the current
+        /// <see href="https://en.wikipedia.org/wiki/ECEF">ECEF</see>
+        /// position for the point of reference.
         /// </summary>
-        LocationInfo GeoLocation { get; }
+        Vector3 EcefPosition { get; }
 
         /// <summary>
-        /// Gets a <see cref="Vector3"/> in Unity space that
-        /// represents <see cref="GeoLocation"/>.
+        /// Gets the current
+        /// <see cref="https://en.wikipedia.org/wiki/World_Geodetic_System">Geodetic</see>
+        /// position for the point of reference.
         /// </summary>
-        Vector3 Position { get; }
+        LocationInfo GeoPosition { get; }
 
         /// <summary>
-        /// Raised whenever the reference translation is updated.
+        /// Gets a the current
+        /// <see cref="https://docs.unity3d.com/ScriptReference/Transform-position.html">Local</see>
+        /// coordinate system position for the point of reference.
+        /// </summary>
+        Vector3 LocalPosition { get; }
+        #endregion // Public Properties
+
+        #region Public Events
+        /// <summary>
+        /// Raised whenever the reference has been updated.
         /// </summary>
         event EventHandler ReferenceUpdated;
+        #endregion // Public Events
     }
 }
