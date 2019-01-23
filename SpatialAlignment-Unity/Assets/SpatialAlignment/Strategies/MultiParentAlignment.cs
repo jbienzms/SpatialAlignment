@@ -190,10 +190,10 @@ namespace Microsoft.SpatialAlignment
                 // Calculate individual weights
                 weightedParents.ForEach(o => o.Weight = (float)(o.InverseDistanceWeight / totalIDW));
 
-                // Calculate weighted offsets
+                // Calculate weighted offsets in WORLD coordinates
                 weightedParents.ForEach(o =>
                 {
-                    weightedPos += (o.Option.Frame.transform.position + o.Option.Position).Weighted(o.Weight);
+                    weightedPos += (o.Option.Frame.transform.TransformPoint(o.Option.Position)).Weighted(o.Weight);
                     weightedRotation += (o.Option.Frame.transform.rotation.eulerAngles + o.Option.Rotation).Weighted(o.Weight);
                     weightedScale += (Vector3.Scale(o.Option.Frame.transform.localScale, o.Option.Scale)).Weighted(o.Weight);
                 });
@@ -201,8 +201,13 @@ namespace Microsoft.SpatialAlignment
                 // Set no parent
                 this.transform.parent = null;
 
-                // Apply offsets globally and animated
-                this.transform.AnimateTo(weightedPos, Quaternion.Euler(weightedRotation), weightedScale);
+                // // Apply offsets globally and animated
+                // this.transform.AnimateTo(weightedPos, Quaternion.Euler(weightedRotation), weightedScale);
+
+                // Apply offsets globally
+                this.transform.position = weightedPos;
+                this.transform.rotation = Quaternion.Euler(weightedRotation);
+                this.transform.localScale = weightedScale;
             }
 
             // Done!

@@ -452,6 +452,23 @@ namespace Microsoft.SpatialAlignment
         {
             return new Vector3(vector.x * weight, vector.y * weight, vector.z * weight);
         }
+
+        /// <summary>
+        /// Returns a weighted percentage of the specified vector.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> to calculate the weighted value for.
+        /// </param>
+        /// <param name="weight">
+        /// The weighted percentage to apply.
+        /// </param>
+        /// <returns>
+        /// The weighted <see cref="Vector3"/>.
+        /// </returns>
+        static public Quaternion Weighted(this Quaternion quat, float weight)
+        {
+            return new Quaternion(quat.x * weight, quat.y * weight, quat.z * weight, quat.w * weight);
+        }
         #endregion // Vector Extensions
     }
 }
