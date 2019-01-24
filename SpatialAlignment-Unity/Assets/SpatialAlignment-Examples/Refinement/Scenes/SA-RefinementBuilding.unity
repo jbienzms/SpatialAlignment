@@ -1354,7 +1354,7 @@ MonoBehaviour:
   parentOptions: []
   referenceTransform: {fileID: 0}
   updateFrequency: 1
-  distancePower: 2
+  distancePower: 1.1
   mode: 1
 --- !u!114 &1707357402
 MonoBehaviour:

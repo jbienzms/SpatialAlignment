@@ -467,7 +467,7 @@ namespace Microsoft.SpatialAlignment
         /// </returns>
         static public Quaternion Weighted(this Quaternion quat, float weight)
         {
-            return new Quaternion(quat.x * weight, quat.y * weight, quat.z * weight, quat.w * weight);
+            return Quaternion.Lerp(Quaternion.identity, quat, weight);
         }
         #endregion // Vector Extensions
     }

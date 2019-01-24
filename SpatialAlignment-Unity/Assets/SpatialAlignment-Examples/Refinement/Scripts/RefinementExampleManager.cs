@@ -227,7 +227,7 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                         // Set offsets
                         Position = largeScaleFrame.transform.localPosition,
-                        Rotation = largeScaleFrame.transform.localRotation.eulerAngles,
+                        Rotation = largeScaleFrame.transform.localRotation,
                         Scale = largeScaleFrame.transform.localScale,
                     });
 
