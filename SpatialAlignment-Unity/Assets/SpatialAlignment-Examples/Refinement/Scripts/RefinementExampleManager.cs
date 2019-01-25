@@ -591,6 +591,21 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
+        public void SetMode(MultiParentMode mode)
+        {
+            multiParent.Mode = mode;
+        }
+
+        public void SetModeClosest()
+        {
+            SetMode(MultiParentMode.Closest);
+        }
+
+        public void SetModeDistanceWeighted()
+        {
+            SetMode(MultiParentMode.DistanceWeighted);
+        }
+
         /// <summary>
         /// Shows all refinement anchors.
         /// </summary>

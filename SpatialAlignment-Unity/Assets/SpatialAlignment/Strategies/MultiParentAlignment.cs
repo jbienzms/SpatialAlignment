@@ -198,13 +198,16 @@ namespace Microsoft.SpatialAlignment
                     weightedScale += (Vector3.Scale(o.Option.Frame.transform.localScale, o.Option.Scale)).Weighted(o.Weight);
                 });
 
+                // Most of the time scale will be 1.0. However,truncating
+                // errors during weighted calculations averaging can end up
+                // with something other than 1.0. Let's take care of that.
+                if (weightedScale.Approximately(Vector3.one))
+                {
+                    weightedScale = Vector3.one;
+                }
+
                 // Set no parent
                 this.transform.parent = null;
-
-                // // Apply offsets globally and animated
-                // this.transform.AnimateTo(weightedPos, Quaternion.Euler(weightedRotation), weightedScale);
-
-                // Debug.Log($"weightedX: {weightedX}, weightedY: {weightedY}, weightedZ: {weightedZ}");
 
                 // Apply offsets globally
                 this.transform.position = weightedPos;
