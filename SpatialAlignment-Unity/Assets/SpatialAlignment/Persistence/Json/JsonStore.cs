@@ -56,6 +56,7 @@ namespace Microsoft.SpatialAlignment.Persistence.Json
             // settings.Converters.Add(new AlignmentStrategyConverter());
             // settings.Converters.Add(new SpatialFrameConverter());
             settings.Converters.Add(new StringEnumConverter());
+            settings.Converters.Add(new QuaternionConverter());
             settings.Converters.Add(new Vector3Converter());
 
             // Enable automatic type name handling to allow extensions for alignment strategies

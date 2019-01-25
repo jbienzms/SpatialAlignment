@@ -576,6 +576,7 @@
     <Compile Include="Assets\SpatialAlignment\Persistence\ISpatialAlignmentStore.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\AlignmentStrategyConverter.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\JsonStore.cs" />
+    <Compile Include="Assets\SpatialAlignment\Persistence\Json\QuaternionConverter.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\SpatialContractResolver.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\SpatialFrameConverter.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\UnityContractResolver.cs" />

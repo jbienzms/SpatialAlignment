@@ -89,6 +89,8 @@ namespace Microsoft.SpatialAlignment.Persistence
     ""$id"": ""5"",
     ""alignmentStrategy"": {
       ""$type"": ""Microsoft.SpatialAlignment.MultiParentAlignment, Assembly-CSharp"",
+      ""distancePower"": 1.1,
+      ""mode"": ""Closest"",
       ""parentOptions"": [
         {
           ""frame"": {
@@ -99,7 +101,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             ""y"": 0.0,
             ""z"": 0.0
           },
-          ""minimuState"": ""Resolved"",
+          ""minimumState"": ""Resolved"",
           ""position"": {
             ""x"": 0.0,
             ""y"": 0.0,
@@ -108,7 +110,8 @@ namespace Microsoft.SpatialAlignment.Persistence
           ""rotation"": {
             ""x"": 0.0,
             ""y"": 0.0,
-            ""z"": 0.0
+            ""z"": 0.0,
+            ""w"": 1.0
           },
           ""scale"": {
             ""x"": 0.3,
@@ -125,7 +128,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             ""y"": 0.0,
             ""z"": 0.0
           },
-          ""minimuState"": ""Resolved"",
+          ""minimumState"": ""Resolved"",
           ""position"": {
             ""x"": 0.0,
             ""y"": 0.0,
@@ -134,7 +137,8 @@ namespace Microsoft.SpatialAlignment.Persistence
           ""rotation"": {
             ""x"": 0.0,
             ""y"": 0.0,
-            ""z"": 0.0
+            ""z"": 0.0,
+            ""w"": 1.0
           },
           ""scale"": {
             ""x"": 0.3,
@@ -151,7 +155,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             ""y"": 0.0,
             ""z"": 0.0
           },
-          ""minimuState"": ""Resolved"",
+          ""minimumState"": ""Resolved"",
           ""position"": {
             ""x"": 0.0,
             ""y"": 0.0,
@@ -160,7 +164,8 @@ namespace Microsoft.SpatialAlignment.Persistence
           ""rotation"": {
             ""x"": 0.0,
             ""y"": 0.0,
-            ""z"": 0.0
+            ""z"": 0.0,
+            ""w"": 1.0
           },
           ""scale"": {
             ""x"": 0.3,
@@ -177,7 +182,7 @@ namespace Microsoft.SpatialAlignment.Persistence
             ""y"": 0.0,
             ""z"": 0.0
           },
-          ""minimuState"": ""Resolved"",
+          ""minimumState"": ""Resolved"",
           ""position"": {
             ""x"": 0.0,
             ""y"": 0.0,
@@ -186,7 +191,8 @@ namespace Microsoft.SpatialAlignment.Persistence
           ""rotation"": {
             ""x"": 0.0,
             ""y"": 0.0,
-            ""z"": 0.0
+            ""z"": 0.0,
+            ""w"": 1.0
           },
           ""scale"": {
             ""x"": 0.3,
