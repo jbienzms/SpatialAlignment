@@ -97,11 +97,29 @@ namespace Microsoft.SpatialAlignment
             if (geoReference == null)
             {
                 State = AlignmentState.Inhibited;
+                Debug.LogWarning($"{nameof(GeoAlignment)} {name}: No {nameof(GeoReference)} available - Inhibited.");
                 return;
             }
 
-            // TODO: Convert our own geodetic values to ECEF values
-            // TODO: Set our transform based on the reference source
+            // Convert our own geodetic values to ECEF
+            Vector3 ecef = GeoConverter.ToEcef(this.latitude, this.latitude, this.altitude);
+
+            // Calculate our offset from the reference position in ECEF space
+            Vector3 ecefOffset = ecef - geoReference.EcefPosition;
+
+            // Calculate our new position based on the reference position plus offset
+            Vector3 pos = geoReference.LocalPosition + ecefOffset;
+
+            // If altitude should be represented as relative, adjust
+            if (relativeAltitude)
+            {
+                pos.y = geoReference.LocalPosition.y + altitude;
+            }
+
+            // Update our transform position
+            transform.position = pos;
+
+            // TODO: Account for north if the app was not started facing north
         }
         #endregion // Internal Methods
 
@@ -134,12 +152,14 @@ namespace Microsoft.SpatialAlignment
             // Pass to base first
             base.OnEnable();
 
-            // If we have a reference, start tracking and update
+            // If we have a reference, start tracking
             if (geoReference != null)
             {
                 SubscribeReference();
-                UpdateTransform();
             }
+
+            // Update
+            UpdateTransform();
         }
         #endregion // Unity Overrides
 
@@ -197,8 +217,10 @@ namespace Microsoft.SpatialAlignment
                     if (geoReference != null)
                     {
                         SubscribeReference();
-                        UpdateTransform();
                     }
+
+                    // Update
+                    UpdateTransform();
                 }
             }
         }
