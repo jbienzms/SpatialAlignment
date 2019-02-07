@@ -25,6 +25,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -63,12 +64,19 @@ namespace Microsoft.SpatialAlignment.Geocentric
     {
         #region Member Variables
         private bool isTracking = false;                    // Whether tracking has been started
+        private double lastTimestamp;						// The time stamp of the last location report
         private GeoReferenceData referenceData;				// The last reported reference data
         private bool restartForDesiredAccuracy = true;      // Whether changes to DesiredAccuracy require a restart
-        private bool restartForUpdateDistance = true;		// Whether changes to UpdateDistance require a restart
+        private bool restartForUpdateDistance = true;       // Whether changes to UpdateDistance require a restart
+        private Task startTrackingTask;						// The Task that is used to start tracking
         #endregion // Member Variables
 
         #region Unity Inspector Variables
+        [DataMember]
+        [SerializeField]
+        [Tooltip("Whether tracking should begin automatically.")]
+        private bool autoStartTracking = true;
+
         [DataMember]
         [SerializeField]
         [Tooltip("Desired accuracy in meters. The default is 10.")]
@@ -77,8 +85,9 @@ namespace Microsoft.SpatialAlignment.Geocentric
 
         [DataMember]
         [SerializeField]
-        [Tooltip("Whether tracking should begin automatically.")]
-        private bool trackOnStart = true;
+        [Tooltip("The amount of (in seconds) time to wait for tracking to start. -1 means forever and the default is 20.")]
+        [Min(-1.0f)]
+        private float startTrackingTimeout = 20f;
 
         [DataMember]
         [SerializeField]
@@ -88,19 +97,87 @@ namespace Microsoft.SpatialAlignment.Geocentric
 
         #region Internal Methods
         /// <summary>
-        /// Reinitializes the device if it is currently tracking.
+        /// Actual implementation to start tracking.
         /// </summary>
-        private void RestartDevice()
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> that can be used to cancel the
+        /// operation.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        private async Task InnerStartTrackingAsync(CancellationToken cancellationToken)
+        {
+            // First, check if user has location service enabled
+            if (!Input.location.isEnabledByUser)
+            {
+                throw new UnauthorizedAccessException("User has blocked location access.");
+            }
+
+            // Start service before querying location
+            Input.location.Start();
+
+            // Wait until service initializes
+            while (Input.location.status == LocationServiceStatus.Initializing)
+            {
+                await Task.Delay(500, cancellationToken);
+            }
+
+            // Connection has failed
+            if (Input.location.status != LocationServiceStatus.Running)
+            {
+                throw new UnauthorizedAccessException("Location services could not be started.");
+            }
+
+            // Tracking!
+            isTracking = true;
+        }
+
+        /// <summary>
+        /// Restarts tracking to apply changes.
+        /// </summary>
+        private async void RestartTracking()
         {
             if (!isTracking)
             {
-                Debug.LogWarning($"{nameof(DeviceGeoReference)} {nameof(RestartDevice)} called but device is not tracking.");
+                Debug.LogWarning($"{nameof(DeviceGeoReference)} {nameof(RestartTracking)} called but device is not tracking.");
                 return;
             }
 
+            // Stop tracking
+            StopTracking();
+
+            // Try to start tracking again
+            try
+            {
+                await StartTrackingAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Could not restart tracking: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Updates the reference data based on the location info.
+        /// </summary>
+        /// <param name="location">
+        /// The location info used in the update.
+        /// </param>
+        private void UpdateReference(LocationInfo location)
+        {
+            // Convert to ECEF
+            Vector3 ecef = GeoConverter.ToEcef(location);
+
+            // Create new reference data
+            GeoReferenceData data = new GeoReferenceData(location, ecef, this.transform.position, location.horizontalAccuracy, location.verticalAccuracy);
+
+            // Update (and notify)
+            ReferenceData = data;
         }
         #endregion // Internal Methods
 
+        #region Overridables / Event Triggers
         /// <summary>
         /// Called whenever the value of the <see cref="ReferenceData"/> property
         /// has changed.
@@ -109,8 +186,103 @@ namespace Microsoft.SpatialAlignment.Geocentric
         {
             ReferenceDataChanged?.Invoke(this, EventArgs.Empty);
         }
+        #endregion // Overridables / Event Triggers
+
+        #region Unity Overrides
+        protected virtual void Update()
+        {
+            // TODO: Move this to a separate thread so it's not taking render cycles
+
+            // Tracking?
+            if ((isTracking) && (Input.location.status == LocationServiceStatus.Running))
+            {
+                // Get last data
+                LocationInfo location = Input.location.lastData;
+
+                // Was there an update?
+                if (location.timestamp > lastTimestamp)
+                {
+                    // Update time stamp
+                    lastTimestamp = location.timestamp;
+
+                    // Update the reference
+                    UpdateReference(location);
+                }
+            }
+        }
+        #endregion // Unity Overrides
+
+        #region Public Methods
+        /// <summary>
+        /// Starts tracking.
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> that can be used to cancel the
+        /// operation.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        public Task StartTrackingAsync(CancellationToken cancellationToken)
+        {
+            // Make sure we're not starting it again
+            if ((isTracking) || ((startTrackingTask != null) && (!startTrackingTask.IsCompleted)))
+            {
+                throw new InvalidOperationException("Tracking has already been started.");
+            }
+
+            // Start and store the task
+            startTrackingTask = InnerStartTrackingAsync(cancellationToken);
+
+            // Return the task
+            return startTrackingTask;
+        }
+
+        /// <summary>
+        /// Starts tracking.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        public Task StartTrackingAsync()
+        {
+            // Call cancellation overload, optionally using timeout
+            if (startTrackingTimeout > 0)
+            {
+                return StartTrackingAsync(new CancellationTokenSource(TimeSpan.FromSeconds(startTrackingTimeout)).Token);
+            }
+            else
+            {
+                return StartTrackingAsync(CancellationToken.None);
+            }
+        }
+
+        /// <summary>
+        /// Stops tracking.
+        /// </summary>
+        public void StopTracking()
+        {
+            // Make sure not tracking
+            if (!isTracking)
+            {
+                throw new InvalidOperationException($"{nameof(StopTracking)} called but device is not tracking.");
+            }
+
+            // Stop tracking
+            Input.location.Stop();
+
+            // No longer tracking
+            isTracking = false;
+        }
+        #endregion // Public Methods
 
         #region Public Properties
+        /// <summary>
+        /// Gets or sets a value that indicates if tracking should start
+        /// automatically when the behavior starts.
+        /// </summary>
+        public bool AutoStartTracking { get => autoStartTracking; set => autoStartTracking = value; }
+
         /// <summary>
         /// Gets or sets the desired accuracy in meters. The default is 10.
         /// </summary>
@@ -148,7 +320,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
                     // Restart required?
                     if ((isTracking) && (restartForDesiredAccuracy))
                     {
-                        RestartDevice();
+                        RestartTracking();
                     }
                 }
             }
@@ -179,10 +351,16 @@ namespace Microsoft.SpatialAlignment.Geocentric
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates if tracking should start
-        /// automatically when the behavior starts.
+        /// Gets or sets the amount of time (in seconds) to wait for tracking
+        /// to start. -1 means wait forever. The default is 20.
         /// </summary>
-        public bool TrackOnStart { get => trackOnStart; set => trackOnStart = value; }
+        /// <remarks>
+        /// When the device is accessed for the first time, a system dialog
+        /// may appear prompting the user for permission. If the user does not
+        /// grant permission within this timeout the starting task will fail
+        /// with a <see cref="TaskCanceledException"/>.
+        /// </remarks>
+        public float StartTrackingTimeout { get => startTrackingTimeout; set => startTrackingTimeout = value; }
 
         /// <summary>
         /// Gets or sets the distance the device must move before an updated is
@@ -213,7 +391,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
                     // Restart required?
                     if ((IsTracking) && (restartForUpdateDistance))
                     {
-                        RestartDevice();
+                        RestartTracking();
                     }
                 }
             }
