@@ -28,7 +28,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Microsoft.SpatialAlignment
+namespace Microsoft.SpatialAlignment.Geocentric
 {
     /// <summary>
     /// The interface for a class that provides continuous translation between
@@ -43,32 +43,28 @@ namespace Microsoft.SpatialAlignment
     {
         #region Public Properties
         /// <summary>
-        /// Gets the current
-        /// <see href="https://en.wikipedia.org/wiki/ECEF">ECEF</see>
-        /// position for the point of reference.
+        /// Gets the <see cref="ReferenceData"/> currently provided by the reference.
         /// </summary>
-        Vector3 EcefPosition { get; }
+        /// <remarks>
+        /// <b>IMPORTANT:</b> If the reference source is a device, this
+        /// property may return <see langword = "null" /> until the device has
+        /// been initialized and starts tracking.
+        /// </remarks>
+        GeoReferenceData ReferenceData { get; }
 
         /// <summary>
-        /// Gets the current
-        /// <see cref="https://en.wikipedia.org/wiki/World_Geodetic_System">Geodetic</see>
-        /// position for the point of reference.
+        /// Gets a value that indicates if the source is currently tracking
+        /// and providing updates.
         /// </summary>
-        LocationInfo GeoPosition { get; }
-
-        /// <summary>
-        /// Gets a the current
-        /// <see cref="https://docs.unity3d.com/ScriptReference/Transform-position.html">Local</see>
-        /// coordinate system position for the point of reference.
-        /// </summary>
-        Vector3 LocalPosition { get; }
+        bool IsTracking { get; }
         #endregion // Public Properties
 
         #region Public Events
         /// <summary>
-        /// Raised whenever the reference has been updated.
+        /// Raised whenever the value of the <see cref="ReferenceData"/> property
+        /// has changed.
         /// </summary>
-        event EventHandler ReferenceUpdated;
+        event EventHandler ReferenceDataChanged;
         #endregion // Public Events
     }
 }

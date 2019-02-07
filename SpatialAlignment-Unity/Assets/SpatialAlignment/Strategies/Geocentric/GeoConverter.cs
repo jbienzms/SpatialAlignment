@@ -34,7 +34,7 @@ using UnityEngine;
 using HoloToolkit.Unity;
 #endif
 
-namespace Microsoft.SpatialAlignment
+namespace Microsoft.SpatialAlignment.Geocentric
 {
     /**********************************************************************
      * Much of the code below is based on the exceptional Wikipedia

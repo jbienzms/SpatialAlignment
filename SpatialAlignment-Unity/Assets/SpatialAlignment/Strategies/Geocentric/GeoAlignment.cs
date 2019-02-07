@@ -23,17 +23,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using Microsoft.SpatialAlignment.Persistence;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.XR.WSA;
-using UnityEngine.XR.WSA.Persistence;
 
-namespace Microsoft.SpatialAlignment
+namespace Microsoft.SpatialAlignment.Geocentric
 {
     /// <summary>
     /// A strategy that aligns the frame to a known Geocentric (GPS) location.
@@ -75,7 +70,7 @@ namespace Microsoft.SpatialAlignment
         private void SubscribeReference()
         {
             // Subscribe to reference events
-            geoReference.ReferenceUpdated += GeoReference_ReferenceUpdated;
+            geoReference.ReferenceDataChanged += GeoReference_ReferenceUpdated;
         }
 
         /// <summary>
@@ -84,7 +79,7 @@ namespace Microsoft.SpatialAlignment
         private void UnsubscribeReference()
         {
             // Subscribe to reference events
-            geoReference.ReferenceUpdated -= GeoReference_ReferenceUpdated;
+            geoReference.ReferenceDataChanged -= GeoReference_ReferenceUpdated;
         }
 
         /// <summary>
@@ -93,11 +88,14 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         protected void UpdateTransform()
         {
-            // If we have no reference, we're in inhibited state
+            // Attempt to get data from the reference
+            GeoReferenceData geoData = geoReference?.ReferenceData;
+
+            // If we have no reference or data, we're in inhibited state
             if (geoReference == null)
             {
                 State = AlignmentState.Inhibited;
-                Debug.LogWarning($"{nameof(GeoAlignment)} {name}: No {nameof(GeoReference)} available - Inhibited.");
+                Debug.LogWarning($"{nameof(GeoAlignment)} {name}: {nameof(GeoReference)} data unavailable - Inhibited.");
                 return;
             }
 
@@ -105,15 +103,15 @@ namespace Microsoft.SpatialAlignment
             Vector3 ecef = GeoConverter.ToEcef(this.latitude, this.latitude, this.altitude);
 
             // Calculate our offset from the reference position in ECEF space
-            Vector3 ecefOffset = ecef - geoReference.EcefPosition;
+            Vector3 ecefOffset = ecef - geoData.EcefPosition;
 
             // Calculate our new position based on the reference position plus offset
-            Vector3 pos = geoReference.LocalPosition + ecefOffset;
+            Vector3 pos = geoData.LocalPosition + ecefOffset;
 
             // If altitude should be represented as relative, adjust
             if (relativeAltitude)
             {
-                pos.y = geoReference.LocalPosition.y + altitude;
+                pos.y = geoData.LocalPosition.y + altitude;
             }
 
             // Update our transform position
@@ -126,6 +124,15 @@ namespace Microsoft.SpatialAlignment
         #region Overrides / Event Handlers
         private void GeoReference_ReferenceUpdated(object sender, EventArgs e)
         {
+            // Get the data
+            GeoReferenceData geoData = geoReference.ReferenceData;
+
+            // Update our stats
+            State = AlignmentState.Tracking;
+            float h = geoData.HorizontalAccuracy;
+            float v = geoData.VerticalAccuracy;
+            Accuracy = new Vector3(h, v, h);
+
             // Reference has updated. Time to update Transform, but must do it
             // on the UI thread.
             UnityDispatcher.InvokeOnAppThread(UpdateTransform);
@@ -140,6 +147,7 @@ namespace Microsoft.SpatialAlignment
             if (geoReference != null)
             {
                 UnsubscribeReference();
+                State = AlignmentState.Inhibited;
             }
 
             // Pass on to base
