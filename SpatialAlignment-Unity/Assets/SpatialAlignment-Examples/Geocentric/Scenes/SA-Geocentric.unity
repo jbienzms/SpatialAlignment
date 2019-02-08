@@ -443,7 +443,7 @@ MonoBehaviour:
   altitude: 0
   geoReference: {fileID: 231975971}
   latitude: 30.04042
-  longitude: -95.65057
+  longitude: -95.65007
   relativeAltitude: 1
 --- !u!114 &1468509574
 MonoBehaviour:

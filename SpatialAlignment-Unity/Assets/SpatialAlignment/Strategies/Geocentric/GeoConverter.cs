@@ -95,7 +95,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         static public Vector3 ToEcef(LocationInfo location)
         {
             // Use geocentric version
-            return ToEcef(location.latitude, location.longitude, location.altitude);
+            return ToEcef(latitude: location.latitude, longitude: location.longitude, altitude: location.altitude);
         }
         #endregion // Public Methods
     }

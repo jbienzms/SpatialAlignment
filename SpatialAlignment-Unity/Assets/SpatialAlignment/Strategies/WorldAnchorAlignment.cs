@@ -171,7 +171,7 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <inheritdoc />
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
             // Pass to base first
             base.OnEnable();
@@ -197,7 +197,9 @@ namespace Microsoft.SpatialAlignment
         /// <returns>
         /// A <see cref="Task"/> that represents the operation.
         /// </returns>
+#pragma warning disable CS1998 // Await is compiled out for UNITY_EDITOR builds.
         public async Task<bool> TryLoadAnchorAsync()
+#pragma warning restore CS1998
         {
             // Validate the ID
             if (string.IsNullOrEmpty(anchorId))
@@ -246,7 +248,9 @@ namespace Microsoft.SpatialAlignment
         /// <returns>
         /// A <see cref="Task"/> that represents the operation.
         /// </returns>
+#pragma warning disable CS1998 // Await is compiled out for UNITY_EDITOR builds.
         public async Task SaveAnchorAsync()
+#pragma warning restore CS1998
         {
             // Validate the ID
             if (string.IsNullOrEmpty(anchorId))

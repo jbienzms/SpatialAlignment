@@ -100,7 +100,27 @@ namespace Microsoft.SpatialAlignment.Geocentric
             }
 
             // Convert our own geodetic values to ECEF
-            Vector3 ecef = GeoConverter.ToEcef(this.latitude, this.latitude, this.altitude);
+            Vector3 ecef1 = geoData.EcefPosition;
+            Vector3 ecef2 = GeoConverter.ToEcef(geoData.GeoPosition);
+            Vector3 ecef3 = GeoConverter.ToEcef(latitude: geoData.GeoPosition.latitude, longitude: geoData.GeoPosition.longitude, altitude: geoData.GeoPosition.altitude);
+            Vector3 ecef4 = GeoConverter.ToEcef(latitude: geoData.GeoPosition.latitude, longitude: geoData.GeoPosition.longitude, altitude: geoData.GeoPosition.altitude + 100f);
+            Debug.Log($"1: {ecef1}\r\n2: {ecef2}\r\n3: {ecef3}\r\n4: {ecef4}\r\n");
+            Vector3 gps = new Vector3(geoData.GeoPosition.latitude, geoData.GeoPosition.altitude + 0.5f, geoData.GeoPosition.longitude);
+            Vector3 ecef = GeoConverter.ToEcef(latitude: gps.x, altitude: gps.y, longitude: gps.z);
+
+            /*
+            Vector3 ecef;
+            if (relativeAltitude)
+            {
+                // Altitude should be represented as relative to reference
+                ecef = GeoConverter.ToEcef(latitude: this.latitude, longitude: this.longitude, altitude: geoData.GeoPosition.altitude + this.altitude);
+            }
+            else
+            {
+                // Altitude is absolute
+                ecef = GeoConverter.ToEcef(latitude: this.latitude, longitude: this.longitude, altitude: this.altitude);
+            }
+            */
 
             // Calculate our offset from the reference position in ECEF space
             Vector3 ecefOffset = ecef - geoData.EcefPosition;
@@ -108,11 +128,18 @@ namespace Microsoft.SpatialAlignment.Geocentric
             // Calculate our new position based on the reference position plus offset
             Vector3 pos = geoData.LocalPosition + ecefOffset;
 
-            // If altitude should be represented as relative, adjust
-            if (relativeAltitude)
-            {
-                pos.y = geoData.LocalPosition.y + altitude;
-            }
+            // TEMP:
+            Vector3 gpsOffset = new Vector3(this.latitude - geoData.GeoPosition.latitude, this.altitude - geoData.GeoPosition.altitude, this.longitude - geoData.GeoPosition.longitude);
+
+            Debug.Log(
+                $"GPS Lat: {geoData.GeoPosition.latitude}, Lon: {geoData.GeoPosition.longitude}, Alt: {geoData.GeoPosition.altitude}\r\n" +
+                $"Target Lat: {this.latitude}, Lon: {this.longitude}, Alt: {this.altitude}\r\n" +
+                $"GPS Offset x: {gpsOffset.x}, y: {gpsOffset.y}, z: {gpsOffset.z}\r\n" +
+                $"GPS ECEF x: {geoData.EcefPosition.x}, y: {geoData.EcefPosition.y}, z: {geoData.EcefPosition.z}\r\n" +
+                $"Target ECEF x: {ecef.x}, y: {ecef.y}, z: {ecef.z}\r\n" +
+                $"ECEF Offset x: {ecefOffset.x}, y: {ecefOffset.y}, z: {ecefOffset.z}\r\n" +
+                $"Pos x: {pos.x}, y: {pos.y}, z: {pos.z}\r\n" +
+                $"");
 
             // Update our transform position
             transform.position = pos;

@@ -101,43 +101,70 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// </returns>
         private async Task InnerStartTrackingAsync(CancellationToken cancellationToken)
         {
+            // Editor delay times below are based on this thread: https://answers.unity.com/questions/1317246/unity5-and-unity-remote-5-will-not-work-with-gps-o.html
+
             #if UNITY_EDITOR
-            // Wait until Unity connects to the Unity Remote
+            Debug.Log("Unity Editor does not support location. Waiting for Unity Remote to connect...");
+
+            // In editor only, wait until Unity connects to the remote device
             while (!UnityEditor.EditorApplication.isRemoteConnected)
+            {
+                try
+                {
+                    await Task.Delay(500, cancellationToken);
+                }
+                catch (TaskCanceledException inner)
+                {
+                    throw new TaskCanceledException("Unity Remote did not connect before task was canceled.", inner);
+                }
+            }
+
+            // Next, wait another 5 seconds to make sure the remote services like location are actually available
+            Debug.Log("Waiting for Unity Remote services to become available...");
+            await Task.Delay(5000, cancellationToken);
+            #endif
+
+            // Next, check to see if user has enabled location services
+            if (!Input.location.isEnabledByUser)
+            {
+                // Some platforms (like iOS) will prompt to enable even if disabled
+                Debug.LogWarning("Location access is not enabled. Attempting to start anyway.");
+            }
+
+            // Start service with requested parameters
+            Input.location.Start(desiredAccuracy, updateDistance);
+
+            #if UNITY_EDITOR
+            // In editor only, wait for remote location services to start the initialization process
+            Debug.Log("Waiting for Remote Location services to begin initializing...");
+            while (Input.location.status == LocationServiceStatus.Stopped)
             {
                 await Task.Delay(500, cancellationToken);
             }
-            #endif
+            #endif // UNITY_EDITOR
 
-            // First, check if user has location service enabled
-            //if (!Input.location.isEnabledByUser)
-            //{
-            //    throw new UnauthorizedAccessException("User has blocked location access.");
-            //}
-
-            // Start service before querying location
-            Input.location.Start(desiredAccuracy, updateDistance);
-
-            // Wait until service initializes
+            // Wait until location service finishes initializing
+            Debug.Log("Waiting for location services to complete initialization...");
             while (Input.location.status == LocationServiceStatus.Initializing)
             {
                 await Task.Delay(500, cancellationToken);
             }
 
-            // Connection has failed
+            // Finally, make sure location services are running
             if (Input.location.status != LocationServiceStatus.Running)
             {
                 throw new UnauthorizedAccessException("Location services could not be started.");
             }
 
             // Tracking!
+            Debug.Log("Location services running!");
             IsTracking = true;
         }
 
         /// <summary>
         /// Restarts tracking to apply changes.
         /// </summary>
-        private async void RestartTracking()
+        private void RestartTracking()
         {
             if (!IsTracking)
             {
