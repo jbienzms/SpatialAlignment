@@ -60,23 +60,16 @@ namespace Microsoft.SpatialAlignment.Geocentric
     /// GPS device or on-device location services.
     /// </summary>
     [DataContract]
-    public class DeviceGeoReference : MonoBehaviour, IGeoReference
+    public class DeviceGeoReference : GeoReference
     {
         #region Member Variables
-        private bool isTracking = false;                    // Whether tracking has been started
         private double lastTimestamp;						// The time stamp of the last location report
-        private GeoReferenceData referenceData;				// The last reported reference data
         private bool restartForDesiredAccuracy = true;      // Whether changes to DesiredAccuracy require a restart
         private bool restartForUpdateDistance = true;       // Whether changes to UpdateDistance require a restart
         private Task startTrackingTask;						// The Task that is used to start tracking
         #endregion // Member Variables
 
         #region Unity Inspector Variables
-        [DataMember]
-        [SerializeField]
-        [Tooltip("Whether tracking should begin automatically.")]
-        private bool autoStartTracking = true;
-
         [DataMember]
         [SerializeField]
         [Tooltip("Desired accuracy in meters. The default is 10.")]
@@ -108,14 +101,22 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// </returns>
         private async Task InnerStartTrackingAsync(CancellationToken cancellationToken)
         {
-            // First, check if user has location service enabled
-            if (!Input.location.isEnabledByUser)
+            #if UNITY_EDITOR
+            // Wait until Unity connects to the Unity Remote
+            while (!UnityEditor.EditorApplication.isRemoteConnected)
             {
-                throw new UnauthorizedAccessException("User has blocked location access.");
+                await Task.Delay(500, cancellationToken);
             }
+            #endif
+
+            // First, check if user has location service enabled
+            //if (!Input.location.isEnabledByUser)
+            //{
+            //    throw new UnauthorizedAccessException("User has blocked location access.");
+            //}
 
             // Start service before querying location
-            Input.location.Start();
+            Input.location.Start(desiredAccuracy, updateDistance);
 
             // Wait until service initializes
             while (Input.location.status == LocationServiceStatus.Initializing)
@@ -130,7 +131,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
             }
 
             // Tracking!
-            isTracking = true;
+            IsTracking = true;
         }
 
         /// <summary>
@@ -138,7 +139,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// </summary>
         private async void RestartTracking()
         {
-            if (!isTracking)
+            if (!IsTracking)
             {
                 Debug.LogWarning($"{nameof(DeviceGeoReference)} {nameof(RestartTracking)} called but device is not tracking.");
                 return;
@@ -148,53 +149,46 @@ namespace Microsoft.SpatialAlignment.Geocentric
             StopTracking();
 
             // Try to start tracking again
+            TryStartTracking();
+        }
+
+        /// <summary>
+        /// Attempts to start tracking and logs if there's a failure.
+        /// </summary>
+        private async void TryStartTracking()
+        {
             try
             {
                 await StartTrackingAsync();
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Could not restart tracking: {ex.Message}");
+                Debug.LogError($"Could not start tracking: {ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// Updates the reference data based on the location info.
-        /// </summary>
-        /// <param name="location">
-        /// The location info used in the update.
-        /// </param>
-        private void UpdateReference(LocationInfo location)
-        {
-            // Convert to ECEF
-            Vector3 ecef = GeoConverter.ToEcef(location);
-
-            // Create new reference data
-            GeoReferenceData data = new GeoReferenceData(location, ecef, this.transform.position, location.horizontalAccuracy, location.verticalAccuracy);
-
-            // Update (and notify)
-            ReferenceData = data;
         }
         #endregion // Internal Methods
 
-        #region Overridables / Event Triggers
-        /// <summary>
-        /// Called whenever the value of the <see cref="ReferenceData"/> property
-        /// has changed.
-        /// </summary>
-        protected virtual void OnReferenceDataChanged()
-        {
-            ReferenceDataChanged?.Invoke(this, EventArgs.Empty);
-        }
-        #endregion // Overridables / Event Triggers
-
         #region Unity Overrides
-        protected virtual void Update()
+        /// <inheritdoc />
+        protected override void Start()
+        {
+            // Call base first
+            base.Start();
+
+            // Auto start?
+            if (AutoStartTracking)
+            {
+                TryStartTracking();
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void Update()
         {
             // TODO: Move this to a separate thread so it's not taking render cycles
 
             // Tracking?
-            if ((isTracking) && (Input.location.status == LocationServiceStatus.Running))
+            if ((IsTracking) && (Input.location.status == LocationServiceStatus.Running))
             {
                 // Get last data
                 LocationInfo location = Input.location.lastData;
@@ -209,6 +203,9 @@ namespace Microsoft.SpatialAlignment.Geocentric
                     UpdateReference(location);
                 }
             }
+
+            // Pass on to base
+            base.Update();
         }
         #endregion // Unity Overrides
 
@@ -226,7 +223,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         public Task StartTrackingAsync(CancellationToken cancellationToken)
         {
             // Make sure we're not starting it again
-            if ((isTracking) || ((startTrackingTask != null) && (!startTrackingTask.IsCompleted)))
+            if ((IsTracking) || ((startTrackingTask != null) && (!startTrackingTask.IsCompleted)))
             {
                 throw new InvalidOperationException("Tracking has already been started.");
             }
@@ -263,7 +260,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         public void StopTracking()
         {
             // Make sure not tracking
-            if (!isTracking)
+            if (!IsTracking)
             {
                 throw new InvalidOperationException($"{nameof(StopTracking)} called but device is not tracking.");
             }
@@ -272,17 +269,11 @@ namespace Microsoft.SpatialAlignment.Geocentric
             Input.location.Stop();
 
             // No longer tracking
-            isTracking = false;
+            IsTracking = false;
         }
         #endregion // Public Methods
 
         #region Public Properties
-        /// <summary>
-        /// Gets or sets a value that indicates if tracking should start
-        /// automatically when the behavior starts.
-        /// </summary>
-        public bool AutoStartTracking { get => autoStartTracking; set => autoStartTracking = value; }
-
         /// <summary>
         /// Gets or sets the desired accuracy in meters. The default is 10.
         /// </summary>
@@ -318,34 +309,10 @@ namespace Microsoft.SpatialAlignment.Geocentric
                     desiredAccuracy = value;
 
                     // Restart required?
-                    if ((isTracking) && (restartForDesiredAccuracy))
+                    if ((IsTracking) && (restartForDesiredAccuracy))
                     {
                         RestartTracking();
                     }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets a value that indicates if the device is currently tracking
-        /// and providing updates.
-        /// </summary>
-        public bool IsTracking { get => isTracking; }
-
-        /// <inheritdoc />
-        public GeoReferenceData ReferenceData
-        {
-            get
-            {
-                return referenceData;
-            }
-            set
-            {
-                // Changing?
-                if (referenceData != value)
-                {
-                    referenceData = value;
-                    OnReferenceDataChanged();
                 }
             }
         }
@@ -397,14 +364,5 @@ namespace Microsoft.SpatialAlignment.Geocentric
             }
         }
         #endregion // Public Properties
-
-        #region Public Events
-        /// <summary>
-        /// Raised whenever the value of the <see cref="ReferenceData"/> property
-        /// has changed.
-        /// </summary>
-        public event EventHandler ReferenceDataChanged;
-        #endregion // Public Events
-
     }
 }

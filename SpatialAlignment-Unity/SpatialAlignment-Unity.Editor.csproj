@@ -5,9 +5,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3A848AB7-9891-EDDA-D555-BF184C2F81F4}</ProjectGuid>
+    <ProjectGuid>{372BA949-3CAE-E6FC-A656-FBD9C0F7789B}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Unity.TextMeshPro.Editor</AssemblyName>
+    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
@@ -241,6 +241,15 @@
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0b11/Editor/Data/UnityExtensions/Unity/GUISystem/Editor/UnityEditor.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TestRunner">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0b11/Editor/Data/UnityExtensions/Unity/TestRunner/Editor/UnityEditor.TestRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TestRunner">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0b11/Editor/Data/UnityExtensions/Unity/TestRunner/UnityEngine.TestRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0b11/Editor/Data/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Timeline">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.0b11/Editor/Data/UnityExtensions/Unity/Timeline/RuntimeEditor/UnityEngine.Timeline.dll</HintPath>
@@ -682,52 +691,118 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="SpatialAlignment-Unity.csproj">
+      <Project>{B0161862-E198-632F-A798-6B00E9869009}</Project>
+      <Name>SpatialAlignment-Unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.TextMeshPro.Editor.csproj">
+      <Project>{3A848AB7-9891-EDDA-D555-BF184C2F81F4}</Project>
+      <Name>Unity.TextMeshPro.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.PackageManagerUI.Editor.csproj">
+      <Project>{6877705C-FBD9-0C4F-5AFB-6FB431E5D39D}</Project>
+      <Name>Unity.PackageManagerUI.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.CollabProxy.Editor.csproj">
+      <Project>{C12CEEC6-100C-58A2-DE36-314E4DE5E40B}</Project>
+      <Name>Unity.CollabProxy.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.XR.WindowsMR.Editor.csproj">
+      <Project>{D7E0F621-D98D-F122-678E-C02D028E5512}</Project>
+      <Name>Unity.XR.WindowsMR.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.csproj">
       <Project>{07A21C90-D344-AE1A-8456-9910C203B41A}</Project>
       <Name>Unity.TextMeshPro</Name>
     </ProjectReference>
+    <ProjectReference Include="Unity.Analytics.DataPrivacy.csproj">
+      <Project>{D6E266C6-3D1F-28C8-9FEB-2A01E44DBF77}</Project>
+      <Name>Unity.Analytics.DataPrivacy</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.XR.WindowsMR.csproj">
+      <Project>{5E11E1B3-0410-B7BD-6D16-1A513F34657C}</Project>
+      <Name>Unity.XR.WindowsMR</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\DropdownOptionListDrawer.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\EditorCoroutine.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\GlyphInfoDrawer.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\KerningPairDrawer.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\SpriteInfoDrawer.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TextAlignmentDrawer.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_BaseEditorPanel.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_BaseShaderGUI.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_BitmapShaderGUI.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_ColorGradientAssetMenu.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_ColorGradientEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_DropdownEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_EditorPanel.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_EditorUtility.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_FontAssetEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_InputFieldEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_MeshRendererEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_PackageUtilities.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_PostBuildProcessHandler.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_ProjectTextSettings.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_ResourcesLoader.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_SDFShaderGUI.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_SettingsEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_SpriteAssetEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_SpriteAssetImporter.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_SpriteAssetMenu.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_StyleAssetMenu.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_StyleSheetEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_SubMesh_Editor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_SubMeshUI_Editor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_UiEditorPanel.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMP_UIStyleManager.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_ContextMenus.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_CreateObjectMenu.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_EditorShaderUtilities.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_FontAssetCreatorWindow.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_FontPlugin.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_SortingLayerHelper.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_TextContainerEditor.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Editor\TMPro_TexturePostProcessor.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\BuildDeployPortal.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\BuildDeployPrefs.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\BuildDeployTools.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\BuildDeployWindow.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\BuildInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\BuildSLNUtilities.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\CertificatePasswordWindow.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\AdapterInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\AppDetails.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\AppList.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\ConnectInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\CopyDirectoryInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\DevicePortalConnections.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\DHCPInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\InstallStatus.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\IpAddressInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\MachineName.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\NetworkInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\ProcessDesc.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\ProcessList.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\DataStructures\Response.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\HoloToolkitCommands.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\USB\USBDeviceInfo.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\USB\USBDeviceListener.cs" />
+    <Compile Include="Assets\HoloToolkit\BuildAndDeploy\Editor\UwpProjectPostProcess.cs" />
+    <Compile Include="Assets\HoloToolkit\Common\Scripts\Editor\EditorPrefsUtility.cs" />
+    <Compile Include="Assets\HoloToolkit\Common\Scripts\Editor\ExternalProcess.cs" />
+    <Compile Include="Assets\HoloToolkit\Common\Scripts\Editor\Obsolete\CustomMaterialEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Common\Scripts\Editor\Obsolete\FastConfigurable2SidedGUI.cs" />
+    <Compile Include="Assets\HoloToolkit\Common\Scripts\Editor\Obsolete\FastConfigurableGUI.cs" />
+    <Compile Include="Assets\HoloToolkit\Common\Scripts\Editor\Obsolete\ShaderGUIUtils.cs" />
+    <Compile Include="Assets\HoloToolkit\Common\Scripts\Editor\StandardShaderGUI.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\AttachToControllerEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\ControllerFinderEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\EditorHandsMaterialInspector.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\KeywordAndKeyCodeDrawer.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\MixedRealityCameraManagerEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\MixedRealityTeleportEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\SpeechInputHandlerEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\SpeechInputSourceEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Input\Scripts\Editor\XboxControllerInputSourceEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Sharing\Scripts\Editor\SharingMenu.cs" />
+    <Compile Include="Assets\HoloToolkit\Sharing\Scripts\Editor\SharingStageEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\SpatialMapping\Scripts\RemoteMapping\Editor\RoomMeshExporter.cs" />
+    <Compile Include="Assets\HoloToolkit\SpatialMapping\Scripts\SpatialProcessing\Editor\SurfaceMeshesToPlanesEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\SpatialSound\Scripts\UAudioManager\Editor\AudioEventBankEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\SpatialSound\Scripts\UAudioManager\Editor\AudioEventPropertyDrawer.cs" />
+    <Compile Include="Assets\HoloToolkit\SpatialSound\Scripts\UAudioManager\Editor\UAudioManagerBaseEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\SpatialSound\Scripts\UAudioManager\Editor\UAudioManagerEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\SpatialSound\Scripts\UAudioManager\Editor\UAudioProfiler.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\AtlasReferenceUpdater\Editor\AtlasReferenceUpdater.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\AtlasReferenceUpdater\Editor\Extensions\SerializedPropertyExtensions.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\AtlasReferenceUpdater\Editor\Extensions\SpriteAtlasExtensions.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\AutoConfigureMenu.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\AutoConfigureWindow.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\CanvasEditorExtension.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\CapabilitySettingsWindow.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\CustomHeaderDrawer.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\EditorGUIExtensions.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\EditorGUILayoutExtensions.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\EnforceEditorSettings.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\EnumFlagsPropertyDrawer.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\HeadsetAdjustmentEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\Int3Drawer.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\LayerMaskExtensions.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\OpenLocalFileEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\OpenLocalFolderEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\ProjectSettingsWindow.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\SaveLocalFileEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\SceneLauncherEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\SceneSettingsWindow.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\SetIconsWindow.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\SolverHandlerEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\SolverInBetweenEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\Utilities\Scripts\Editor\TextureScale.cs" />
+    <Compile Include="Assets\HoloToolkit\UX\Scripts\Collections\Editor\CollectionEditor.cs" />
+    <Compile Include="Assets\HoloToolkit\UX\Scripts\Editor\CompoundButtonSaveInterceptor.cs" />
+    <Compile Include="Assets\HoloToolkit\UX\Scripts\Editor\KeyboardInputFieldEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HoloToolkit\Common\Shaders\Obsolete\BlinnPhongConfigurable.cginc" />

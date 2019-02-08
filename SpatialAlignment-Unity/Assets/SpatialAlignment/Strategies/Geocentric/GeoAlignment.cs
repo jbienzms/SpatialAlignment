@@ -45,7 +45,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         [DataMember]
         [SerializeField]
         [Tooltip("The reference source used when converting between global and application 3D space.")]
-        private IGeoReference geoReference;
+        private GeoReference geoReference;
 
         [DataMember]
         [SerializeField]
@@ -92,7 +92,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
             GeoReferenceData geoData = geoReference?.ReferenceData;
 
             // If we have no reference or data, we're in inhibited state
-            if (geoReference == null)
+            if (geoData == null)
             {
                 State = AlignmentState.Inhibited;
                 Debug.LogWarning($"{nameof(GeoAlignment)} {name}: {nameof(GeoReference)} data unavailable - Inhibited.");
@@ -201,7 +201,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// Gets or sets the reference source used when converting between
         /// global and application 3D space.
         /// </summary>
-        public IGeoReference GeoReference
+        public GeoReference GeoReference
         {
             get
             {
