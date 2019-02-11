@@ -141,7 +141,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
             float longitudeMeters = DistanceBetween(aLatitude, aLongitude, aLatitude, bLongitude);
 
             // Invert the distance sign if necessary to account for direction
-            if (aLatitude < bLatitude)
+            if (aLatitude > bLatitude)
             {
                 latitudeMeters *= -1;
             }
