@@ -58,11 +58,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// </param>
         protected void UpdateReference(LocationInfo location)
         {
-            // Convert to ECEF
-            Vector3 ecef = GeoConverter.ToEcef(location);
-
             // Create new reference data
-            GeoReferenceData data = new GeoReferenceData(location, ecef, this.transform.position, location.horizontalAccuracy, location.verticalAccuracy);
+            GeoReferenceData data = new GeoReferenceData(location, this.transform.position, location.horizontalAccuracy, location.verticalAccuracy);
 
             // Update (and notify)
             ReferenceData = data;

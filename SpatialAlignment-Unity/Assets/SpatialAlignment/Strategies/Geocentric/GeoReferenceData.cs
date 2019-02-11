@@ -38,7 +38,6 @@ namespace Microsoft.SpatialAlignment.Geocentric
     public class GeoReferenceData
     {
         #region Member Variables
-        private Vector3 ecefPosition;
         private LocationInfo geoPosition;
         private float horizontalAccuracy;
         private Vector3 localPosition;
@@ -52,9 +51,6 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// <param name="geoPosition">
         /// The <see cref="GeoPosition"/>.
         /// </param>
-        /// <param name="ecefPosition">
-        /// The <see cref="EcefPosition"/>.
-        /// </param>
         /// <param name="localPosition">
         /// The <see cref="LocalPosition"/>.
         /// </param>
@@ -64,11 +60,10 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// <param name="verticalAccuracy">
         /// The <see cref="VerticalAccuracy"/>.
         /// </param>
-        public GeoReferenceData(LocationInfo geoPosition, Vector3 ecefPosition, Vector3 localPosition, float horizontalAccuracy, float verticalAccuracy)
+        public GeoReferenceData(LocationInfo geoPosition, Vector3 localPosition, float horizontalAccuracy, float verticalAccuracy)
         {
             // Store
             this.geoPosition = geoPosition;
-            this.ecefPosition = ecefPosition;
             this.localPosition = localPosition;
             this.horizontalAccuracy = horizontalAccuracy;
             this.verticalAccuracy = verticalAccuracy;
@@ -76,13 +71,6 @@ namespace Microsoft.SpatialAlignment.Geocentric
         #endregion // Constructors
 
         #region Public Properties
-        /// <summary>
-        /// Gets the current
-        /// <see href="https://en.wikipedia.org/wiki/ECEF">ECEF</see>
-        /// position for the point of reference.
-        /// </summary>
-        public Vector3 EcefPosition { get => ecefPosition; }
-
         /// <summary>
         /// Gets the current
         /// <see cref="https://en.wikipedia.org/wiki/World_Geodetic_System">Geodetic</see>

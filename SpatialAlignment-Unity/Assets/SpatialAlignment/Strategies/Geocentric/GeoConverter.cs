@@ -50,52 +50,217 @@ namespace Microsoft.SpatialAlignment.Geocentric
     static public class GeoConverter
     {
         #region Constants
-        private const float DegToRad = (Mathf.PI / 180.0f);     // Short for converting degrees to radians
-        private const float WGSAxis = 6378137f;                 // WGS axis expressed in meters
-        private const float WGSEcc = 0.081819190842622f;        // WGS eccentricity
+        private const double EarthRadiusInMeters = 6371000d;
+        private const double MetersPerLatitudeDegree = 111133d;
         #endregion // Constants
 
         #region Public Methods
         /// <summary>
-        /// Converts Geocentric values to an
-        /// <see href="https://en.wikipedia.org/wiki/ECEF">ECEF</see>
-        /// <see cref="Vector3"/>.
+        /// Calculates the strait line distance between two geographic coordinates.
         /// </summary>
-        /// <param name="latitude">The geocentric latitude.</param>
-        /// <param name="longitude">The geocentric longitude.</param>
-        /// <param name="altitude">The geocentric altitude.</param>
-        /// <returns>The converted ECEF value.</returns>
-        static public Vector3 ToEcef(float latitude, float longitude, float altitude)
+        /// <param name="aLatitude">
+        /// The latitude of the first geographic coordinate.
+        /// </param>
+        /// <param name="aLongitude">
+        /// The longitude of the first geographic coordinate.
+        /// </param>
+        /// <param name="bLatitude">
+        /// The latitude of the second geographic coordinate.
+        /// </param>
+        /// <param name="bLongitude">
+        /// The longitude of the second geographic coordinate.
+        /// </param>
+        /// <returns>
+        /// The strait line distance between the two points.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// This method does not take into account differences in altitude.
+        /// </para>
+        /// <para>
+        /// <b>IMPORTANT:</b> This method is not accurate over long distances.
+        /// However, it is sufficient for scales used in most AR applications
+        /// where distance is limited by human sight.
+        /// </para>
+        /// </remarks>
+        static public float DistanceBetween(float aLatitude, float aLongitude, float bLatitude, float bLongitude)
         {
-            // Lat / Long Sin and Cos in radians
-            float latSin = Mathf.Sin(latitude * DegToRad);
-            float lonSin = Mathf.Sin(longitude * DegToRad);
-            float latCos = Mathf.Cos(latitude * DegToRad);
-            float lonCos = Mathf.Cos(longitude * DegToRad);
-
-            // Prime vertical radius
-            float n = WGSAxis / Mathf.Sqrt(1.0f - WGSEcc * WGSEcc * latSin * latSin);
-
-            // Each axis
-            float x = (n + altitude) * latCos * lonCos;
-            float y = (n + altitude) * latCos * lonSin;
-            float z = (n * (1.0f - WGSEcc * WGSEcc) + altitude) * latSin;
-
-            // To Vector3
-            return new Vector3(x, y, z);
+            float r = 6371f;
+            float dLat = (bLatitude - aLatitude).ToRadian();
+            float dLon = (bLongitude - aLongitude).ToRadian();
+            float a = Mathf.Sin(dLat / 2f) * Mathf.Sin(dLat / 2f) +
+                      Mathf.Cos(aLatitude.ToRadian()) * Mathf.Cos(bLatitude.ToRadian()) *
+                      Mathf.Sin(dLon / 2f) * Mathf.Sin(dLon / 2f);
+            float c = 2 * Mathf.Asin(Mathf.Min(1, Mathf.Sqrt(a)));
+            float d = r * c;
+            return d * 1000f;
         }
 
         /// <summary>
-        /// Converts a <see cref="LocationInfo"/> to an
-        /// <see href="https://en.wikipedia.org/wiki/ECEF">ECEF</see>
-        /// <see cref="Vector3"/>.
+        /// Calculates the 3D distance, in meters, between the two coordinates.
         /// </summary>
-        /// <param name="location">The <see cref="LocationInfo"/> to convert.</param>
-        /// <returns>The converted ECEF value.</returns>
-        static public Vector3 ToEcef(LocationInfo location)
+        /// <param name="aLatitude">
+        /// The latitude of the first geographic coordinate.
+        /// </param>
+        /// <param name="aLongitude">
+        /// The longitude of the first geographic coordinate.
+        /// </param>
+        /// <param name="aAltitude">
+        /// The altitude of the first geographic coordinate.
+        /// </param>
+        /// <param name="bLatitude">
+        /// The latitude of the second geographic coordinate.
+        /// </param>
+        /// <param name="bLongitude">
+        /// The longitude of the second geographic coordinate.
+        /// </param>
+        /// <param name="bAltitude">
+        /// The altitude of the second geographic coordinate.
+        /// </param>
+        /// <returns>
+        /// The 3D distance, in meters, between the two coordinates.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// In the <see cref="Vector3"/> returned, X represents longitude,
+        /// Z represents latitude and Y represents altitude. The Z+ axis in
+        /// this configuration aligns toward the North Pole.
+        /// </para>
+        /// <para>
+        /// <b>IMPORTANT:</b> This method is not accurate over long distances.
+        /// However, it is sufficient for scales used in most AR applications
+        /// where distance is limited by human sight.
+        /// </para>
+        /// </remarks>
+        static public Vector3 DistanceBetween3D(float aLatitude, float aLongitude, float aAltitude, float bLatitude, float bLongitude, float bAltitude)
         {
-            // Use geocentric version
-            return ToEcef(latitude: location.latitude, longitude: location.longitude, altitude: location.altitude);
+            // Use same longitude on both points to calculate latitude distance
+            // and use same latitude on both points to calculate longitude
+            // distance.
+            float latitudeMeters = DistanceBetween(aLatitude, aLongitude, bLatitude, aLongitude);
+            float longitudeMeters = DistanceBetween(aLatitude, aLongitude, aLatitude, bLongitude);
+
+            // Invert the distance sign if necessary to account for direction
+            if (aLatitude < bLatitude)
+            {
+                latitudeMeters *= -1;
+            }
+            if (aLongitude > bLongitude)
+            {
+                longitudeMeters *= -1;
+            }
+
+            // Calculate altitude difference
+            float altitudeMeters = (bAltitude - aAltitude);
+
+            // Return as Vector3
+            return new Vector3(longitudeMeters, altitudeMeters, latitudeMeters);
+        }
+
+        /// <summary>
+        /// Calculates the 3D distance, in meters, between the two locations.
+        /// </summary>
+        /// <param name="here">
+        /// The first geographic location.
+        /// </param>
+        /// <param name="bLatitude">
+        /// The latitude of the second geographic coordinate.
+        /// </param>
+        /// <param name="bLongitude">
+        /// The longitude of the second geographic coordinate.
+        /// </param>
+        /// <param name="bAltitude">
+        /// The altitude of the second geographic coordinate.
+        /// </param>
+        /// <returns>
+        /// The 3D distance, in meters, between the two coordinates.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// In the <see cref="Vector3"/> returned, X represents longitude,
+        /// Z represents latitude and Y represents altitude. The Z+ axis in
+        /// this configuration aligns toward the North Pole.
+        /// </para>
+        /// <para>
+        /// <b>IMPORTANT:</b> This method is not accurate over long distances.
+        /// However, it is sufficient for scales used in most AR applications
+        /// where distance is limited by human sight.
+        /// </para>
+        /// </remarks>
+        static public Vector3 DistanceTo(this LocationInfo here, float bLatitude, float bLongitude, float bAltitude)
+        {
+            return DistanceBetween3D(
+                       aLatitude: here.latitude,
+                       aLongitude: here.longitude,
+                       aAltitude: here.altitude,
+
+                       bLatitude: bLatitude,
+                       bLongitude: bLongitude,
+                       bAltitude: bAltitude);
+        }
+
+        /// <summary>
+        /// Calculates the 3D distance, in meters, between the two locations.
+        /// </summary>
+        /// <param name="here">
+        /// The first geographic location.
+        /// </param>
+        /// <param name="there">
+        /// The second geographic location.
+        /// </param>
+        /// <returns>
+        /// The 3D distance, in meters, between the two coordinates.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// In the <see cref="Vector3"/> returned, X represents longitude,
+        /// Z represents latitude and Y represents altitude. The Z+ axis in
+        /// this configuration aligns toward the North Pole.
+        /// </para>
+        /// <para>
+        /// <b>IMPORTANT:</b> This method is not accurate over long distances.
+        /// However, it is sufficient for scales used in most AR applications
+        /// where distance is limited by human sight.
+        /// </para>
+        /// </remarks>
+        static public Vector3 DistanceTo(this LocationInfo here, LocationInfo there)
+        {
+            return DistanceBetween3D(
+                       aLatitude: here.latitude,
+                       aLongitude: here.longitude,
+                       aAltitude: here.altitude,
+
+                       bLatitude: there.latitude,
+                       bLongitude: there.longitude,
+                       bAltitude: there.altitude);
+        }
+
+        /// <summary>
+        /// Converts a degree to a radian.
+        /// </summary>
+        /// <param name="val">
+        /// The degree to convert.
+        /// </param>
+        /// <returns>
+        /// The resulting radian.
+        /// </returns>
+        static public float ToRadian(this float val)
+        {
+            return Mathf.Deg2Rad * val;
+        }
+
+        /// <summary>
+        /// Converts the <see cref="GeoCoordinate"/> to a properly formatted WGS84 string.
+        /// </summary>
+        /// <param name="location">
+        /// The location to convert.
+        /// </param>
+        /// <returns>
+        /// The WGS84 string.
+        /// </returns>
+        static public string ToWGS84String(this LocationInfo location)
+        {
+            return string.Format("{0}, {1}", location.latitude, location.longitude);
         }
         #endregion // Public Methods
     }
