@@ -123,6 +123,12 @@ namespace Microsoft.SpatialAlignment.Geocentric
             // Update our transform position
             transform.position = pos;
 
+            // If north is not 0, we need to rotate around the reference point
+            if (geoData.NorthHeading != 0f)
+            {
+                transform.RotateAround(geoData.LocalPosition, Vector3.up, -geoData.NorthHeading);
+            }
+
             // TODO: Account for north if the app was not started facing north
         }
         #endregion // Internal Methods

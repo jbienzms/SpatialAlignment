@@ -243,10 +243,10 @@ namespace Microsoft.SpatialAlignment.Geocentric
                     lastTimestamp = location.timestamp;
 
                     // Also get compass data
-                    float northHeading = this.transform.rotation.y - Input.compass.trueHeading; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
+                    float northHeading = this.transform.rotation.eulerAngles.y - Input.compass.trueHeading; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
                     float northAccuracy = Input.compass.headingAccuracy;
 
-                    Debug.Log($"Local Rotation: {this.transform.rotation.y}, Compass Heading: {Input.compass.trueHeading}, North: {northHeading}");
+                    Debug.Log($"Local Rotation: {this.transform.rotation.eulerAngles.y}, Compass Heading: {Input.compass.trueHeading}, North: {northHeading}");
 
                     // Update the reference
                     UpdateReference(location: location, northHeading: northHeading, northAccuracy: northAccuracy);
