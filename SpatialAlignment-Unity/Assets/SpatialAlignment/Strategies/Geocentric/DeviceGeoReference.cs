@@ -156,6 +156,22 @@ namespace Microsoft.SpatialAlignment.Geocentric
                 throw new UnauthorizedAccessException("Location services could not be started.");
             }
 
+            // Enable the compass too
+            Input.compass.enabled = true;
+            #if UNITY_EDITOR
+            // In editor only, wait for remote location services to start the initialization process
+            Debug.Log("Waiting for Remote Compass services to initialize...");
+            while (!Input.compass.enabled)
+            {
+                await Task.Delay(500, cancellationToken);
+            }
+            #endif // UNITY_EDITOR
+
+            if (!Input.compass.enabled)
+            {
+                Debug.LogWarning("Compass could not be enabled.");
+            }
+
             // Tracking!
             Debug.Log("Location services running!");
             IsTracking = true;
@@ -217,7 +233,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
             // Tracking?
             if ((IsTracking) && (Input.location.status == LocationServiceStatus.Running))
             {
-                // Get last data
+                // Get location
                 LocationInfo location = Input.location.lastData;
 
                 // Was there an update?
@@ -226,8 +242,14 @@ namespace Microsoft.SpatialAlignment.Geocentric
                     // Update time stamp
                     lastTimestamp = location.timestamp;
 
+                    // Also get compass data
+                    float northHeading = this.transform.rotation.y - Input.compass.trueHeading; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
+                    float northAccuracy = Input.compass.headingAccuracy;
+
+                    Debug.Log($"Local Rotation: {this.transform.rotation.y}, Compass Heading: {Input.compass.trueHeading}, North: {northHeading}");
+
                     // Update the reference
-                    UpdateReference(location);
+                    UpdateReference(location: location, northHeading: northHeading, northAccuracy: northAccuracy);
                 }
             }
 

@@ -56,10 +56,16 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// <param name="location">
         /// The location info used in the update.
         /// </param>
-        protected void UpdateReference(LocationInfo location)
+        protected void UpdateReference(LocationInfo location, float northHeading, float northAccuracy)
         {
             // Create new reference data
-            GeoReferenceData data = new GeoReferenceData(location, this.transform.position, location.horizontalAccuracy, location.verticalAccuracy);
+            GeoReferenceData data = new GeoReferenceData(
+                geoPosition: location,
+                localPosition: this.transform.position,
+                horizontalAccuracy: location.horizontalAccuracy,
+                verticalAccuracy: location.verticalAccuracy,
+                northHeading: northHeading,
+                northAccuracy: northAccuracy);
 
             // Update (and notify)
             ReferenceData = data;

@@ -41,6 +41,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
         private LocationInfo geoPosition;
         private float horizontalAccuracy;
         private Vector3 localPosition;
+        private float northHeading;
+        private float northAccuracy;
         private float verticalAccuracy;
         #endregion // Member Variables
 
@@ -60,13 +62,21 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// <param name="verticalAccuracy">
         /// The <see cref="VerticalAccuracy"/>.
         /// </param>
-        public GeoReferenceData(LocationInfo geoPosition, Vector3 localPosition, float horizontalAccuracy, float verticalAccuracy)
+        /// <param name="northHeading">
+        /// The <see cref="NorthHeading"/>.
+        /// </param>
+        /// <param name="northAccuracy">
+        /// The <see cref="NorthAccuracy"/>.
+        /// </param>
+        public GeoReferenceData(LocationInfo geoPosition, Vector3 localPosition, float horizontalAccuracy, float verticalAccuracy, float northHeading, float northAccuracy)
         {
             // Store
             this.geoPosition = geoPosition;
             this.localPosition = localPosition;
             this.horizontalAccuracy = horizontalAccuracy;
             this.verticalAccuracy = verticalAccuracy;
+            this.northHeading = northHeading;
+            this.northAccuracy = northAccuracy;
         }
         #endregion // Constructors
 
@@ -79,7 +89,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         public LocationInfo GeoPosition { get => geoPosition; }
 
         /// <summary>
-        /// Horizontal accuracy in meters.
+        /// Gets the horizontal accuracy in meters.
         /// </summary>
         public float HorizontalAccuracy { get => horizontalAccuracy; }
 
@@ -91,7 +101,18 @@ namespace Microsoft.SpatialAlignment.Geocentric
         public Vector3 LocalPosition { get => localPosition; }
 
         /// <summary>
-        /// Vertical accuracy in meters.
+        /// Gets the rotation angle (in degrees) at the reference position
+        /// which represents true north.
+        /// </summary>
+        public float NorthHeading { get => northHeading; }
+
+        /// <summary>
+        /// Gets the accuracy of the rotation angle for true north.
+        /// </summary>
+        public float NorthAccuracy { get => northAccuracy; }
+
+        /// <summary>
+        /// Gets the vertical accuracy in meters.
         /// </summary>
         public float VerticalAccuracy { get => verticalAccuracy; }
         #endregion // Public Properties
