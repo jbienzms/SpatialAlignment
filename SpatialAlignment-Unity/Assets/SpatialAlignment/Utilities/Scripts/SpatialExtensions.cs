@@ -23,13 +23,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+
+#if !NO_MRTK
+using HoloToolkit.Unity;
+#endif
 
 namespace Microsoft.SpatialAlignment
 {
@@ -309,6 +312,65 @@ namespace Microsoft.SpatialAlignment
         }
         #endregion // RefinementDirection Extensions
 
+        #region Transform Extensions
+        /// <summary>
+        /// Updates the transform to match the specified world values.
+        /// </summary>
+        /// <param name="transform">
+        /// The transform to update.
+        /// </param>
+        /// <param name="position">
+        /// The updated position.
+        /// </param>
+        /// <param name="rotation">
+        /// The updated rotation.
+        /// </param>
+        /// <param name="scale">
+        /// The updated scale.
+        /// </param>
+        /// <remarks>
+        /// Animations only work in MRTK builds. In other builds animations complete immediately.
+        /// </remarks>
+        static public void AnimateTo(this Transform transform, Vector3 position, Quaternion rotation, Vector3 scale)
+        {
+            #if NO_MRTK
+            transform.position = position;
+            transform.rotation = rotation;
+            transform.localScale = scale;
+            #else
+            // Get or create Interpolator
+            Interpolator i = transform.gameObject.EnsureComponent<Interpolator>();
+
+            // Reset in case of previous action
+            i.Reset();
+
+            // Interpolate to values
+            i.SetTargetPosition(position);
+            i.SetTargetRotation(rotation);
+            i.SetTargetLocalScale(scale);
+            #endif
+        }
+
+        /// <summary>
+        /// Skips any running animation to the end.
+        /// </summary>
+        /// <param name="transform">
+        /// The transform where an animation may be running.
+        /// </param>
+        /// <remarks>
+        /// Animations only work in MRTK builds. In other builds animations complete immediately.
+        /// </remarks>
+        static public void EndAnimation(this Transform transform)
+        {
+            #if !NO_MRTK
+            // Try to get Interpolator
+            Interpolator i = transform.gameObject.GetComponent<Interpolator>();
+
+            // If found, jump to end
+            if (i != null) { i.SnapToTarget(); }
+            #endif
+        }
+        #endregion // Transform Extensions
 
         #region Vector Extensions
         /// <summary>
@@ -350,6 +412,32 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
+        /// Returns <c>true</c> if <paramref name="vector"/> is approximately
+        /// the same as the <see cref="toVector"/>.
+        /// </summary>
+        /// <param name="vector">
+        /// The vector to compare.
+        /// </param>
+        /// <param name="decimalPlaces">
+        /// The number of decimal places to round to. The default is 0.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if <paramref name="vector"/> and <see cref="toVector"/>
+        /// are approximately the same.
+        /// </returns>
+        /// <remarks>
+        /// This method uses <see cref="Mathf.Approximately(float, float)"/> to
+        /// compare each component of the two vectors.
+        /// </remarks>
+        static public bool Approximately(this Vector3 vector, Vector3 toVector)
+        {
+            if (!Mathf.Approximately(vector.x, toVector.x)) { return false; }
+            if (!Mathf.Approximately(vector.y, toVector.y)) { return false; }
+            if (!Mathf.Approximately(vector.z, toVector.z)) { return false; }
+            return true;
+        }
+
+        /// <summary>
         /// Rounds a <see cref="Vector3"/>.
         /// </summary>
         /// <param name="vector">
@@ -372,6 +460,40 @@ namespace Microsoft.SpatialAlignment
                        Mathf.Round(vector.x * multiplier) / multiplier,
                        Mathf.Round(vector.y * multiplier) / multiplier,
                        Mathf.Round(vector.z * multiplier) / multiplier);
+        }
+
+        /// <summary>
+        /// Returns a weighted percentage of the specified vector.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> to calculate the weighted value for.
+        /// </param>
+        /// <param name="weight">
+        /// The weighted percentage to apply.
+        /// </param>
+        /// <returns>
+        /// The weighted <see cref="Vector3"/>.
+        /// </returns>
+        static public Vector3 Weighted(this Vector3 vector, float weight)
+        {
+            return new Vector3(vector.x * weight, vector.y * weight, vector.z * weight);
+        }
+
+        /// <summary>
+        /// Returns a weighted percentage of the specified vector.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> to calculate the weighted value for.
+        /// </param>
+        /// <param name="weight">
+        /// The weighted percentage to apply.
+        /// </param>
+        /// <returns>
+        /// The weighted <see cref="Vector3"/>.
+        /// </returns>
+        static public Quaternion Weighted(this Quaternion quat, float weight)
+        {
+            return Quaternion.Lerp(Quaternion.identity, quat, weight);
         }
         #endregion // Vector Extensions
     }
