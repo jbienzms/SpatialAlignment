@@ -30,20 +30,31 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using UnityEngine;
+
+#if UNITY_WSA
 using UnityEngine.XR.WSA;
 using UnityEngine.XR.WSA.Persistence;
+using NativeAnchor = UnityEngine.XR.WSA.WorldAnchor;
+#else
+using NativeAnchor = UnityEngine.Component;
+#endif
 
 namespace Microsoft.SpatialAlignment
 {
     /// <summary>
-    /// An alignment strategy that attaches the object to a HoloLens world anchor.
+    /// An alignment strategy that attaches the object to a platform-specific native world anchor.
     /// </summary>
+    /// <remarks>
+    /// On HoloLens the native anchor is <see cref="UnityEngine.XR.WSA.WorldAnchor">WorldAnchor</see>.
+    /// </remarks>
     [DataContract]
-    public class WorldAnchorAlignment : AlignmentStrategy, INativePersistence
+    public class NativeAnchorAlignment : AlignmentStrategy, INativePersistence
     {
         #region Member Variables
-        private WorldAnchor anchor;
+        private NativeAnchor nativeAnchor;
+        #if UNITY_WSA
         private WorldAnchorStore anchorStore;
+        #endif // UNITY_WSA
         #endregion // Member Variables
 
         #region Unity Inspector Variables
@@ -66,8 +77,11 @@ namespace Microsoft.SpatialAlignment
         /// <returns>
         /// A <see cref="Task"/> that represents the operation.
         /// </returns>
+#pragma warning disable CS1998 // Await is compiled out for non-WSA builds.
         private async Task EnsureAnchorStoreAsync()
+#pragma warning restore CS1998
         {
+            #if UNITY_WSA
             // Do we need to acquire the store?
             if (anchorStore == null)
             {
@@ -89,26 +103,9 @@ namespace Microsoft.SpatialAlignment
             if (anchorStore == null)
             {
                 State = AlignmentState.Error;
-                throw new UnauthorizedAccessException($"{nameof(WorldAnchorAlignment)}: {nameof(WorldAnchorStore)} could not be acquired.");
+                throw new UnauthorizedAccessException($"{nameof(NativeAnchorAlignment)}: WorldAnchorStore could not be acquired.");
             }
-        }
-
-        /// <summary>
-        /// Sets the internal anchor to a new one.
-        /// </summary>
-        private void NewAnchor()
-        {
-            // Unload any existing
-            if (anchor != null)
-            {
-                UnloadAnchor();
-            }
-
-            // Create a new one
-            anchor = gameObject.AddComponent<WorldAnchor>();
-
-            // Subscribe to events
-            SubscribeAnchor();
+            #endif // UNITY_WSA
         }
 
         /// <summary>
@@ -116,16 +113,16 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         private void SubscribeAnchor()
         {
-            // Subscribe to anchor events
-            anchor.OnTrackingChanged += Anchor_OnTrackingChanged;
-
             #if UNITY_EDITOR
             // The anchor store will never be available in the editor, so
             // when in the editor just pretend that the anchor is resolved
             State = AlignmentState.Resolved;
-            #else
+            #elif UNITY_WSA
+            // Subscribe to anchor events
+            nativeAnchor.OnTrackingChanged += Anchor_OnTrackingChanged;
+
             // Update state based on anchor state
-            State = (anchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
+            State = (nativeAnchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
             #endif
         }
 
@@ -134,29 +131,33 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         private void UnsubscribeAnchor()
         {
+            #if UNITY_WSA
             // Unsubscribe from events
-            anchor.OnTrackingChanged -= Anchor_OnTrackingChanged;
+            nativeAnchor.OnTrackingChanged -= Anchor_OnTrackingChanged;
+            #endif
         }
         #endregion // Internal Methods
 
         #region INativePersistence Members
         Task INativePersistence.LoadNativeAsync()
         {
-            return TryLoadAnchorAsync();
+            return TryLoadNativeAsync();
         }
 
         Task INativePersistence.SaveNativeAsync()
         {
-            return SaveAnchorAsync();
+            return SaveNativeAsync();
         }
         #endregion // INativePersistence Members
 
         #region Overrides / Event Handlers
+        #if UNITY_WSA
         private void Anchor_OnTrackingChanged(WorldAnchor worldAnchor, bool located)
         {
             // Update state based on anchor tracking state
             State = (located ? AlignmentState.Tracking : AlignmentState.Unresolved);
         }
+        #endif // UNITY_WSA
         #endregion // Overrides / Event Handlers
 
         #region Unity Overrides
@@ -164,7 +165,7 @@ namespace Microsoft.SpatialAlignment
         protected override void OnDisable()
         {
             // Make sure the anchor is unloaded
-            UnloadAnchor();
+            UnloadNative();
 
             // Pass on to base
             base.OnDisable();
@@ -180,17 +181,75 @@ namespace Microsoft.SpatialAlignment
             if (loadOnStart)
             {
                 // Try to load
-                var t = TryLoadAnchorAsync();
+                var t = TryLoadNativeAsync();
             }
             else
             {
                 // Create a new one
-                NewAnchor();
+                CreateNative();
             }
         }
         #endregion // Unity Overrides
 
         #region Public Methods
+        /// <summary>
+        /// Attempts to find a native anchor already on the same GameObject.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if the native anchor was found; otherwise <c>false</c>.
+        /// </returns>
+        /// <seealso cref="CreateNative"/>
+        /// <seealso cref="FindOrCreateNative"/>
+        public bool FindNative()
+        {
+            // Already found?
+            if (nativeAnchor != null)
+            {
+                return true;
+            }
+
+            // Try to find it
+            nativeAnchor = gameObject.GetComponent<NativeAnchor>();
+
+            // Found?
+            return nativeAnchor != null;
+        }
+
+        /// <summary>
+        /// Attempts to find a native anchor already on the same
+        /// GameObject and creates one if none is found.
+        /// </summary>
+        /// <seealso cref="CreateNative"/>
+        /// <seealso cref="FindNative"/>
+        public void FindOrCreateNative()
+        {
+            if (!FindNative())
+            {
+                // Add the native anchor
+                nativeAnchor = gameObject.AddComponent<NativeAnchor>();
+
+                // Subscribe to events
+                SubscribeAnchor();
+            }
+        }
+
+        /// <summary>
+        /// Creates a new native anchor. If one already exists, it is replaced.
+        /// </summary>
+        /// <seealso cref="FindNative"/>
+        /// <seealso cref="FindOrCreateNative"/>
+        public void CreateNative()
+        {
+            // Unload any existing
+            if (nativeAnchor != null)
+            {
+                UnloadNative();
+            }
+
+            // Use FindOrCreate to Create a new one
+            FindOrCreateNative();
+        }
+
         /// <summary>
         /// Attempts to load the native anchor specified by <see cref="AnchorId"/>.
         /// </summary>
@@ -198,19 +257,19 @@ namespace Microsoft.SpatialAlignment
         /// A <see cref="Task"/> that represents the operation.
         /// </returns>
 #pragma warning disable CS1998 // Await is compiled out for UNITY_EDITOR builds.
-        public async Task<bool> TryLoadAnchorAsync()
+        public async Task<bool> TryLoadNativeAsync()
 #pragma warning restore CS1998
         {
             // Validate the ID
             if (string.IsNullOrEmpty(anchorId))
             {
                 State = AlignmentState.Error;
-                Debug.LogError($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
+                Debug.LogError($"{nameof(NativeAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
                 return false;
             }
 
             // If there was an existing anchor, unload it
-            if (anchor != null) { UnloadAnchor(); }
+            if (nativeAnchor != null) { UnloadNative(); }
 
             // The anchor store is not accessible in the editor
             #if !UNITY_EDITOR && UNITY_WSA
@@ -219,15 +278,15 @@ namespace Microsoft.SpatialAlignment
             await EnsureAnchorStoreAsync();
 
             // Now try to load the anchor itself
-            anchor = anchorStore.Load(anchorId, this.gameObject);
+            nativeAnchor = anchorStore.Load(anchorId, this.gameObject);
 
             #endif // !UNITY_EDITOR && UNITY_WSA
 
             // If still not loaded, log and fail
-            if (anchor == null)
+            if (nativeAnchor == null)
             {
                 State = AlignmentState.Error;
-                Debug.LogError($"{nameof(WorldAnchorAlignment)}: {nameof(WorldAnchor)} with the id '{anchorId}' was not found.");
+                Debug.LogError($"{nameof(NativeAnchorAlignment)}: {nameof(NativeAnchor)} with the id '{anchorId}' was not found.");
                 return false;
             }
             else
@@ -249,17 +308,17 @@ namespace Microsoft.SpatialAlignment
         /// A <see cref="Task"/> that represents the operation.
         /// </returns>
 #pragma warning disable CS1998 // Await is compiled out for UNITY_EDITOR builds.
-        public async Task SaveAnchorAsync()
+        public async Task SaveNativeAsync()
 #pragma warning restore CS1998
         {
             // Validate the ID
             if (string.IsNullOrEmpty(anchorId))
             {
-                throw new InvalidOperationException($"{nameof(WorldAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
+                throw new InvalidOperationException($"{nameof(NativeAnchorAlignment)}: {nameof(AnchorId)} is not valid.");
             }
 
             // If there is no anchor, create it
-            if (anchor == null) { NewAnchor(); }
+            if (nativeAnchor == null) { CreateNative(); }
 
             // The anchor store is not accessible in the editor
             #if !UNITY_EDITOR && UNITY_WSA
@@ -268,27 +327,27 @@ namespace Microsoft.SpatialAlignment
             await EnsureAnchorStoreAsync();
 
             // Now try to save the anchor itself
-            anchorStore.Save(anchorId, anchor);
+            anchorStore.Save(anchorId, nativeAnchor);
 
             #endif // !UNITY_EDITOR && UNITY_WSA
         }
 
         /// <summary>
-        /// Unloads any attached <see cref="WorldAnchor"/> and stops tracking.
+        /// Unloads any attached native anchor and stops tracking.
         /// </summary>
-        public void UnloadAnchor()
+        public void UnloadNative()
         {
             // Make sure we have an anchor to unload
-            if (anchor == null) { return; }
+            if (nativeAnchor == null) { return; }
 
             // Unsubscribe from anchor events
             UnsubscribeAnchor();
 
             // Destroy the anchor (which also removes it from the game object)
-            Destroy(anchor);
+            Destroy(nativeAnchor);
 
             // Reset the reference
-            anchor = null;
+            nativeAnchor = null;
 
             // No longer tracking
             State = AlignmentState.Unresolved;
@@ -305,6 +364,11 @@ namespace Microsoft.SpatialAlignment
         /// Gets or sets a value that indicates if the anchor should be loaded when the behavior starts.
         /// </summary>
         public bool LoadOnStart { get { return loadOnStart; } set { loadOnStart = value; } }
+
+        /// <summary>
+        /// Gets the underlying native anchor.
+        /// </summary>
+        public NativeAnchor NativeAnchor { get { return nativeAnchor; } }
         #endregion // Public Properties
     }
 }
