@@ -30,6 +30,14 @@ HoloToolkit-Examples/
 HoloToolkit-Preview/
 HoloToolkit-UnitTests/
 
+# Google AR Core which should be imported separately
+GoogleARCore/
+GoogleARCore.meta
+
+# Google Play Services Resolver which is imported as part of ARCore
+PlayServicesResolver/
+PlayServicesResolver.meta
+
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
 Lib/*.suo
