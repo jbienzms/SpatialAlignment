@@ -773,9 +773,11 @@
     <Compile Include="Assets\SpatialAlignment\Strategies\AlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\DeviceGeoReference.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoAlignment.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoAlignmentBase.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoConverter.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoReference.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoReferenceData.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\HeadingAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\IGeoReference.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\IAlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\MultiParentAlignment.cs" />

@@ -34,18 +34,13 @@ namespace Microsoft.SpatialAlignment.Geocentric
     /// A strategy that aligns the frame to a known Geocentric (GPS) location.
     /// </summary>
     [DataContract]
-    public class GeoAlignment : AlignmentStrategy
+    public class GeoAlignment : HeadingAlignment
     {
         #region Unity Inspector Variables
         [DataMember]
         [SerializeField]
         [Tooltip("The geodetic altitude the frame will be aligned to.")]
         private float altitude;
-
-        [DataMember]
-        [SerializeField]
-        [Tooltip("The reference source used when converting between global and application 3D space.")]
-        private GeoReference geoReference;
 
         [DataMember]
         [SerializeField]
@@ -63,33 +58,12 @@ namespace Microsoft.SpatialAlignment.Geocentric
         private bool relativeAltitude;
         #endregion // Unity Inspector Variables
 
-        #region Internal Methods
-        /// <summary>
-        /// Subscribe to reference events.
-        /// </summary>
-        private void SubscribeReference()
+        #region Overrides / Event Handlers
+        /// <inheritdoc />
+        protected override void UpdateTransform(GeoReferenceData geoData)
         {
-            // Subscribe to reference events
-            geoReference.ReferenceDataChanged += GeoReference_ReferenceUpdated;
-        }
-
-        /// <summary>
-        /// Unsubscribe from reference events.
-        /// </summary>
-        private void UnsubscribeReference()
-        {
-            // Subscribe to reference events
-            geoReference.ReferenceDataChanged -= GeoReference_ReferenceUpdated;
-        }
-
-        /// <summary>
-        /// Updates the transform based on the current coordinates related to
-        /// the <see cref="GeoReference"/>
-        /// </summary>
-        protected void UpdateTransform()
-        {
-            // Attempt to get data from the reference
-            GeoReferenceData geoData = geoReference?.ReferenceData;
+            // IMPORTANT: We do NOT call the base version because we calculate
+            // rotation in a different way.
 
             // If we have no reference or data, we're in inhibited state
             if (geoData == null)
@@ -128,60 +102,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
             {
                 transform.RotateAround(geoData.LocalPosition, Vector3.up, -geoData.NorthHeading);
             }
-
-            // TODO: Account for north if the app was not started facing north
-        }
-        #endregion // Internal Methods
-
-        #region Overrides / Event Handlers
-        private void GeoReference_ReferenceUpdated(object sender, EventArgs e)
-        {
-            // Get the data
-            GeoReferenceData geoData = geoReference.ReferenceData;
-
-            // Update our stats
-            State = AlignmentState.Tracking;
-            float h = geoData.HorizontalAccuracy;
-            float v = geoData.VerticalAccuracy;
-            Accuracy = new Vector3(h, v, h);
-
-            // Reference has updated. Time to update Transform, but must do it
-            // on the UI thread.
-            UnityDispatcher.InvokeOnAppThread(UpdateTransform);
         }
         #endregion // Overrides / Event Handlers
-
-        #region Unity Overrides
-        /// <inheritdoc />
-        protected override void OnDisable()
-        {
-            // If we have a reference, stop tracking
-            if (geoReference != null)
-            {
-                UnsubscribeReference();
-                State = AlignmentState.Inhibited;
-            }
-
-            // Pass on to base
-            base.OnDisable();
-        }
-
-        /// <inheritdoc />
-        protected override void OnEnable()
-        {
-            // Pass to base first
-            base.OnEnable();
-
-            // If we have a reference, start tracking
-            if (geoReference != null)
-            {
-                SubscribeReference();
-            }
-
-            // Update
-            UpdateTransform();
-        }
-        #endregion // Unity Overrides
 
         #region Public Properties
         /// <summary>
@@ -204,42 +126,6 @@ namespace Microsoft.SpatialAlignment.Geocentric
                 if (altitude != value)
                 {
                     altitude = value;
-                    UpdateTransform();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the reference source used when converting between
-        /// global and application 3D space.
-        /// </summary>
-        public GeoReference GeoReference
-        {
-            get
-            {
-                return geoReference;
-            }
-            set
-            {
-                // Is it changing?
-                if (geoReference != value)
-                {
-                    // If old reference, unsubscribe
-                    if (geoReference != null)
-                    {
-                        UnsubscribeReference();
-                    }
-
-                    // Store
-                    geoReference = value;
-
-                    // If new reference, subscribe and update
-                    if (geoReference != null)
-                    {
-                        SubscribeReference();
-                    }
-
-                    // Update
                     UpdateTransform();
                 }
             }
