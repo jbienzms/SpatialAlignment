@@ -62,18 +62,23 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// <inheritdoc />
         protected override void ApplyHeading(HeadingData heading)
         {
-            // We also need location in order to handle heading changes
-            LocationData location = GeoReference.Location;
-
-            // If the GeoReference has a NorthHeading of anything other than
-            // 0, we need to rotate around the references local position as a
-            // pivot point. This step is what accounts for the device not
-            // facing North on application launch.
-            if ((heading.NorthHeading != 0f) && (location != null))
+            // Only attempt to apply if a heading is available.
+            // Not having a heading doesn't necessarily mean
+            // we're inhibited
+            if (heading != null)
             {
-                transform.RotateAround(location.LocalPosition, Vector3.up, -heading.NorthHeading);
-            }
+                // We also need location in order to handle heading changes
+                LocationData location = GeoReference.Location;
 
+                // If the GeoReference has a NorthHeading of anything other than
+                // 0, we need to rotate around the references local position as a
+                // pivot point. This step is what accounts for the device not
+                // facing North on application launch.
+                if ((heading.NorthHeading != 0f) && (location != null))
+                {
+                    transform.RotateAround(location.LocalPosition, Vector3.up, -heading.NorthHeading);
+                }
+            }
             // Finally, pass on to base to apply local rotation.
             base.ApplyHeading(heading);
         }

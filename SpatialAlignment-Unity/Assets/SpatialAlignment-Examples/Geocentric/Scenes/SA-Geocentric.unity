@@ -262,9 +262,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoStartTracking: 1
-  desiredAccuracy: 5
+  desiredAccuracy: 0.01
   startTrackingTimeout: 20
-  updateDistance: 0.5
+  updateDistance: 0.01
 --- !u!1001 &278386368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -445,7 +445,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   geoReference: {fileID: 231975971}
-  heading: 0
+  northRotation: 0
   altitude: 0
   latitude: 30.04042
   longitude: -95.65007
@@ -566,7 +566,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   geoReference: {fileID: 231975971}
-  heading: 0
+  northRotation: 0
   altitude: 0
   latitude: 30.04093
   longitude: -95.65057
@@ -672,7 +672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   geoReference: {fileID: 231975971}
-  heading: 0
+  northRotation: 0
   altitude: 0
   latitude: 30.04073
   longitude: -95.64962
@@ -903,7 +903,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   geoReference: {fileID: 231975971}
-  heading: 0
+  northRotation: 0
 --- !u!4 &2126429526
 Transform:
   m_ObjectHideFlags: 0
