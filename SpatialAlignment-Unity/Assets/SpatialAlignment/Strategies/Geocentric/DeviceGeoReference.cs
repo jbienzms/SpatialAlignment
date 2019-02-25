@@ -189,7 +189,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
             lastHeadingTime = Input.compass.timestamp;
 
             // Get compass sensor heading
-            float compassHeading = Input.compass.trueHeading; // In order to use trueHeading, location must be initialized
+            // float compassHeading = Input.compass.trueHeading; // In order to use trueHeading, location must be initialized
+            float compassHeading = Input.compass.magneticHeading; // In order to use trueHeading, location must be initialized
 
             // Account for screen orientation
             float deviceRotation = Input.acceleration.z;
@@ -211,7 +212,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
             //}
 
             // Calculate compass data
-            float northHeading = this.transform.rotation.eulerAngles.y - compassHeading; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
+            float northHeading = (-compassHeading); //  + this.transform.rotation.eulerAngles.y; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
             float northAccuracy = Input.compass.headingAccuracy;
 
             //Debug.Log($"Local Rotation: {this.transform.rotation.eulerAngles.y}\r\n" +

@@ -209,6 +209,52 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1314454273
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1314454275}
+  - component: {fileID: 1314454274}
+  m_Layer: 0
+  m_Name: North
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1314454274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1314454273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25778b7d2a760fd409d3a9fb12d02f74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  geoReference: {fileID: 1871446382}
+  northRotation: 0
+--- !u!4 &1314454275
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1314454273}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1867730808}
+  m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1468509572
@@ -242,8 +288,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43de0081f68fbe24c8c8f74ad956405c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  altitude: 0
   geoReference: {fileID: 1871446382}
+  northRotation: 0
+  altitude: 0
   latitude: 30.04042
   longitude: -95.65007
   relativeAltitude: 1
@@ -362,8 +409,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43de0081f68fbe24c8c8f74ad956405c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  altitude: 0
   geoReference: {fileID: 1871446382}
+  northRotation: 0
+  altitude: 0
   latitude: 30.04093
   longitude: -95.65057
   relativeAltitude: 1
@@ -408,10 +456,73 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4442908887562770, guid: c10877f7cd5764de18d46d7b777d1faa, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c10877f7cd5764de18d46d7b777d1faa, type: 3}
+--- !u!1001 &1867730807
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1314454275}
+    m_Modifications:
+    - target: {fileID: 100002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_Name
+      value: Direction
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 05d0678d150ba6c409d42cde9979d052, type: 3}
+--- !u!4 &1867730808 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400002, guid: 05d0678d150ba6c409d42cde9979d052,
+    type: 3}
+  m_PrefabInstance: {fileID: 1867730807}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1871446381 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1637996540812124, guid: c10877f7cd5764de18d46d7b777d1faa,
@@ -465,8 +576,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43de0081f68fbe24c8c8f74ad956405c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  altitude: 0
   geoReference: {fileID: 1871446382}
+  northRotation: 0
+  altitude: 0
   latitude: 30.04073
   longitude: -95.64962
   relativeAltitude: 1

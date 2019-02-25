@@ -36,6 +36,10 @@ namespace Microsoft.SpatialAlignment.Geocentric
     [DataContract]
     public class GeoAlignment : HeadingAlignment
     {
+        #region Member Variables
+        Vector3 lastPosition;			// The last calculated position in local space.
+        #endregion // Member Variables
+
         #region Unity Inspector Variables
         [DataMember]
         [SerializeField]
@@ -76,7 +80,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
                 // facing North on application launch.
                 if ((heading.NorthHeading != 0f) && (location != null))
                 {
-                    transform.RotateAround(location.LocalPosition, Vector3.up, -heading.NorthHeading);
+                    transform.position = lastPosition;
+                    transform.RotateAround(location.LocalPosition, Vector3.up, heading.NorthHeading);
                 }
             }
             // Finally, pass on to base to apply local rotation.
@@ -109,17 +114,17 @@ namespace Microsoft.SpatialAlignment.Geocentric
             }
 
             // Calculate our new position based on the reference position plus offset
-            Vector3 pos = location.LocalPosition + offset;
+            lastPosition = location.LocalPosition + offset;
 
-            Debug.Log(
-                $"GPS Lat: {location.GeoPosition.latitude}, Lon: {location.GeoPosition.longitude}, Alt: {location.GeoPosition.altitude}\r\n" +
-                $"Target Lat: {this.latitude}, Lon: {this.longitude}, Alt: {this.altitude}\r\n" +
-                $"GPS Offset x: {offset.x}, y: {offset.y}, z: {offset.z}\r\n" +
-                $"Pos x: {pos.x}, y: {pos.y}, z: {pos.z}\r\n" +
-                $"");
+            //Debug.Log(
+            //    $"GPS Lat: {location.GeoPosition.latitude}, Lon: {location.GeoPosition.longitude}, Alt: {location.GeoPosition.altitude}\r\n" +
+            //    $"Target Lat: {this.latitude}, Lon: {this.longitude}, Alt: {this.altitude}\r\n" +
+            //    $"GPS Offset x: {offset.x}, y: {offset.y}, z: {offset.z}\r\n" +
+            //    $"Pos x: {lastPosition.x}, y: {lastPosition.y}, z: {lastPosition.z}\r\n" +
+            //    $"");
 
             // Update our transform position
-            transform.position = pos;
+            transform.position = lastPosition;
         }
         #endregion // Overrides / Event Handlers
 
