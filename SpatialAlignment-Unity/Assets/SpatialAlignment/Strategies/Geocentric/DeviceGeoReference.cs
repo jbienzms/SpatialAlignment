@@ -157,8 +157,10 @@ namespace Microsoft.SpatialAlignment.Geocentric
                 throw new UnauthorizedAccessException("Location services could not be started.");
             }
 
-            // Enable the compass too
+            // Enable the compass and gyroscope too
             Input.compass.enabled = true;
+            Input.gyro.enabled = true;
+
             #if UNITY_EDITOR
             // In editor only, wait for remote location services to start the initialization process
             Debug.Log("Waiting for Remote Compass services to initialize...");
@@ -176,6 +178,64 @@ namespace Microsoft.SpatialAlignment.Geocentric
             // Tracking!
             Debug.Log("Location services running!");
             IsTracking = true;
+        }
+
+        /// <summary>
+        /// Updates heading information from the platform.
+        /// </summary>
+        private void InnerUpdateHeading()
+        {
+            // Update heading time stamp
+            lastHeadingTime = Input.compass.timestamp;
+
+            // Get compass sensor heading
+            float compassHeading = Input.compass.trueHeading; // In order to use trueHeading, location must be initialized
+
+            // Account for screen orientation
+            float deviceRotation = Input.acceleration.z;
+            //if ((Screen.orientation == ScreenOrientation.Portrait) || (Screen.orientation == ScreenOrientation.PortraitUpsideDown))
+            //{
+            if (deviceRotation > 0)
+            {
+                compassHeading += 180f;
+            }
+            //}
+
+            //var rot = Input.gyro.attitude.eulerAngles;
+            //Debug.Log($"Rot: {rot}");
+
+            //float deviceRotation = Input.gyro.attitude.eulerAngles.y;
+            //if (deviceRotation <= 270f)
+            //{
+            //    compassHeading += 180f;
+            //}
+
+            // Calculate compass data
+            float northHeading = this.transform.rotation.eulerAngles.y - compassHeading; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
+            float northAccuracy = Input.compass.headingAccuracy;
+
+            //Debug.Log($"Local Rotation: {this.transform.rotation.eulerAngles.y}\r\n" +
+            //          $"True Heading: {Input.compass.trueHeading}\r\n" +
+            //          $"Magnetic Heading: {Input.compass.magneticHeading}\r\n" +
+            //          $", North: {northHeading}");
+
+            // Update the reference
+            UpdateHeading(northHeading: northHeading, northAccuracy: northAccuracy);
+        }
+
+        /// <summary>
+        /// Updates location information from the platform.
+        /// </summary>
+        private void InnerUpateLocation()
+        {
+            // Get location data
+            LocationInfo location = Input.location.lastData;
+
+            // Update location time stamp
+            lastLocationTime = location.timestamp;
+
+            // Update the location
+            UpdateLocation(location: location);
         }
 
         /// <summary>
@@ -232,38 +292,19 @@ namespace Microsoft.SpatialAlignment.Geocentric
             // TODO: Move this to a separate thread so it's not taking render cycles
 
             // Tracking?
-            if ((IsTracking) && (Input.location.status == LocationServiceStatus.Running))
+            if (IsTracking)
             {
                 // Compass update?
                 if (Input.compass.timestamp > lastHeadingTime)
                 {
-                    // Update heading time stamp
-                    lastHeadingTime = Input.compass.timestamp;
-
-                    // Calculate compass data
-                    float northHeading = this.transform.rotation.eulerAngles.y - Input.compass.trueHeading; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
-                    float northAccuracy = Input.compass.headingAccuracy;
-
-                    Debug.Log($"Local Rotation: {this.transform.rotation.eulerAngles.y}\r\n" +
-                              $"True Heading: {Input.compass.trueHeading}\r\n" +
-                              $"Magnetic Heading: {Input.compass.magneticHeading}\r\n" +
-                              $", North: {northHeading}");
-
-                    // Update the reference
-                    UpdateHeading(northHeading: northHeading, northAccuracy: northAccuracy);
+                    InnerUpdateHeading();
                 }
 
                 // Location update?
-                LocationInfo location = Input.location.lastData;
-
-                // Was there an update?
-                if (location.timestamp > lastLocationTime)
+                if ((Input.location.status == LocationServiceStatus.Running) &&
+                        (Input.location.lastData.timestamp > lastLocationTime))
                 {
-                    // Update location time stamp
-                    lastLocationTime = location.timestamp;
-
-                    // Update the location
-                    UpdateLocation(location: location);
+                    InnerUpateLocation();
                 }
             }
 
@@ -328,11 +369,15 @@ namespace Microsoft.SpatialAlignment.Geocentric
                 throw new InvalidOperationException($"{nameof(StopTracking)} called but device is not tracking.");
             }
 
-            // Stop tracking
-            Input.location.Stop();
-
             // No longer tracking
             IsTracking = false;
+
+            // Stop compass and gyro
+            Input.compass.enabled = false;
+            Input.gyro.enabled = false;
+
+            // Stop location
+            Input.location.Stop();
         }
         #endregion // Public Methods
 

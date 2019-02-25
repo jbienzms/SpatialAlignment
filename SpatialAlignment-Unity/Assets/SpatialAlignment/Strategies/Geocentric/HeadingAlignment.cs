@@ -44,6 +44,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
         #endregion // Unity Inspector Variables
 
         #region Overrides / Event Handlers
+        float y;
+
         /// <inheritdoc />
         protected override void ApplyHeading(HeadingData heading)
         {
@@ -59,8 +61,10 @@ namespace Microsoft.SpatialAlignment.Geocentric
             float calcHeading = heading.NorthHeading + this.northRotation;
 
             // Apply rotation
+            // Debug.Log($"calcHeading: {calcHeading}");
             transform.localRotation = Quaternion.Euler(0, calcHeading, 0);
         }
+
         protected override void ApplyLocation(LocationData location)
         {
             // Location data is not used.
