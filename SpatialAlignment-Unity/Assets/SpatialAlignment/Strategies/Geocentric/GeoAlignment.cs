@@ -60,13 +60,32 @@ namespace Microsoft.SpatialAlignment.Geocentric
 
         #region Overrides / Event Handlers
         /// <inheritdoc />
-        protected override void UpdateTransform(GeoReferenceData geoData)
+        protected override void ApplyHeading(HeadingData heading)
         {
-            // IMPORTANT: We do NOT call the base version because we calculate
-            // rotation in a different way.
+            // We also need location in order to handle heading changes
+            LocationData location = GeoReference.Location;
+
+            // If the GeoReference has a NorthHeading of anything other than
+            // 0, we need to rotate around the references local position as a
+            // pivot point. This step is what accounts for the device not
+            // facing North on application launch.
+            if ((heading.NorthHeading != 0f) && (location != null))
+            {
+                transform.RotateAround(location.LocalPosition, Vector3.up, -heading.NorthHeading);
+            }
+
+            // Finally, pass on to base to apply local rotation.
+            base.ApplyHeading(heading);
+        }
+
+        /// <inheritdoc />
+        protected override void ApplyLocation(LocationData location)
+        {
+            // Pass to base first (HeadingAlignment doesn't do anything with location)
+            base.ApplyLocation(location);
 
             // If we have no reference or data, we're in inhibited state
-            if (geoData == null)
+            if (location == null)
             {
                 State = AlignmentState.Inhibited;
                 Debug.LogWarning($"{nameof(GeoAlignment)} {name}: {nameof(GeoReference)} data unavailable - Inhibited.");
@@ -77,18 +96,18 @@ namespace Microsoft.SpatialAlignment.Geocentric
             Vector3 offset;
             if (relativeAltitude)
             {
-                offset = geoData.GeoPosition.DistanceTo(latitude, longitude, geoData.GeoPosition.altitude + altitude);
+                offset = location.GeoPosition.DistanceTo(latitude, longitude, location.GeoPosition.altitude + altitude);
             }
             else
             {
-                offset = geoData.GeoPosition.DistanceTo(latitude, longitude, altitude);
+                offset = location.GeoPosition.DistanceTo(latitude, longitude, altitude);
             }
 
             // Calculate our new position based on the reference position plus offset
-            Vector3 pos = geoData.LocalPosition + offset;
+            Vector3 pos = location.LocalPosition + offset;
 
             Debug.Log(
-                $"GPS Lat: {geoData.GeoPosition.latitude}, Lon: {geoData.GeoPosition.longitude}, Alt: {geoData.GeoPosition.altitude}\r\n" +
+                $"GPS Lat: {location.GeoPosition.latitude}, Lon: {location.GeoPosition.longitude}, Alt: {location.GeoPosition.altitude}\r\n" +
                 $"Target Lat: {this.latitude}, Lon: {this.longitude}, Alt: {this.altitude}\r\n" +
                 $"GPS Offset x: {offset.x}, y: {offset.y}, z: {offset.z}\r\n" +
                 $"Pos x: {pos.x}, y: {pos.y}, z: {pos.z}\r\n" +
@@ -96,12 +115,6 @@ namespace Microsoft.SpatialAlignment.Geocentric
 
             // Update our transform position
             transform.position = pos;
-
-            // If north is not 0, we need to rotate around the reference point
-            if (geoData.NorthHeading != 0f)
-            {
-                transform.RotateAround(geoData.LocalPosition, Vector3.up, -geoData.NorthHeading);
-            }
         }
         #endregion // Overrides / Event Handlers
 

@@ -38,56 +38,55 @@ namespace Microsoft.SpatialAlignment.Geocentric
         #region Unity Inspector Variables
         [DataMember]
         [SerializeField]
-        [Tooltip("The compass heading the frame will be aligned to.")]
+        [Tooltip("A rotational offset from North that the frame will be aligned to.")]
         [Range(0f, 360f)]
-        private float heading;
+        private float northRotation;
         #endregion // Unity Inspector Variables
 
         #region Overrides / Event Handlers
-        /// <summary>
-        /// Updates the transform based on the current coordinates related to
-        /// the <see cref="GeoReference"/>
-        /// </summary>
-        /// <param name="geoData">
-        /// The <see cref="GeoReferenceData"/> used to calculate the transform.
-        /// </param>
-        protected override void UpdateTransform(GeoReferenceData geoData)
+        /// <inheritdoc />
+        protected override void ApplyHeading(HeadingData heading)
         {
             // If we have no reference or data, we're in inhibited state
-            if (geoData == null)
+            if (heading == null)
             {
                 State = AlignmentState.Inhibited;
-                Debug.LogWarning($"{nameof(HeadingAlignment)} {name}: {nameof(GeoReference)} data unavailable - Inhibited.");
+                Debug.LogWarning($"{nameof(HeadingAlignment)} {name}: {nameof(GeoReference)} heading data unavailable - Inhibited.");
                 return;
             }
 
             // Calculate heading as an offset from north
-            float calcHeading = geoData.NorthHeading + heading;
+            float calcHeading = heading.NorthHeading + this.northRotation;
 
             // Apply rotation
-            transform.rotation = Quaternion.Euler(0, calcHeading, 0);
+            transform.localRotation = Quaternion.Euler(0, calcHeading, 0);
+        }
+        protected override void ApplyLocation(LocationData location)
+        {
+            // Location data is not used.
         }
         #endregion // Overrides / Event Handlers
 
         #region Public Properties
         /// <summary>
-        /// Gets or sets then compass heading the frame will be aligned to.
+        /// Gets or sets a rotational offset from North that the frame will be
+        /// aligned to.
         /// </summary>
         /// <remarks>
         /// Changing this value will cause the transform to be updated.
         /// </remarks>
-        public float Heading
+        public float NorthRotation
         {
             get
             {
-                return heading;
+                return northRotation;
             }
             set
             {
                 // Ensure changing
-                if (heading != value)
+                if (northRotation != value)
                 {
-                    heading = value;
+                    northRotation = value;
                     UpdateTransform();
                 }
             }

@@ -33,22 +33,20 @@ using UnityEngine;
 namespace Microsoft.SpatialAlignment.Geocentric
 {
     /// <summary>
-    /// Provides data for updates to <see cref="IGeoReference"/> sources.
+    /// Provides location data for updates to <see cref="IGeoReference"/> sources.
     /// </summary>
-    public class GeoReferenceData
+    public class LocationData
     {
         #region Member Variables
         private LocationInfo geoPosition;
         private float horizontalAccuracy;
         private Vector3 localPosition;
-        private float northHeading;
-        private float northAccuracy;
         private float verticalAccuracy;
         #endregion // Member Variables
 
         #region Constructors
         /// <summary>
-        /// Initializes a new <see cref="GeoReferenceData"/> instance.
+        /// Initializes a new <see cref="LocationData"/> instance.
         /// </summary>
         /// <param name="geoPosition">
         /// The <see cref="GeoPosition"/>.
@@ -62,21 +60,13 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// <param name="verticalAccuracy">
         /// The <see cref="VerticalAccuracy"/>.
         /// </param>
-        /// <param name="northHeading">
-        /// The <see cref="NorthHeading"/>.
-        /// </param>
-        /// <param name="northAccuracy">
-        /// The <see cref="NorthAccuracy"/>.
-        /// </param>
-        public GeoReferenceData(LocationInfo geoPosition, Vector3 localPosition, float horizontalAccuracy, float verticalAccuracy, float northHeading, float northAccuracy)
+        public LocationData(LocationInfo geoPosition, Vector3 localPosition, float horizontalAccuracy, float verticalAccuracy)
         {
             // Store
             this.geoPosition = geoPosition;
             this.localPosition = localPosition;
             this.horizontalAccuracy = horizontalAccuracy;
             this.verticalAccuracy = verticalAccuracy;
-            this.northHeading = northHeading;
-            this.northAccuracy = northAccuracy;
         }
         #endregion // Constructors
 
@@ -99,17 +89,6 @@ namespace Microsoft.SpatialAlignment.Geocentric
         /// coordinate system position for the point of reference.
         /// </summary>
         public Vector3 LocalPosition { get => localPosition; }
-
-        /// <summary>
-        /// Gets the rotation angle (in degrees) at the reference position
-        /// which represents true north.
-        /// </summary>
-        public float NorthHeading { get => northHeading; }
-
-        /// <summary>
-        /// Gets the accuracy of the rotation angle for true north.
-        /// </summary>
-        public float NorthAccuracy { get => northAccuracy; }
 
         /// <summary>
         /// Gets the vertical accuracy in meters.

@@ -63,7 +63,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
     public class DeviceGeoReference : GeoReference
     {
         #region Member Variables
-        private double lastTimestamp;						// The time stamp of the last location report
+        private double lastHeadingTime;						// The time stamp of the last heading report
+        private double lastLocationTime;					// The time stamp of the last location report
         private bool restartForDesiredAccuracy = true;      // Whether changes to DesiredAccuracy require a restart
         private bool restartForUpdateDistance = true;       // Whether changes to UpdateDistance require a restart
         private Task startTrackingTask;						// The Task that is used to start tracking
@@ -233,23 +234,36 @@ namespace Microsoft.SpatialAlignment.Geocentric
             // Tracking?
             if ((IsTracking) && (Input.location.status == LocationServiceStatus.Running))
             {
-                // Get location
-                LocationInfo location = Input.location.lastData;
-
-                // Was there an update?
-                if (location.timestamp > lastTimestamp)
+                // Compass update?
+                if (Input.compass.timestamp > lastHeadingTime)
                 {
-                    // Update time stamp
-                    lastTimestamp = location.timestamp;
+                    // Update heading time stamp
+                    lastHeadingTime = Input.compass.timestamp;
 
-                    // Also get compass data
+                    // Calculate compass data
                     float northHeading = this.transform.rotation.eulerAngles.y - Input.compass.trueHeading; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
                     float northAccuracy = Input.compass.headingAccuracy;
 
-                    Debug.Log($"Local Rotation: {this.transform.rotation.eulerAngles.y}, Compass Heading: {Input.compass.trueHeading}, North: {northHeading}");
+                    Debug.Log($"Local Rotation: {this.transform.rotation.eulerAngles.y}\r\n" +
+                              $"True Heading: {Input.compass.trueHeading}\r\n" +
+                              $"Magnetic Heading: {Input.compass.magneticHeading}\r\n" +
+                              $", North: {northHeading}");
 
                     // Update the reference
-                    UpdateReference(location: location, northHeading: northHeading, northAccuracy: northAccuracy);
+                    UpdateHeading(northHeading: northHeading, northAccuracy: northAccuracy);
+                }
+
+                // Location update?
+                LocationInfo location = Input.location.lastData;
+
+                // Was there an update?
+                if (location.timestamp > lastLocationTime)
+                {
+                    // Update location time stamp
+                    lastLocationTime = location.timestamp;
+
+                    // Update the location
+                    UpdateLocation(location: location);
                 }
             }
 

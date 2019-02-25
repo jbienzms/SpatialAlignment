@@ -43,14 +43,24 @@ namespace Microsoft.SpatialAlignment.Geocentric
     {
         #region Public Properties
         /// <summary>
-        /// Gets the <see cref="ReferenceData"/> currently provided by the reference.
+        /// Gets the <see cref="Heading"/> currently provided by the reference.
         /// </summary>
         /// <remarks>
         /// <b>IMPORTANT:</b> If the reference source is a device, this
         /// property may return <see langword = "null" /> until the device has
         /// been initialized and starts tracking.
         /// </remarks>
-        GeoReferenceData ReferenceData { get; }
+        HeadingData Heading { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Location"/> currently provided by the reference.
+        /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT:</b> If the reference source is a device, this
+        /// property may return <see langword = "null" /> until the device has
+        /// been initialized and starts tracking.
+        /// </remarks>
+        LocationData Location { get; }
 
         /// <summary>
         /// Gets a value that indicates if the source is currently tracking
@@ -61,10 +71,16 @@ namespace Microsoft.SpatialAlignment.Geocentric
 
         #region Public Events
         /// <summary>
-        /// Raised whenever the value of the <see cref="ReferenceData"/> property
+        /// Raised whenever the value of the <see cref="Heading"/> property
         /// has changed.
         /// </summary>
-        event EventHandler ReferenceDataChanged;
+        event EventHandler HeadingChanged;
+
+        /// <summary>
+        /// Raised whenever the value of the <see cref="Location"/> property
+        /// has changed.
+        /// </summary>
+        event EventHandler LocationChanged;
         #endregion // Public Events
     }
 }

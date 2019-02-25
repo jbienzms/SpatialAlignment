@@ -38,7 +38,7 @@ namespace Microsoft.SpatialAlignment.Geocentric
         #region Unity Inspector Variables
         [DataMember]
         [SerializeField]
-        [Tooltip("The reference source used to calculate the rotation.")]
+        [Tooltip("The reference source used to calculate position and rotation.")]
         private GeoReference geoReference;
         #endregion // Unity Inspector Variables
 
@@ -49,7 +49,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
         private void SubscribeReference()
         {
             // Subscribe to reference events
-            geoReference.ReferenceDataChanged += GeoReference_ReferenceUpdated;
+            geoReference.HeadingChanged += GeoReference_HeadingChanged;
+            geoReference.LocationChanged += GeoReference_LocationChanged;
         }
 
         /// <summary>
@@ -58,7 +59,8 @@ namespace Microsoft.SpatialAlignment.Geocentric
         private void UnsubscribeReference()
         {
             // Subscribe to reference events
-            geoReference.ReferenceDataChanged -= GeoReference_ReferenceUpdated;
+            geoReference.HeadingChanged -= GeoReference_HeadingChanged;
+            geoReference.LocationChanged -= GeoReference_LocationChanged;
         }
 
         /// <summary>
@@ -68,39 +70,65 @@ namespace Microsoft.SpatialAlignment.Geocentric
         protected void UpdateTransform()
         {
             // Attempt to get data from the reference
-            GeoReferenceData geoData = geoReference?.ReferenceData;
+            HeadingData heading = geoReference?.Heading;
+            LocationData location = geoReference?.Location;
 
             // Call overload
-            UpdateTransform(geoData);
+            ApplyHeading(heading);
+            ApplyLocation(location);
         }
         #endregion // Internal Methods
 
         #region Overridables / Event Triggers
         /// <summary>
-        /// Updates the transform based on the current coordinates related to
-        /// the <see cref="GeoReference"/>
+        /// Updates the transform to match the current heading of the
+        /// the <see cref="GeoReference"/>.
         /// </summary>
-        /// <param name="geoData">
-        /// The <see cref="GeoReferenceData"/> used to calculate the transform.
+        /// <param name="heading">
+        /// The <see cref="HeadingData"/> used to calculate the transform.
         /// </param>
-        protected abstract void UpdateTransform(GeoReferenceData geoData);
+        protected abstract void ApplyHeading(HeadingData heading);
+
+        /// <summary>
+        /// Updates the transform to match the current location of the
+        /// the <see cref="GeoReference"/>.
+        /// </summary>
+        /// <param name="location">
+        /// The <see cref="LocationData"/> used to calculate the transform.
+        /// </param>
+        protected abstract void ApplyLocation(LocationData location);
         #endregion // Overridables / Event Triggers
 
         #region Overrides / Event Handlers
-        private void GeoReference_ReferenceUpdated(object sender, EventArgs e)
+        private void GeoReference_HeadingChanged(object sender, EventArgs e)
         {
             // Get the data
-            GeoReferenceData geoData = geoReference.ReferenceData;
+            HeadingData heading = geoReference.Heading;
 
-            // Update our stats
+            // Update our state to show we're tracking
             State = AlignmentState.Tracking;
-            float h = geoData.HorizontalAccuracy;
-            float v = geoData.VerticalAccuracy;
+
+            // Reference has updated. Time to update Transform, but must do it
+            // on the UI thread.
+            UnityDispatcher.InvokeOnAppThread(() => ApplyHeading(heading));
+        }
+
+        private void GeoReference_LocationChanged(object sender, EventArgs e)
+        {
+            // Get the data
+            LocationData location = geoReference.Location;
+
+            // Update our state to show we're tracking
+            State = AlignmentState.Tracking;
+
+            // Update our accuracy values
+            float h = location.HorizontalAccuracy;
+            float v = location.VerticalAccuracy;
             Accuracy = new Vector3(h, v, h);
 
             // Reference has updated. Time to update Transform, but must do it
             // on the UI thread.
-            UnityDispatcher.InvokeOnAppThread(() => UpdateTransform(geoData));
+            UnityDispatcher.InvokeOnAppThread(() => ApplyLocation(location));
         }
         #endregion // Overrides / Event Handlers
 

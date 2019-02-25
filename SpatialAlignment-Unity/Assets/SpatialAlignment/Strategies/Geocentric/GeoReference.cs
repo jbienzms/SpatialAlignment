@@ -38,8 +38,9 @@ namespace Microsoft.SpatialAlignment.Geocentric
     public abstract class GeoReference : MonoBehaviour, IGeoReference
     {
         #region Member Variables
+        private HeadingData heading;						// The last reported heading data
         private bool isTracking = false;                    // Whether tracking has been started
-        private GeoReferenceData referenceData;				// The last reported reference data
+        private LocationData location;						// The last reported location data
         #endregion // Member Variables
 
         #region Unity Inspector Variables
@@ -51,35 +52,62 @@ namespace Microsoft.SpatialAlignment.Geocentric
 
         #region Internal Methods
         /// <summary>
-        /// Updates the reference data based on the location info.
+        /// Updates the heading data to match the specified values.
         /// </summary>
-        /// <param name="location">
-        /// The location info used in the update.
+        /// <param name="northHeading">
+        /// The new north heading value.
         /// </param>
-        protected void UpdateReference(LocationInfo location, float northHeading, float northAccuracy)
+        /// <param name="northAccuracy">
+        /// The new north accuracy value.
+        /// </param>
+        protected void UpdateHeading(float northHeading, float northAccuracy)
         {
             // Create new reference data
-            GeoReferenceData data = new GeoReferenceData(
-                geoPosition: location,
-                localPosition: this.transform.position,
-                horizontalAccuracy: location.horizontalAccuracy,
-                verticalAccuracy: location.verticalAccuracy,
+            HeadingData data = new HeadingData(
                 northHeading: northHeading,
                 northAccuracy: northAccuracy);
 
             // Update (and notify)
-            ReferenceData = data;
+            Heading = data;
+        }
+
+        /// <summary>
+        /// Updates the location data to match the specified values.
+        /// </summary>
+        /// <param name="location">
+        /// The location info used in the update.
+        /// </param>
+        protected void UpdateLocation(LocationInfo location)
+        {
+            // Create new reference data
+            LocationData data = new LocationData(
+                geoPosition: location,
+                localPosition: this.transform.position,
+                horizontalAccuracy: location.horizontalAccuracy,
+                verticalAccuracy: location.verticalAccuracy);
+
+            // Update (and notify)
+            Location = data;
         }
         #endregion // Internal Methods
 
         #region Overridables / Event Triggers
         /// <summary>
-        /// Called whenever the value of the <see cref="ReferenceData"/> property
+        /// Called whenever the value of the <see cref="Heading"/> property
         /// has changed.
         /// </summary>
-        protected virtual void OnReferenceDataChanged()
+        protected virtual void OnHeadingChanged()
         {
-            ReferenceDataChanged?.Invoke(this, EventArgs.Empty);
+            HeadingChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Called whenever the value of the <see cref="Location"/> property
+        /// has changed.
+        /// </summary>
+        protected virtual void OnLocationChanged()
+        {
+            LocationChanged?.Invoke(this, EventArgs.Empty);
         }
         #endregion // Overridables / Event Triggers
 
@@ -123,22 +151,40 @@ namespace Microsoft.SpatialAlignment.Geocentric
         public bool AutoStartTracking { get => autoStartTracking; set => autoStartTracking = value; }
 
         /// <inheritdoc />
-        public bool IsTracking { get => isTracking; protected set => isTracking = value; }
-
-        /// <inheritdoc />
-        public GeoReferenceData ReferenceData
+        public HeadingData Heading
         {
             get
             {
-                return referenceData;
+                return heading;
             }
             protected set
             {
                 // Changing?
-                if (referenceData != value)
+                if (heading != value)
                 {
-                    referenceData = value;
-                    OnReferenceDataChanged();
+                    heading = value;
+                    OnHeadingChanged();
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public bool IsTracking { get => isTracking; protected set => isTracking = value; }
+
+        /// <inheritdoc />
+        public LocationData Location
+        {
+            get
+            {
+                return location;
+            }
+            protected set
+            {
+                // Changing?
+                if (location != value)
+                {
+                    location = value;
+                    OnLocationChanged();
                 }
             }
         }
@@ -146,7 +192,10 @@ namespace Microsoft.SpatialAlignment.Geocentric
 
         #region Public Events
         /// <inheritdoc />
-        public event EventHandler ReferenceDataChanged;
+        public event EventHandler HeadingChanged;
+
+        /// <inheritdoc />
+        public event EventHandler LocationChanged;
         #endregion // Public Events
 
     }
