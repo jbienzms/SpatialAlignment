@@ -542,9 +542,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoStartTracking: 1
-  desiredAccuracy: 10
+  desiredAccuracy: 0.1
   startTrackingTimeout: 20
-  updateDistance: 1.5
+  updateDistance: 0.1
 --- !u!1 &2037526709
 GameObject:
   m_ObjectHideFlags: 0

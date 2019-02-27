@@ -24,6 +24,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,12 +63,18 @@ namespace Microsoft.SpatialAlignment.Geocentric
     [DataContract]
     public class DeviceGeoReference : GeoReference
     {
+        #region Constants
+        private const int SMOOTH_SAMPLES = 5;                       // The number of samples to use for smoothing
+        #endregion // Constants
+
         #region Member Variables
-        private double lastHeadingTime;						// The time stamp of the last heading report
-        private double lastLocationTime;					// The time stamp of the last location report
-        private bool restartForDesiredAccuracy = true;      // Whether changes to DesiredAccuracy require a restart
-        private bool restartForUpdateDistance = true;       // Whether changes to UpdateDistance require a restart
-        private Task startTrackingTask;						// The Task that is used to start tracking
+        private int headingSample;									// The current heading sample
+        private float[] headingSamples = new float[SMOOTH_SAMPLES];	// Smoothed heading samples
+        private double lastHeadingTime;								// The time stamp of the last heading report
+        private double lastLocationTime;							// The time stamp of the last location report
+        private bool restartForDesiredAccuracy = true;				// Whether changes to DesiredAccuracy require a restart
+        private bool restartForUpdateDistance = true;				// Whether changes to UpdateDistance require a restart
+        private Task startTrackingTask;								// The Task that is used to start tracking
         #endregion // Member Variables
 
         #region Unity Inspector Variables
@@ -90,6 +97,35 @@ namespace Microsoft.SpatialAlignment.Geocentric
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
+        /// <summary>
+        /// Adds a heading sample to be included in smoothing.
+        /// </summary>
+        /// <param name="heading">
+        /// The heading sample to add.
+        /// </param>
+        private void AddHeading(float heading)
+        {
+            // Store
+            headingSamples[headingSample] = heading;
+
+            // Increment
+            headingSample++;
+
+            // Loop
+            if (headingSample == SMOOTH_SAMPLES) { headingSample = 0; }
+        }
+
+        /// <summary>
+        /// Gets the smoothed heading value.
+        /// </summary>
+        /// <returns>
+        /// The smoothed heading value
+        /// </returns>
+        private float GetHeading()
+        {
+            return headingSamples.Average();
+        }
+
         /// <summary>
         /// Actual implementation to start tracking.
         /// </summary>
@@ -202,17 +238,12 @@ namespace Microsoft.SpatialAlignment.Geocentric
             }
             //}
 
-            //var rot = Input.gyro.attitude.eulerAngles;
-            //Debug.Log($"Rot: {rot}");
-
-            //float deviceRotation = Input.gyro.attitude.eulerAngles.y;
-            //if (deviceRotation <= 270f)
-            //{
-            //    compassHeading += 180f;
-            //}
+            // Add the heading sample
+            AddHeading(-compassHeading);
 
             // Calculate compass data
-            float northHeading = (-compassHeading); //  + this.transform.rotation.eulerAngles.y; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
+            // float northHeading = (-compassHeading); //  + this.transform.rotation.eulerAngles.y; // TODO: Assumes this script is attached to the camera and assumes the camera rotates with the device.
+            float northHeading = GetHeading(); // Use sample smoothing
             float northAccuracy = Input.compass.headingAccuracy;
 
             //Debug.Log($"Local Rotation: {this.transform.rotation.eulerAngles.y}\r\n" +
