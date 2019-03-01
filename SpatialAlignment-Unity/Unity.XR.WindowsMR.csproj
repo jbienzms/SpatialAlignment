@@ -5,9 +5,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{07A21C90-D344-AE1A-8456-9910C203B41A}</ProjectGuid>
+    <ProjectGuid>{5E11E1B3-0410-B7BD-6D16-1A513F34657C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Unity.TextMeshPro</AssemblyName>
+    <AssemblyName>Unity.XR.WindowsMR</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
@@ -676,51 +676,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\FastAction.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\MaterialReferenceManager.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\PackageResourceImporterWindow.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TextContainer.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TextMeshPro.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TextMeshProUGUI.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_Asset.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_ColorGradient.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_Compatibility.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_CoroutineTween.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_DefaultControls.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_Dropdown.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_FontAsset.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_InputField.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_InputValidator.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_LineInfo.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_ListPool.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_MaterialManager.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_MeshInfo.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_ObjectPool.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_ScrollbarEventHandler.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_SelectionCaret.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_Settings.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_Sprite.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_SpriteAnimator.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_SpriteAsset.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_SpriteAssetImportFormats.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_Style.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_StyleSheet.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_SubMesh.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_SubMeshUI.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_Text.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_TextElement.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_TextInfo.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_TextUtilities.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_UpdateManager.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_UpdateRegistery.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMP_XmlTagStack.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMPro_EventManager.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMPro_ExtensionMethods.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMPro_FontUtilities.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMPro_MeshUtilities.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMPro_Private.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMPro_ShaderUtilities.cs" />
-    <Compile Include="Packages\com.unity.textmeshpro\Scripts\Runtime\TMPro_UGUI_Private.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\AudioSpatializer.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\HoloLensInput.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\HoloLensInputModule.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\HoloLensInputModule.deprecated.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\SpatialMappingBase.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\SpatialMappingCollider.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\SpatialMappingContext.cs" />
+    <Compile Include="Packages\com.unity.xr.windowsmr.metro\Runtime\SpatialMappingRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\GoogleARCore\Editor\ARCoreiOSDependencies.template" />

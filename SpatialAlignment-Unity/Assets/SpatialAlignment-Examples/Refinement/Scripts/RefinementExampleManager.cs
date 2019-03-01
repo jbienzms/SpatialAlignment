@@ -133,8 +133,8 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                 case AddAnchorStep.ModelRay:
 
-                    // Add a WorldAnchor to the anchor so it stays in place
-                    newAnchor.gameObject.AddComponent<WorldAnchor>();
+                    // Add a native alignment to the anchor so that it stays in place
+                    newAnchor.gameObject.AddComponent<NativeAnchorAlignment>();
 
                     // Done placing anchor
                     newAnchor.RefinementMode = RefinableModelMode.Placed;
@@ -209,7 +209,7 @@ namespace Microsoft.SpatialAlignment.Persistence
                     newFrame.Id = id;
 
                     // Add a WorldAnchorAlignment to SpatialFrame
-                    WorldAnchorAlignment worldAlignment = frameGO.AddComponent<WorldAnchorAlignment>();
+                    NativeAnchorAlignment worldAlignment = frameGO.AddComponent<NativeAnchorAlignment>();
 
                     // Give the anchor an ID
                     worldAlignment.AnchorId = id;

@@ -66,8 +66,9 @@ namespace Microsoft.SpatialAlignment
         #endregion // Internal Methods
 
         #region Unity Overrides
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             ApplyValues();
         }
 
