@@ -62,7 +62,7 @@ namespace Microsoft.SpatialAlignment
         [DataMember]
         [SerializeField]
         [Tooltip("Rotation to use when a child of this parent.")]
-        private Vector3 rotation = Vector3.zero;
+        private Quaternion rotation = Quaternion.identity;
 
         [DataMember]
         [SerializeField]
@@ -192,7 +192,7 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Gets or sets the rotation to use when a child of this parent.
         /// </summary>
-        public Vector3 Rotation { get { return rotation; } set { rotation = value; } }
+        public Quaternion Rotation { get { return rotation; } set { rotation = value; } }
 
         /// <summary>
         /// Gets or sets an optional scale offset from the parent.

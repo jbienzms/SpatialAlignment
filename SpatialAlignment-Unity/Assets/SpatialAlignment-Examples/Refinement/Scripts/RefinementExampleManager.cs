@@ -227,7 +227,7 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                         // Set offsets
                         Position = largeScaleFrame.transform.localPosition,
-                        Rotation = largeScaleFrame.transform.localRotation.eulerAngles,
+                        Rotation = largeScaleFrame.transform.localRotation,
                         Scale = largeScaleFrame.transform.localScale,
                     });
 
@@ -589,6 +589,21 @@ namespace Microsoft.SpatialAlignment.Persistence
                 // Remove the anchor option
                 RemoveAnchor(multiParent.ParentOptions[i]);
             }
+        }
+
+        public void SetMode(MultiParentMode mode)
+        {
+            multiParent.Mode = mode;
+        }
+
+        public void SetModeClosest()
+        {
+            SetMode(MultiParentMode.Closest);
+        }
+
+        public void SetModeDistanceWeighted()
+        {
+            SetMode(MultiParentMode.DistanceWeighted);
         }
 
         /// <summary>

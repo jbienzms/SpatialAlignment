@@ -412,6 +412,32 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
+        /// Returns <c>true</c> if <paramref name="vector"/> is approximately
+        /// the same as the <see cref="toVector"/>.
+        /// </summary>
+        /// <param name="vector">
+        /// The vector to compare.
+        /// </param>
+        /// <param name="decimalPlaces">
+        /// The number of decimal places to round to. The default is 0.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if <paramref name="vector"/> and <see cref="toVector"/>
+        /// are approximately the same.
+        /// </returns>
+        /// <remarks>
+        /// This method uses <see cref="Mathf.Approximately(float, float)"/> to
+        /// compare each component of the two vectors.
+        /// </remarks>
+        static public bool Approximately(this Vector3 vector, Vector3 toVector)
+        {
+            if (!Mathf.Approximately(vector.x, toVector.x)) { return false; }
+            if (!Mathf.Approximately(vector.y, toVector.y)) { return false; }
+            if (!Mathf.Approximately(vector.z, toVector.z)) { return false; }
+            return true;
+        }
+
+        /// <summary>
         /// Rounds a <see cref="Vector3"/>.
         /// </summary>
         /// <param name="vector">
@@ -451,6 +477,23 @@ namespace Microsoft.SpatialAlignment
         static public Vector3 Weighted(this Vector3 vector, float weight)
         {
             return new Vector3(vector.x * weight, vector.y * weight, vector.z * weight);
+        }
+
+        /// <summary>
+        /// Returns a weighted percentage of the specified vector.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> to calculate the weighted value for.
+        /// </param>
+        /// <param name="weight">
+        /// The weighted percentage to apply.
+        /// </param>
+        /// <returns>
+        /// The weighted <see cref="Vector3"/>.
+        /// </returns>
+        static public Quaternion Weighted(this Quaternion quat, float weight)
+        {
+            return Quaternion.Lerp(Quaternion.identity, quat, weight);
         }
         #endregion // Vector Extensions
     }

@@ -120,8 +120,8 @@ namespace Microsoft.SpatialAlignment
         [DataMember]
         [SerializeField]
         [Range(0.1f, 4.0f)]
-        [Tooltip("The power factor used for calculating weights in DistanceWeighted mode. The default is 2.0, which results in inverse-squared weighting.")]
-        float distancePower = 2f;
+        [Tooltip("The power factor used for calculating weights in DistanceWeighted mode. The default is 1.1.")]
+        float distancePower = 1.1f;
 
         [DataMember]
         [SerializeField]
@@ -152,7 +152,7 @@ namespace Microsoft.SpatialAlignment
 
                 // Apply transform modifications locally
                 this.transform.localPosition = parentOption.Position;
-                this.transform.localRotation = Quaternion.Euler(parentOption.Rotation);
+                this.transform.localRotation = parentOption.Rotation;
                 this.transform.localScale = parentOption.Scale;
             }
             else
@@ -170,7 +170,7 @@ namespace Microsoft.SpatialAlignment
 
                 // Placeholders
                 Vector3 weightedPos = Vector3.zero;
-                Vector3 weightedRotation = Vector3.zero;
+                Quaternion weightedRot = Quaternion.identity;
                 Vector3 weightedScale = Vector3.zero;
 
                 // Use inspector-configurable power factor for Inverse Distance Weighting
@@ -190,19 +190,29 @@ namespace Microsoft.SpatialAlignment
                 // Calculate individual weights
                 weightedParents.ForEach(o => o.Weight = (float)(o.InverseDistanceWeight / totalIDW));
 
-                // Calculate weighted offsets
+                // Calculate weighted offsets in WORLD coordinates
                 weightedParents.ForEach(o =>
                 {
-                    weightedPos += (o.Option.Frame.transform.position + o.Option.Position).Weighted(o.Weight);
-                    weightedRotation += (o.Option.Frame.transform.rotation.eulerAngles + o.Option.Rotation).Weighted(o.Weight);
+                    weightedPos += (o.Option.Frame.transform.TransformPoint(o.Option.Position)).Weighted(o.Weight);
+                    weightedRot *= (o.Option.Frame.transform.rotation * o.Option.Rotation).Weighted(o.Weight);
                     weightedScale += (Vector3.Scale(o.Option.Frame.transform.localScale, o.Option.Scale)).Weighted(o.Weight);
                 });
+
+                // Most of the time scale will be 1.0. However,truncating
+                // errors during weighted calculations averaging can end up
+                // with something other than 1.0. Let's take care of that.
+                if (weightedScale.Approximately(Vector3.one))
+                {
+                    weightedScale = Vector3.one;
+                }
 
                 // Set no parent
                 this.transform.parent = null;
 
-                // Apply offsets globally and animated
-                this.transform.AnimateTo(weightedPos, Quaternion.Euler(weightedRotation), weightedScale);
+                // Apply offsets globally
+                this.transform.position = weightedPos;
+                this.transform.rotation = weightedRot;
+                this.transform.localScale = weightedScale;
             }
 
             // Done!
