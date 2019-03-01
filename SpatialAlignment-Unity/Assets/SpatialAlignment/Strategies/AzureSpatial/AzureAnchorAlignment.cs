@@ -339,5 +339,12 @@ namespace Microsoft.SpatialAlignment.Azure
             #endif // !UNITY_EDITOR
         }
         #endregion // Public Methods
+
+        #region Public Properties
+        /// <summary>
+        /// Gets the underlying native anchor.
+        /// </summary>
+        public CloudSpatialAnchor CloudAnchor { get { return cloudAnchor; } }
+        #endregion // Public Properties}
     }
 }

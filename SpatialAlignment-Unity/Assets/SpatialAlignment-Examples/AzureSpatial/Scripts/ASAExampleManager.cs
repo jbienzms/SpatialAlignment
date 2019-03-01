@@ -26,6 +26,8 @@
 // #define UNITY_IOS
 // #define WINDOWS_UWP
 
+using Microsoft.Azure.SpatialAnchors;
+using Microsoft.SpatialAlignment.Azure;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -83,7 +85,7 @@ namespace Microsoft.SpatialAlignment
         private GameObject currentObject;                                   // The current object that may be being added or removed
         private bool isPlaced = false;                                      // When adding a new object, has the object been placed?
         private List<GameObject> localObjects = new List<GameObject>();     // List of locally created anchor objects
-        private int locateDataNeeded;                                       // The number of locate objects that were deleted
+        private int locateNotFound;                                       // The number of locate objects that were deleted
         private int locateDeleted;                                          // The number of locate objects that were deleted
         private int locateFound;                                            // The number of locate objects that were found
         private int locateOrphaned;                                         // The number of locate objects that were orphaned
@@ -192,7 +194,7 @@ namespace Microsoft.SpatialAlignment
             lock (localObjects)
             {
                 go = (from g in localObjects
-                      let cn = g.GetComponent<CloudNativeAnchor>()
+                      let cn = g.GetComponent<AzureAnchorAlignment>()
                       where cn?.CloudAnchor?.Identifier == anchor.Identifier
                       select g).FirstOrDefault();
             }
@@ -429,13 +431,6 @@ namespace Microsoft.SpatialAlignment
                 RecCreateReadyImage.enabled = SpatialManager.IsRecommendedForCreate;
             }
 
-            // Progress recommended locate
-            if (RecLocateProgressImage != null)
-            {
-                float locateProgress = Mathf.Min(status.RecommendedForLocateProgress, 1.0f); // Can go beyond 1.0
-                RecLocateProgressImage.rectTransform.localScale = new Vector3(locateProgress, 1, 1);
-            }
-
             // Ready recommended locate
             if (RecLocateReadyImage != null)
             {
@@ -573,12 +568,8 @@ namespace Microsoft.SpatialAlignment
                     locateDeleted++;
                     break;
 
-                case LocateAnchorStatus.NotLocatedAnchorOrphaned:
-                    locateOrphaned++;
-                    break;
-
-                case LocateAnchorStatus.NotLocatedNeedsMoreData:
-                    locateDataNeeded++;
+                case LocateAnchorStatus.NotLocated:
+                    locateNotFound++;
                     break;
             }
         }
@@ -606,7 +597,7 @@ namespace Microsoft.SpatialAlignment
         }
         private void SpatialManager_LocateAnchorsCompleted(object sender, LocateAnchorsCompletedEventArgs args)
         {
-            Logger.LogInfo($"Locate Complete. {locateFound} found, {locateDeleted} deleted, {locateOrphaned} orphaned, {locateDataNeeded} need more data.", ui: StatusText);
+            Logger.LogInfo($"Locate Complete. {locateFound} found, {locateDeleted} deleted, {locateOrphaned} orphaned, {locateNotFound} need more data.", ui: StatusText);
         }
 
         private void SpatialManager_SessionUpdated(object sender, SessionUpdatedEventArgs args)
@@ -677,7 +668,7 @@ namespace Microsoft.SpatialAlignment
                 Logger.LogInfo("Locating cloud anchors.", ui: StatusText);
 
                 // Reset counters
-                locateDataNeeded = 0;
+                locateNotFound = 0;
                 locateDeleted = 0;
                 locateFound = 0;
                 locateOrphaned = 0;
@@ -712,7 +703,7 @@ namespace Microsoft.SpatialAlignment
                 if (!ValidateSession()) { return; }
 
                 // Create an anchor for the object
-                CloudNativeAnchor cnAnchor = await SpatialManager.CreateAnchorAsync(currentObject);
+                AzureAnchorAlignment cnAnchor = await SpatialManager.CreateAnchorAsync(currentObject);
 
                 // Add the cloud anchor ID to the list of known anchors
                 anchorIds.Add(cnAnchor.CloudAnchor.Identifier);

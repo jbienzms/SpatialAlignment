@@ -814,6 +814,7 @@
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SplitViewManager.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\UnityDispatcher.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\AzureSpatial\Scripts\ASAExampleManager.cs" />
+    <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\Logger.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <None Include="Assets\GoogleARCore\Examples\Common\Materials\Shaders\PlaneGrid.shader" />

@@ -26,7 +26,7 @@
 // #define UNITY_IOS
 // #define WINDOWS_UWP
 
-using SpatialServices;
+using Microsoft.Azure.SpatialAnchors;
 using System;
 using System.Collections;
 using System.Collections.Generic;
