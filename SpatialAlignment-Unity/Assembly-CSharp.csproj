@@ -60,6 +60,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\AnchorExchanger.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\Android\AnchorHelpers.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\Android\UnityAndroidHelper.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\Android\UnityARCoreWorldAnchorComponent.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\AuthenticationHelper.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\AzureSpatialAnchorsBasicDemoScript.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\AzureSpatialAnchorsDemoWrapper.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\AzureSpatialAnchorsNearbyDemoScript.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\AzureSpatialAnchorsSharedAnchorDemoScript.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\AzureSpatialAnchorsUnityExtensions.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\DemoScriptBase.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\FollowUserGaze.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\InputInteractionBase.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\IOS\ARKitNativeHelpers.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\IOS\UnityARMatrix4x4Extensions.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\IOS\UnityARSessionNativeInterfaceExtensions.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\IOS\UnityARUserAnchorComponentExtensions.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\XRCameraPicker.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\XRUXPicker.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Examples\XRUXPickerForSharedAnchorDemo.cs" />
+    <Compile Include="Assets\AzureSpatialAnchorsPlugin\Plugins\Common\AzureSpatialAnchorsBridge.cs" />
     <Compile Include="Assets\GoogleARCore\Examples\AugmentedFaces\Scripts\ARCoreAugmentedFaceMeshFilter.cs" />
     <Compile Include="Assets\GoogleARCore\Examples\AugmentedFaces\Scripts\ARCoreAugmentedFaceRig.cs" />
     <Compile Include="Assets\GoogleARCore\Examples\AugmentedFaces\Scripts\AugmentedFacesExampleController.cs" />
@@ -772,6 +793,8 @@
     <Compile Include="Assets\SpatialAlignment\SpatialFrame.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrameCollection.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\AlignmentStrategy.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\AzureSpatial\AzureAnchorAlignment.cs" />
+    <Compile Include="Assets\SpatialAlignment\Strategies\AzureSpatial\AzureNativeAnchor.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\DeviceGeoReference.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoAlignmentBase.cs" />
@@ -790,6 +813,7 @@
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SpatialExtensions.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SplitViewManager.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\UnityDispatcher.cs" />
+    <Compile Include="Assets\SpatialAlignment-Examples\AzureSpatial\Scripts\ASAExampleManager.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <None Include="Assets\GoogleARCore\Examples\Common\Materials\Shaders\PlaneGrid.shader" />
@@ -811,6 +835,7 @@
     <None Include="Assets\HoloToolkit\UX\Fonts\LICENSE.txt" />
     <None Include="Assets\HoloToolkit\Common\Shaders\Obsolete\UnlitConfigurableTransparent.shader" />
     <None Include="Assets\HoloToolkit\Input\Shaders\Cursor.shader" />
+    <None Include="Assets\AzureSpatialAnchorsPlugin\Plugins\HoloLens\version.txt" />
     <None Include="Assets\HoloToolkit\Common\Shaders\Obsolete\LambertianConfigurable.cginc" />
     <None Include="Assets\HoloToolkit\Common\Shaders\Obsolete\VertexLitConfigurable.shader" />
     <None Include="Assets\GoogleARCore\Examples\Common\Materials\Shaders\PointCloud.shader" />

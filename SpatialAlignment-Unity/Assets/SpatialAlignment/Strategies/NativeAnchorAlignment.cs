@@ -109,31 +109,43 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// Subscribe to anchor events.
+        /// Subscribe to native anchor events.
         /// </summary>
-        private void SubscribeAnchor()
+        private void SubscribeNative()
+        {
+            #if UNITY_WSA
+            // Subscribe to anchor events
+            nativeAnchor.OnTrackingChanged += Anchor_OnTrackingChanged;
+            #endif
+
+            // Update state based on anchor state
+            UpdateStateFromNative();
+        }
+
+        /// <summary>
+        /// Unsubscribe from native anchor events.
+        /// </summary>
+        private void UnsubscribeNative()
+        {
+            #if UNITY_WSA
+            // Unsubscribe from events
+            nativeAnchor.OnTrackingChanged -= Anchor_OnTrackingChanged;
+            #endif
+        }
+
+        /// <summary>
+        /// Update the <see cref="SpatialAlignment"/> state to match the
+        /// native anchor state.
+        /// </summary>
+        protected void UpdateStateFromNative()
         {
             #if UNITY_EDITOR
             // The anchor store will never be available in the editor, so
             // when in the editor just pretend that the anchor is resolved
             State = AlignmentState.Resolved;
-            #elif UNITY_WSA
-            // Subscribe to anchor events
-            nativeAnchor.OnTrackingChanged += Anchor_OnTrackingChanged;
-
-            // Update state based on anchor state
-            State = (nativeAnchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
-            #endif
-        }
-
-        /// <summary>
-        /// Unsubscribe from anchor events.
-        /// </summary>
-        private void UnsubscribeAnchor()
-        {
-            #if UNITY_WSA
-            // Unsubscribe from events
-            nativeAnchor.OnTrackingChanged -= Anchor_OnTrackingChanged;
+            #elif WINDOWS_UWP
+            // Read from Mixed Reality World Anchor
+            State = (anchor.NativeAnchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
             #endif
         }
         #endregion // Internal Methods
@@ -141,12 +153,12 @@ namespace Microsoft.SpatialAlignment
         #region INativePersistence Members
         Task INativePersistence.LoadNativeAsync()
         {
-            return TryLoadNativeAsync();
+            return OnLoadAsync();
         }
 
         Task INativePersistence.SaveNativeAsync()
         {
-            return SaveNativeAsync();
+            return OnSaveAsync();
         }
         #endregion // INativePersistence Members
 
@@ -155,9 +167,37 @@ namespace Microsoft.SpatialAlignment
         private void Anchor_OnTrackingChanged(WorldAnchor worldAnchor, bool located)
         {
             // Update state based on anchor tracking state
-            State = (located ? AlignmentState.Tracking : AlignmentState.Unresolved);
+            UpdateStateFromNative();
         }
         #endif // UNITY_WSA
+
+        /// <summary>
+        /// Overridable implementation of <see cref="INativePersistence.LoadNativeAsync"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        /// <remarks>
+        /// The default implementation calls <see cref="TryLoadNativeAsync"/>.
+        /// </remarks>
+        protected virtual Task OnLoadAsync()
+        {
+            return TryLoadNativeAsync();
+        }
+
+        /// <summary>
+        /// Overridable implementation of <see cref="INativePersistence.SaveNativeAsync"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the operation.
+        /// </returns>
+        /// <remarks>
+        /// The default implementation calls <see cref="SaveNativeAsync"/>.
+        /// </remarks>
+        protected virtual Task OnSaveAsync()
+        {
+            return SaveNativeAsync();
+        }
         #endregion // Overrides / Event Handlers
 
         #region Unity Overrides
@@ -229,7 +269,7 @@ namespace Microsoft.SpatialAlignment
                 nativeAnchor = gameObject.AddComponent<NativeAnchor>();
 
                 // Subscribe to events
-                SubscribeAnchor();
+                SubscribeNative();
             }
         }
 
@@ -292,7 +332,7 @@ namespace Microsoft.SpatialAlignment
             else
             {
                 // Subscribe
-                SubscribeAnchor();
+                SubscribeNative();
 
                 // Loaded!
                 return true;
@@ -341,7 +381,7 @@ namespace Microsoft.SpatialAlignment
             if (nativeAnchor == null) { return; }
 
             // Unsubscribe from anchor events
-            UnsubscribeAnchor();
+            UnsubscribeNative();
 
             // Destroy the anchor (which also removes it from the game object)
             Destroy(nativeAnchor);
