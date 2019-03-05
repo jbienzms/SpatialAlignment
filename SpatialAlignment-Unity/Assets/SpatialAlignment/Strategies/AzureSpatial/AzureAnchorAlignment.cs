@@ -194,10 +194,13 @@ namespace Microsoft.SpatialAlignment.Azure
             if (args.Identifier == AnchorId)
             {
                 // Was the anchor just located?
+                // TODO: Do we also need to track LocateAnchorStatus.AlreadyTracked?
                 if (args.Status == LocateAnchorStatus.Located)
                 {
-                    // Sync cloud to native
-                    CloudToNative(args.Anchor);
+                    // Sync cloud anchor data to native anchor data but do it
+                    // using the Unity main thread since behaviors may need to
+                    // be created or updated.
+                    UnityDispatcher.InvokeOnAppThread(()=> CloudToNative(args.Anchor));
                 }
             }
         }
@@ -337,6 +340,34 @@ namespace Microsoft.SpatialAlignment.Azure
             anchor.CloudToNative(savedAnchor);
 
             #endif // !UNITY_EDITOR
+        }
+
+        /// <summary>
+        /// Sets an existing anchor as the cloud anchor for this alignment.
+        /// </summary>
+        /// <param name="anchor">
+        /// The existing <see cref="CloudSpatialAnchor"/> to set.
+        /// </param>
+        /// <remarks>
+        /// NOTE: This capability exists as a standalone method rather than a
+        /// setter on the <see cref="CloudAnchor"/> property because calling it
+        /// results in significant and observable side effects. The side
+        /// effects may include the removal of and recreation of the underlying
+        /// native anchor. For more information see
+        /// <see href="https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-4.0/ms229054(v=vs.100)">
+        /// Choosing Between Properties and Methods</see>.
+        /// </remarks>
+        public void SetCloudAnchor(CloudSpatialAnchor anchor)
+        {
+            // Validate
+            if (anchor == null) throw new ArgumentNullException(nameof(anchor));
+
+            // Store
+            this.AnchorId = anchor.Identifier;
+            this.cloudAnchor = anchor;
+
+            // Apply
+            CloudToNative(anchor);
         }
         #endregion // Public Methods
 

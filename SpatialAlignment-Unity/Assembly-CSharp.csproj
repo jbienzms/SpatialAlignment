@@ -794,7 +794,6 @@
     <Compile Include="Assets\SpatialAlignment\SpatialFrameCollection.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\AlignmentStrategy.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\AzureSpatial\AzureAnchorAlignment.cs" />
-    <Compile Include="Assets\SpatialAlignment\Strategies\AzureSpatial\AzureNativeAnchor.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\DeviceGeoReference.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoAlignment.cs" />
     <Compile Include="Assets\SpatialAlignment\Strategies\Geocentric\GeoAlignmentBase.cs" />

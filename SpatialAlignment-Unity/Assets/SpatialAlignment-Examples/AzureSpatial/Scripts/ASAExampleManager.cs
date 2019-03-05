@@ -26,7 +26,9 @@
 // #define UNITY_IOS
 // #define WINDOWS_UWP
 
+using HoloToolkit.Unity;
 using Microsoft.Azure.SpatialAnchors;
+using Microsoft.Azure.SpatialAnchors.Unity.Samples;
 using Microsoft.SpatialAlignment.Azure;
 using System;
 using System.Collections;
@@ -90,41 +92,30 @@ namespace Microsoft.SpatialAlignment
         private int locateFound;                                            // The number of locate objects that were found
         private int locateOrphaned;                                         // The number of locate objects that were orphaned
         private int spatialMeshLayer;                                       // The layer where spatial meshes appear (usually named "SpatialMesh")
+        private CloudSpatialAnchorWatcher watcher;							// The watcher watching all the current anchors
         #endregion // Member Variables
 
         #region Unity Inspector Variables
-        [Tooltip("Shows the progress toward minimum data needed for creating anchors.")]
-        public Image MinCreateProgressImage;
+        [Tooltip("The GameObject container where new anchors will be stored. If one is not specified, this GameObject will be used as the parent.")]
+        public Transform AnchorContainer;
 
-        [Tooltip("Shows if minimum data is available for anchors to be created.")]
-        public Image MinCreateReadyImage;
-
-        [Tooltip("Shows the progress toward minimum data needed for locating anchors.")]
-        public Image MinLocateProgressImage;
-
-        [Tooltip("Shows if minimum data is available for anchors to be located.")]
-        public Image MinLocateReadyImage;
-
-        [Tooltip("The transform where new objects will be parented. If one is not specified, this GameObject will be used as the parent.")]
-        public Transform ObjectContainer;
+        [Tooltip("The Azure Spatial Anchor manager that will be used to create and track anchors.")]
+        public AzureSpatialAnchorsDemoWrapper AnchorManager;
 
         [Tooltip("The prefab to use when creating new objects to represent anchors. If one is not specified, a cube will be used.")]
-        public GameObject ObjectPrefab;
+        public GameObject AnchorPrefab;
 
-        [Tooltip("Shows the progress toward recommended data for creating anchors.")]
-        public Image RecCreateProgressImage;
+        [Tooltip("Shows if the anchor manager is ready for anchors to be created.")]
+        public Image CreateReady;
 
-        [Tooltip("Shows if recommended data is available for anchors to be created.")]
-        public Image RecCreateReadyImage;
+        [Tooltip("Shows the progress toward minimum data for creating anchors.")]
+        public Image CreateReadyProgress;
 
-        [Tooltip("Shows the progress toward recommended data for locating anchors.")]
-        public Image RecLocateProgressImage;
+        [Tooltip("Shows the progress toward minimum data for creating anchors.")]
+        public Image CreateRecommendedProgress;
 
-        [Tooltip("Shows if recommended data is available for anchors to be located.")]
-        public Image RecLocateReadyImage;
-
-        [Tooltip("The spatial services manager that will be used to create and track anchors.")]
-        public SpatialServiceManager SpatialManager;
+        [Tooltip("Shows if the anchor manager is ready for anchors to be queried.")]
+        public Image QueryReady;
 
         [Tooltip("An optional Text control that can be used to display status messages.")]
         public Text StatusText;
@@ -158,10 +149,10 @@ namespace Microsoft.SpatialAlignment
             GameObject go;
 
             // Use prefab or default object?
-            if (ObjectPrefab != null)
+            if (AnchorPrefab != null)
             {
                 // Instantiate the prefab
-                go = Instantiate(ObjectPrefab);
+                go = Instantiate(AnchorPrefab);
             }
             else
             {
@@ -171,7 +162,7 @@ namespace Microsoft.SpatialAlignment
             }
 
             // Parent it to the object container
-            go.transform.SetParent(ObjectContainer, worldPositionStays: true);
+            go.transform.SetParent(AnchorContainer, worldPositionStays: true);
 
             // Done
             return go;
@@ -199,7 +190,10 @@ namespace Microsoft.SpatialAlignment
                       select g).FirstOrDefault();
             }
 
-            // If an existing object wasn't found, create a new one
+            // If an object was found it's already been updated through it's
+            // own event handler.
+
+            // If an existing object wasn't found, we need to create a new one
             if (go == null)
             {
                 // Create a new object
@@ -210,10 +204,14 @@ namespace Microsoft.SpatialAlignment
                 {
                     localObjects.Add(go);
                 }
-            }
 
-            // Apply the cloud anchor to the object
-            SpatialManager.ApplyAnchor(anchor, go);
+                // Add the Azure Anchor alignment
+                AzureAnchorAlignment azureAlignment = go.AddComponent<AzureAnchorAlignment>();
+
+                // Apply the existing cloud anchor to the object.
+                // It will then start tracking its own events.
+                azureAlignment.SetCloudAnchor(anchor);
+            }
         }
 
         /// <summary>
@@ -388,53 +386,34 @@ namespace Microsoft.SpatialAlignment
         /// </remarks>
         private void UpdateUI(SessionStatus status)
         {
-            /* Minimum */
+            /* Indicators */
 
-            // Progress minimum create
-            if (MinCreateProgressImage != null)
+            // Ready to create
+            if (CreateReady != null)
+            {
+                CreateReady.enabled = AnchorManager.EnoughDataToCreate;
+            }
+
+            // Ready to query
+            if (QueryReady != null)
+            {
+                QueryReady.enabled = AnchorManager.EnoughDataToQuery;
+            }
+
+            /* Progress */
+
+            // Progress toward ready to create
+            if (CreateReadyProgress != null)
             {
                 float createProgress = Mathf.Min(status.ReadyForCreateProgress, 1.0f); // Can go beyond 1.0
-                MinCreateProgressImage.rectTransform.localScale = new Vector3(createProgress, 1, 1);
+                CreateReadyProgress.rectTransform.localScale = new Vector3(createProgress, 1, 1);
             }
 
-            // Ready minimum create
-            if (MinCreateReadyImage != null)
-            {
-                MinCreateReadyImage.enabled = SpatialManager.IsReadyForCreate;
-            }
-
-            // Progress minimum locate
-            if (MinLocateProgressImage != null)
-            {
-                float locateProgress = Mathf.Min(status.ReadyForLocateProgress, 1.0f); // Can go beyond 1.0
-                MinLocateProgressImage.rectTransform.localScale = new Vector3(locateProgress, 1, 1);
-            }
-
-            /* Recommended */
-
-            // Ready recommended locate
-            if (RecLocateReadyImage != null)
-            {
-                RecLocateReadyImage.enabled = SpatialManager.IsReadyForLocate;
-            }
-
-            // Progress recommended create
-            if (RecCreateProgressImage != null)
+            // Progress toward recommended to create
+            if (CreateRecommendedProgress != null)
             {
                 float createProgress = Mathf.Min(status.RecommendedForCreateProgress, 1.0f); // Can go beyond 1.0
-                RecCreateProgressImage.rectTransform.localScale = new Vector3(createProgress, 1, 1);
-            }
-
-            // Ready recommended create
-            if (RecCreateReadyImage != null)
-            {
-                RecCreateReadyImage.enabled = SpatialManager.IsRecommendedForCreate;
-            }
-
-            // Ready recommended locate
-            if (RecLocateReadyImage != null)
-            {
-                RecLocateReadyImage.enabled = SpatialManager.IsRecommendedForLocate;
+                CreateRecommendedProgress.rectTransform.localScale = new Vector3(createProgress, 1, 1);
             }
         }
 
@@ -452,9 +431,9 @@ namespace Microsoft.SpatialAlignment
             string errMsg = "";
             bool valid = true;
 
-            if (SpatialManager == null)
+            if (AnchorManager == null)
             {
-                errMsg += $"{nameof(SpatialManager)} cannot be null. ";
+                errMsg += $"{nameof(AnchorManager)} cannot be null. ";
                 valid = false;
             }
 
@@ -480,9 +459,9 @@ namespace Microsoft.SpatialAlignment
         /// </returns>
         private bool ValidateSession()
         {
-            if (SpatialManager.SessionState != SpatialSessionState.Started)
+            if (!AnchorManager.SessionValid())
             {
-                Logger.LogWarn("The session must be started first.", ui: StatusText);
+                Logger.LogWarn("A valid session must be started first.", ui: StatusText);
                 return false;
             }
             return true;
@@ -515,16 +494,15 @@ namespace Microsoft.SpatialAlignment
         {
             // If no parent container is specified for objects to be created in,
             // use the same game object we're attached to.
-            if (ObjectContainer == null)
+            if (AnchorContainer == null)
             {
-                ObjectContainer = this.transform;
+                AnchorContainer = this.transform;
             }
 
             // Subscribe to spatial manager events
-            SpatialManager.AnchorLocated += SpatialManager_AnchorLocated;
-            SpatialManager.LocateAnchorsCompleted += SpatialManager_LocateAnchorsCompleted;
-            SpatialManager.SessionStateChanged += SpatialManager_SessionStateChanged;
-            SpatialManager.SessionUpdated += SpatialManager_SessionUpdated;
+            AnchorManager.OnAnchorLocated += AnchorManager_AnchorLocated;
+            AnchorManager.OnLocateAnchorsCompleted += AnchorManager_LocateAnchorsCompleted;
+            AnchorManager.OnSessionUpdated += AnchorManager_SessionUpdated;
 
             #if WINDOWS_UWP
             // Get the spatial mesh layer
@@ -551,13 +529,15 @@ namespace Microsoft.SpatialAlignment
         #endregion // Unity Overrides
 
         #region Overrides / Event Handlers
-        private void SpatialManager_AnchorLocated(object sender, AnchorLocatedEventArgs args)
+        private void AnchorManager_AnchorLocated(object sender, AnchorLocatedEventArgs args)
         {
             switch (args.Status)
             {
                 case LocateAnchorStatus.Located:
                 case LocateAnchorStatus.AlreadyTracked:
+                    // Increment the counter.
                     locateFound++;
+
                     // A cloud anchor has been located. We need to create or update
                     // a local game object to match this cloud anchor. However, we
                     // must do this on Unity's main thread.
@@ -584,23 +564,24 @@ namespace Microsoft.SpatialAlignment
         /// </remarks>
         private void SpatialManager_SessionStateChanged(object sender, EventArgs e)
         {
+            // TODO: Nothing is calling this. We need a way of starting and stopping the session.
+
             // Update our demo mode to match the state of the session
-            switch (SpatialManager.SessionState)
+            if (AnchorManager.SessionValid())
             {
-                case SpatialSessionState.Started:
-                    SetMode(ControllerMode.ActionReady);
-                    break;
-                default:
-                    SetMode(ControllerMode.SessionStopped);
-                    break;
+                SetMode(ControllerMode.ActionReady);
+            }
+            else
+            {
+                SetMode(ControllerMode.SessionStopped);
             }
         }
-        private void SpatialManager_LocateAnchorsCompleted(object sender, LocateAnchorsCompletedEventArgs args)
+        private void AnchorManager_LocateAnchorsCompleted(object sender, LocateAnchorsCompletedEventArgs args)
         {
             Logger.LogInfo($"Locate Complete. {locateFound} found, {locateDeleted} deleted, {locateOrphaned} orphaned, {locateNotFound} need more data.", ui: StatusText);
         }
 
-        private void SpatialManager_SessionUpdated(object sender, SessionUpdatedEventArgs args)
+        private void AnchorManager_SessionUpdated(object sender, SessionUpdatedEventArgs args)
         {
             // Update the UI, but we must do it on Unity's main thread
             UnityDispatcher.InvokeOnAppThread(() => UpdateUI(args.Status));
@@ -631,7 +612,7 @@ namespace Microsoft.SpatialAlignment
             currentObject = CreateNewObject();
 
             // Parent it
-            currentObject.transform.SetParent(ObjectContainer, worldPositionStays: true);
+            currentObject.transform.SetParent(AnchorContainer, worldPositionStays: true);
 
             // Reset the "placed" flag since this object hasn't been placed yet
             isPlaced = false;
@@ -659,7 +640,7 @@ namespace Microsoft.SpatialAlignment
             {
                 Logger.LogInfo("No cloud anchors to locate. Create some first.", ui: StatusText);
             }
-            else if (SpatialManager.SessionState != SpatialSessionState.Started)
+            else if (!AnchorManager.SessionValid())
             {
                 Logger.LogWarn("The session must be started first.", ui: StatusText);
             }
@@ -667,24 +648,24 @@ namespace Microsoft.SpatialAlignment
             {
                 Logger.LogInfo("Locating cloud anchors.", ui: StatusText);
 
+                // If there is an active watcher, stop it
+                if (watcher != null)
+                {
+                    watcher.Stop();
+                    watcher = null;
+                }
+
                 // Reset counters
                 locateNotFound = 0;
                 locateDeleted = 0;
                 locateFound = 0;
                 locateOrphaned = 0;
 
-                // Create the search criteria
-                AnchorLocateCriteria locateCriteria = new AnchorLocateCriteria();
-                locateCriteria.Identifiers = anchorIds.ToArray(); // QUESTION: Why is this an array?
+                // Set the search criteria
+                AnchorManager.SetAnchorIdsToLocate(anchorIds);
 
-                // Remove any existing criteria
-                SpatialManager.Session.LocateCriteria.Clear();
-
-                // Add new criteria
-                SpatialManager.Session.LocateCriteria.Add(locateCriteria);
-
-                // Start locating
-                SpatialManager.Session.BeginLocateAnchors(); // QUESTION: What if it's already locating? How do we stop and start over?
+                // Create a new watcher
+                watcher = AnchorManager.CreateWatcher();
             }
         }
 
@@ -702,11 +683,14 @@ namespace Microsoft.SpatialAlignment
                 // Make sure there's an active session
                 if (!ValidateSession()) { return; }
 
-                // Create an anchor for the object
-                AzureAnchorAlignment cnAnchor = await SpatialManager.CreateAnchorAsync(currentObject);
+                // Attach an azure anchor to the object
+                AzureAnchorAlignment azureAlignment = currentObject.AddComponent<AzureAnchorAlignment>();
+
+                // Save the azure anchor (and generate a cloud ID)
+                await azureAlignment.SaveCloudAsync();
 
                 // Add the cloud anchor ID to the list of known anchors
-                anchorIds.Add(cnAnchor.CloudAnchor.Identifier);
+                anchorIds.Add(azureAlignment.CloudAnchor.Identifier);
 
                 // Add the object to the list of created objects
                 localObjects.Add(currentObject);
