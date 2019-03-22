@@ -114,8 +114,8 @@ namespace Microsoft.SpatialAlignment
         [Tooltip("Shows the progress toward minimum data for creating anchors.")]
         public Image CreateRecommendedProgress;
 
-        [Tooltip("Shows if the anchor manager is ready for anchors to be queried.")]
-        public Image QueryReady;
+        //[Tooltip("Shows if the anchor manager is ready for anchors to be queried.")]
+        //public Image QueryReady;
 
         [Tooltip("An optional Text control that can be used to display status messages.")]
         public Text StatusText;
@@ -394,11 +394,11 @@ namespace Microsoft.SpatialAlignment
                 CreateReady.enabled = AnchorManager.EnoughDataToCreate;
             }
 
-            // Ready to query
-            if (QueryReady != null)
-            {
-                QueryReady.enabled = AnchorManager.EnoughDataToQuery;
-            }
+            //// Ready to query
+            //if (QueryReady != null)
+            //{
+            //    QueryReady.enabled = AnchorManager.EnoughDataToQuery;
+            //}
 
             /* Progress */
 
@@ -414,6 +414,26 @@ namespace Microsoft.SpatialAlignment
             {
                 float createProgress = Mathf.Min(status.RecommendedForCreateProgress, 1.0f); // Can go beyond 1.0
                 CreateRecommendedProgress.rectTransform.localScale = new Vector3(createProgress, 1, 1);
+            }
+
+            /* User Hints */
+            switch (status.UserFeedback)
+            {
+                case SessionUserFeedback.None:
+                    // Nothing to show
+                    break;
+                case SessionUserFeedback.NotEnoughMotion:
+                    Logger.LogInfo("Move around slowly to capture more detail.", ui: StatusText);
+                    break;
+                case SessionUserFeedback.MotionTooQuick:
+                    Logger.LogInfo("Moving too quickly.", ui: StatusText);
+                    break;
+                case SessionUserFeedback.NotEnoughFeatures:
+                    Logger.LogInfo("Environment has insufficient detail.", ui: StatusText);
+                    break;
+                default:
+                    Debug.LogWarning($"Unknown User Feedback: {status.UserFeedback}");
+                    break;
             }
         }
 
@@ -670,6 +690,21 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
+        /// Starts an Azure Spatial Anchor Session and updates the UI accordingly.
+        /// </summary>
+        public void BeginSession()
+        {
+            // If already in a session waiting for an action, ignore
+            if (currentMode != ControllerMode.SessionStopped) { return; }
+
+            // Start the session through the demo wrapper
+            AnchorManager.EnableProcessing = true;
+
+            // Ready for an action
+            SetMode(ControllerMode.ActionReady);
+        }
+
+        /// <summary>
         /// Ends the process of adding a new anchor to the scene.
         /// </summary>
         public async void EndAnchorAdd()
@@ -736,6 +771,21 @@ namespace Microsoft.SpatialAlignment
 
             // No longer in locating mode
             SetMode(ControllerMode.ActionReady);
+        }
+
+        /// <summary>
+        /// Ends an Azure Spatial Anchor Session and updates the UI accordingly.
+        /// </summary>
+        public void EndSession()
+        {
+            // If not in a session waiting for an action, ignore
+            if (currentMode != ControllerMode.ActionReady) { return; }
+
+            // End the session through the demo wrapper
+            AnchorManager.EnableProcessing = false;
+
+            // No longer in a session
+            SetMode(ControllerMode.SessionStopped);
         }
 
         /// <summary>
