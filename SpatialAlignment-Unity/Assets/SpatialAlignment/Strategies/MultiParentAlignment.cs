@@ -221,9 +221,6 @@ namespace Microsoft.SpatialAlignment
         /// <inheritdoc />
         protected override void OnDisable()
         {
-            // If we have an interpolator running, finish immediately
-            this.transform.EndAnimation();
-
             // Pass on to base
             base.OnDisable();
         }

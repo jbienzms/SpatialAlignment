@@ -83,6 +83,7 @@ namespace Microsoft.SpatialAlignment
 
         #region Member Variables
         private RayRefinementStep currentStep;      // What step we're on in the refinement
+        private GameObject currentTarget;           // Current target to be moved
         private Vector3 lastTargetPosition;			// The last position where a target was placed
         private GameObject modelDirection;          // GameObject instance representing the models direction
         private LineRenderer modelLine;             // Used to render a line pointing from the model origin in the model direction
@@ -90,7 +91,6 @@ namespace Microsoft.SpatialAlignment
         private GameObject placementDirection;      // GameObject instance representing the placement direction
         private LineRenderer placementLine;         // Used to render a line pointing from the placement origin in the placement direction
         private GameObject placementOrigin;         // GameObject instance representing the placement origin
-        private Interpolator targetInterpolator;    // Interpolator used to move the current target
         private bool targetPlaced;                  // Whether or not the current target has been placed
         #endregion // Member Variables
 
@@ -191,8 +191,8 @@ namespace Microsoft.SpatialAlignment
             // Name it
             target.name = name;
 
-            // Ensure it has an interpolator and store the reference
-            targetInterpolator = target.EnsureComponent<Interpolator>();
+            // Store the reference
+            currentTarget = target;
 
             // Target has not been placed
             targetPlaced = false;
@@ -333,7 +333,7 @@ namespace Microsoft.SpatialAlignment
             lastTargetPosition = Vector3.zero;
             modelLine = null;
             placementLine = null;
-            targetInterpolator = null;
+            currentTarget = null;
         }
         #endregion // Internal Methods
 
@@ -486,7 +486,7 @@ namespace Microsoft.SpatialAlignment
                 lastTargetPosition = hitInfo.point;
 
                 // Tell the target to move to the new position
-                targetInterpolator.SetTargetPosition(lastTargetPosition);
+                currentTarget.transform.position = lastTargetPosition;
 
                 // Target has been placed
                 targetPlaced = true;
@@ -506,7 +506,7 @@ namespace Microsoft.SpatialAlignment
                 Vector3 relativePos = direction.position - origin.position;
 
                 // Rotate the target direction to point away from the origin
-                targetInterpolator.SetTargetRotation(Quaternion.FromToRotation(TargetTransform.up, relativePos));
+                currentTarget.transform.rotation = Quaternion.FromToRotation(TargetTransform.up, relativePos);
 
                 // Get the line renderer
                 LineRenderer line = (isModel ? modelLine : placementLine);
