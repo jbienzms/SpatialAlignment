@@ -24,11 +24,11 @@ Data/
 SharingClient.dll
 PlaneFinding.dll
 
-# HoloToolkit which is symlinked in
-HoloToolkit/
-HoloToolkit-Examples/
-HoloToolkit-Preview/
-HoloToolkit-UnitTests/
+# Mixed Reality Toolkit which is symlinked in
+MixedRealityToolkit*/
+Microsoft.MixedReality.Toolkit*.*
+MixedRealityToolkit*.*
+
 
 # Google AR Core which should be imported separately
 GoogleARCore/
