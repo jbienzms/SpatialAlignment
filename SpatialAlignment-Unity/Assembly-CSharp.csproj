@@ -72,7 +72,6 @@
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\NudgeController.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\NudgeRefinement.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RayRefinement.cs" />
-    <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinableModel.cs" />
     <Compile Include="Assets\SpatialAlignment\Refinement\Scripts\RefinementBase.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialAlignmentManager.cs" />
     <Compile Include="Assets\SpatialAlignment\SpatialFrame.cs" />

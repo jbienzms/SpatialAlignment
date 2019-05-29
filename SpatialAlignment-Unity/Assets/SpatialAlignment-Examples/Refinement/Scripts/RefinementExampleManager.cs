@@ -23,7 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
+using Microsoft.MixedReality.Toolkit;
 using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
 using System;
@@ -81,6 +81,10 @@ namespace Microsoft.SpatialAlignment.Persistence
         [SerializeField]
         [Tooltip("The large-scale model.")]
         private GameObject largeScaleModel;
+
+        [SerializeField]
+        [Tooltip("Used to enable split view for video recording.")]
+        private SplitViewManager splitViewManager;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -627,13 +631,15 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// </summary>
         public void SplitView()
         {
-            if (SplitViewManager.Instance.Mode == SplitViewMode.Unoccluded)
+            if (splitViewManager == null) { return; }
+
+            if (splitViewManager.Mode == SplitViewMode.Unoccluded)
             {
-                SplitViewManager.Instance.Mode = SplitViewMode.OccludedRight;
+                splitViewManager.Mode = SplitViewMode.OccludedRight;
             }
             else
             {
-                SplitViewManager.Instance.Mode = SplitViewMode.Unoccluded;
+                splitViewManager.Mode = SplitViewMode.Unoccluded;
             }
         }
         #endregion // Public Methods
@@ -653,6 +659,11 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// Gets or sets the large-scale model.
         /// </summary>
         public GameObject LargeScaleModel { get { return largeScaleModel; } set { largeScaleModel = value; } }
+
+        /// <summary>
+        /// Gets or sets the split view manager.
+        /// </summary>
+        public SplitViewManager SplitViewManager { get { return splitViewManager; } set { splitViewManager = value; } }
         #endregion // Public Properties
     }
 }

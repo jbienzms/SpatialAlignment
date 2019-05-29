@@ -23,9 +23,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
-using HoloToolkit.Unity.InputModule;
-using HoloToolkit.Unity.Receivers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,109 +35,64 @@ namespace Microsoft.SpatialAlignment
     /// <summary>
     /// Handles user interaction and routes it to a <see cref="NudgeRefinement"/>.
     /// </summary>
-    public class NudgeController : InteractionReceiver
+    public class NudgeController : MonoBehaviour
     {
         #region Unity Inspector Variables
         [SerializeField]
         [Tooltip("The nudge refinement instance to control.")]
         private NudgeRefinement refinement;
-
-        [SerializeField]
-        [Tooltip("Whether the look direction of the controller should be used as the forward direction for nudge operations.")]
-        private bool useLookDirection = true;
         #endregion // Unity Inspector Variables
 
-        protected virtual RefinementDirection GetLookDirection()
+
+        public void Finish()
         {
-            // Which "forward" are we using
-            Vector3 forward;
-            if (refinement.Space == Space.World)
-            {
-                // Just use controller forward
-                forward = transform.forward;
-            }
-            else
-            {
-                // Use controller forward but in target local space
-                forward = refinement.TargetTransform.InverseTransformDirection(transform.forward);
-            }
-
-            // Get the absolute axis for the forward direction (snaps to axis only)
-            forward = forward.AbsoluteAxis();
-
-            // Normalize it toward 1.0
-            forward = forward.normalized;
-
-            // Try to convert the vector to a direction
-            RefinementDirection direction;
-            if (forward.TryGetDirection(out direction))
-            {
-                return direction;
-            }
-            else
-            {
-                return RefinementDirection.Forward;
-            }
+            refinement.FinishRefinement();
+        }
+        public void Cancel()
+        {
+            refinement.CancelRefinement();
+        }
+        public void Up()
+        {
+            refinement.Nudge(RefinementDirection.Up);
+        }
+        public void Down()
+        {
+            refinement.Nudge(RefinementDirection.Down);
+        }
+        public void Left()
+        {
+            refinement.Nudge(RefinementDirection.Left);
+        }
+        public void Right()
+        {
+            refinement.Nudge(RefinementDirection.Right);
+        }
+        public void Forward()
+        {
+            refinement.Nudge(RefinementDirection.Forward);
         }
 
-        #region Overrides / Event Handlers
-        protected override void InputUp(GameObject obj, InputEventData eventData)
+        public void Back()
         {
-            if (refinement == null)
-            {
-                Debug.LogWarning($"{nameof(NudgeController)} does not have a valid {nameof(Refinement)} instance.");
-                return;
-            }
-
-            // Update forward direction to match look direction?
-            if (useLookDirection)
-            {
-                refinement.ForwardDirection = GetLookDirection();
-            }
-
-            // Execute action and direction based on name
-            switch (obj.name)
-            {
-                case "Finish":
-                    refinement.FinishRefinement();
-                    break;
-                case "Cancel":
-                    refinement.CancelRefinement();
-                    break;
-                case "Up":
-                case "Down":
-                case "Left":
-                case "Right":
-                case "Forward":
-                case "Back":
-                    RefinementDirection direction;
-                    Enum.TryParse<RefinementDirection>(obj.name, out direction);
-                    refinement.Nudge(direction);
-                    break;
-                case "RotateLeft":
-                    refinement.Nudge(NudgeRotation.Left);
-                    break;
-                case "RotateRight":
-                    refinement.Nudge(NudgeRotation.Right);
-                    break;
-            }
+            refinement.Nudge(RefinementDirection.Back);
         }
-        #endregion // Overrides / Event Handlers
+
+        public void RotateLeft()
+        {
+            refinement.Nudge(NudgeRotation.Left);
+        }
+
+        public void RotateRight()
+        {
+            refinement.Nudge(NudgeRotation.Right);
+        }
 
         #region Public Properties
         /// <summary>
         /// Gets or sets the nudge refinement instance to control.
         /// </summary>
         public NudgeRefinement Refinement { get { return refinement; } set { refinement = value; } }
-
-        /// <summary>
-        /// Gets or sets whether the look direction of the controller should be
-        /// used as the forward direction for nudge operations.
-        /// </summary>
-        /// <remarks>
-        /// The default is <c>true</c>.
-        /// </remarks>
-        public bool UseLookDirection { get { return useLookDirection; } set { useLookDirection = value; } }
         #endregion // Public Properties
     }
 }

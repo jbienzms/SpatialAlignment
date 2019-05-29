@@ -23,9 +23,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
-using HoloToolkit.Unity.InputModule;
-using HoloToolkit.Unity.SpatialMapping;
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +75,7 @@ namespace Microsoft.SpatialAlignment
     /// A controller that refines the transform based on an origin point and
     /// a direction.
     /// </summary>
-    public class RayRefinement : RefinementBase, IInputClickHandler
+    public class RayRefinement : RefinementBase, IMixedRealityInputHandler
     {
         #region Constants
         private const float DEF_SCALE = 0.05f;
@@ -318,7 +318,7 @@ namespace Microsoft.SpatialAlignment
         private void StopAndCleanup()
         {
             // No longer modal
-            InputManager.Instance.PopModalInputHandler();
+            MixedRealityToolkit.InputSystem.PopModalInputHandler();
 
             // No longer in any step
             currentStep = RayRefinementStep.None;
@@ -339,7 +339,7 @@ namespace Microsoft.SpatialAlignment
 
         #region Overrides / Event Handlers
         /// <inheritdoc />
-        protected virtual void OnInputClicked(InputClickedEventData eventData)
+        private void OnInputUp(InputEventData eventData)
         {
             // If we're not refining, ignore
             if (!IsRefining) { return; }
@@ -385,7 +385,7 @@ namespace Microsoft.SpatialAlignment
         protected override void OnRefinementStarted()
         {
             // Capture input handler (released in StopAndCleanup)
-            InputManager.Instance.PushModalInputHandler(gameObject);
+            MixedRealityToolkit.InputSystem.PushModalInputHandler(gameObject);
 
             // Start
             currentStep = RayRefinementStep.None;
@@ -396,8 +396,9 @@ namespace Microsoft.SpatialAlignment
         }
         #endregion // Overrides / Event Handlers
 
-        #region IInputClickHandler Interface
-        void IInputClickHandler.OnInputClicked(InputClickedEventData eventData) { OnInputClicked(eventData); }
+        #region IMixedRealityInputHandler Interface
+        void IMixedRealityInputHandler.OnInputDown(InputEventData eventData) { }
+        void IMixedRealityInputHandler.OnInputUp(InputEventData eventData) { OnInputUp(eventData); }
         #endregion // IInputClickHandler Interface
 
         #region Unity Overrides
@@ -408,9 +409,13 @@ namespace Microsoft.SpatialAlignment
             // intelligent.
             if (placementLayers == 0)
             {
-                // If SpatialMappingManager is valid, use its layer mask
-                // Otherwise, use the 'Default' layer.
-                int mask = (SpatialMappingManager.Instance != null ? SpatialMappingManager.Instance.LayerMask : 1 << 0);
+                // Try to get the first running spatial mapping observer
+                var observer = MixedRealityToolkit.SpatialAwarenessSystem.GetObservers().Where(o => o.IsRunning).FirstOrDefault();
+
+                // Use the observers layer mask or a reasonable default
+                int mask = (observer != null ? observer.DefaultPhysicsLayer : 1 << 0);
+
+                // Update the layers
                 placementLayers = mask;
             }
 
@@ -444,6 +449,9 @@ namespace Microsoft.SpatialAlignment
                 directionPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
                 directionPrefab.SetActive(false);
             }
+
+            // Register for global events
+            MixedRealityToolkit.InputSystem.Register(this.gameObject);
 
             // Pass to base to complete startup
             base.Start();

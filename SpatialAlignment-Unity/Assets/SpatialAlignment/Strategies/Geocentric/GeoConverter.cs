@@ -30,10 +30,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-#if !NO_MRTK
-using HoloToolkit.Unity;
-#endif
-
 namespace Microsoft.SpatialAlignment.Geocentric
 {
     /**********************************************************************

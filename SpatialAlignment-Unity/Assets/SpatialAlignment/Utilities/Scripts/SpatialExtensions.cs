@@ -23,16 +23,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Microsoft.MixedReality.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-
-#if !NO_MRTK
-using HoloToolkit.Unity;
-#endif
 
 namespace Microsoft.SpatialAlignment
 {
@@ -333,11 +330,6 @@ namespace Microsoft.SpatialAlignment
         /// </remarks>
         static public void AnimateTo(this Transform transform, Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            #if NO_MRTK
-            transform.position = position;
-            transform.rotation = rotation;
-            transform.localScale = scale;
-            #else
             // Get or create Interpolator
             Interpolator i = transform.gameObject.EnsureComponent<Interpolator>();
 
@@ -348,7 +340,6 @@ namespace Microsoft.SpatialAlignment
             i.SetTargetPosition(position);
             i.SetTargetRotation(rotation);
             i.SetTargetLocalScale(scale);
-            #endif
         }
 
         /// <summary>
@@ -362,13 +353,11 @@ namespace Microsoft.SpatialAlignment
         /// </remarks>
         static public void EndAnimation(this Transform transform)
         {
-            #if !NO_MRTK
             // Try to get Interpolator
             Interpolator i = transform.gameObject.GetComponent<Interpolator>();
 
             // If found, jump to end
             if (i != null) { i.SnapToTarget(); }
-            #endif
         }
         #endregion // Transform Extensions
 
