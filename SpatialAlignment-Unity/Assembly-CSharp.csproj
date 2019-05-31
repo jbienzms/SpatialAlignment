@@ -95,6 +95,7 @@
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SpatialExtensions.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SplitViewManager.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\UnityDispatcher.cs" />
+    <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\TapToPlace.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <None Include="Assets\SpatialAlignment\Plugins\Newtonsoft.Json.xml" />
@@ -324,6 +325,9 @@
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.6f1/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/SpatialAlignment/Plugins/Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
@@ -332,9 +336,6 @@
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/SpatialAlignment/Plugins/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.6f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>

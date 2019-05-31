@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{CF0B51C6-04F0-EC15-8275-61B9C27E787C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.Toolkit.Providers.OpenVR", "Microsoft.MixedReality.Toolkit.Providers.OpenVR.csproj", "{47581911-447E-923C-97A9-39F012C1CA7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.Toolkit.Examples", "Microsoft.MixedReality.Toolkit.Examples.csproj", "{79A367A2-57EF-06EC-AC8A-77286B600896}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{CF0B51C6-04F0-EC15-8275-61B9C27E787C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.MixedReality.Toolkit", "Microsoft.MixedReality.Toolkit.csproj", "{7AE258AE-44AC-C12E-005A-5D2C2DA81FCB}"
 EndProject
@@ -75,10 +75,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{47581911-447E-923C-97A9-39F012C1CA7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{47581911-447E-923C-97A9-39F012C1CA7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47581911-447E-923C-97A9-39F012C1CA7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,6 +83,10 @@ Global
 		{79A367A2-57EF-06EC-AC8A-77286B600896}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79A367A2-57EF-06EC-AC8A-77286B600896}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79A367A2-57EF-06EC-AC8A-77286B600896}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF0B51C6-04F0-EC15-8275-61B9C27E787C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7AE258AE-44AC-C12E-005A-5D2C2DA81FCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7AE258AE-44AC-C12E-005A-5D2C2DA81FCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AE258AE-44AC-C12E-005A-5D2C2DA81FCB}.Release|Any CPU.ActiveCfg = Release|Any CPU

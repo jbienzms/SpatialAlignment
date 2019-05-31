@@ -410,7 +410,7 @@ namespace Microsoft.SpatialAlignment
             if (placementLayers == 0)
             {
                 // Try to get the first running spatial mapping observer
-                var observer = MixedRealityToolkit.SpatialAwarenessSystem.GetObservers().Where(o => o.IsRunning).FirstOrDefault();
+                var observer = MixedRealityToolkit.SpatialAwarenessSystem?.GetObservers().Where(o => o.IsRunning).FirstOrDefault();
 
                 // Use the observers layer mask or a reasonable default
                 int mask = (observer != null ? observer.DefaultPhysicsLayer : 1 << 0);

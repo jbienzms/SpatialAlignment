@@ -64,7 +64,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         private RefinementBase largeScaleRefinement;
         private RefinementExampleMode mode;
         private MultiParentAlignment multiParent;
-        private RefinableModel newAnchor;
+        private TapToPlace newAnchor;
         private AddAnchorStep anchorStep;
         private SpatialFrameCollection frames = new SpatialFrameCollection();
         #endregion // Member Variables
@@ -114,24 +114,24 @@ namespace Microsoft.SpatialAlignment.Persistence
                     anchorGO.transform.SetParent(anchorContainer.transform, worldPositionStays: true);
 
                     // Get the refining behavior
-                    newAnchor = anchorGO.GetComponentInChildren<RefinableModel>();
+                    newAnchor = anchorGO.GetComponentInChildren<TapToPlace>();
                     if (newAnchor == null)
                     {
-                        throw new InvalidOperationException($"{nameof(AnchorPrefab)} does not have a {nameof(RefinableModel)} component.");
+                        throw new InvalidOperationException($"{nameof(AnchorPrefab)} does not have a {nameof(TapToPlace)} component.");
                     }
 
                     // Subscribe to anchor events
                     SubscribeAnchor(newAnchor);
 
                     // Put the anchor in placement mode
-                    newAnchor.RefinementMode = RefinableModelMode.Placing;
+                    newAnchor.IsBeingPlaced = true;
                     break;
 
 
                 //case AddAnchorStep.RefiningAnchor:
 
                 //    // Now refining anchor
-                //    newAnchor.RefinementMode = RefinableModelMode.Refining;
+                //    newAnchor.RefinementMode = TapToPlaceMode.Refining;
                 //    break;
 
 
@@ -141,7 +141,7 @@ namespace Microsoft.SpatialAlignment.Persistence
                     newAnchor.gameObject.AddComponent<NativeAnchorAlignment>();
 
                     // Done placing anchor
-                    newAnchor.RefinementMode = RefinableModelMode.Placed;
+                    newAnchor.IsBeingPlaced = false;
 
                     // Show the model
                     ShowModel();
@@ -311,12 +311,10 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
-        private void SubscribeAnchor(RefinableModel anchor)
+        private void SubscribeAnchor(TapToPlace anchor)
         {
-            // Subscribe from refinement events
-            anchor.RefinementCanceled += Anchor_CanceledRefinement;
-            anchor.RefinementFinished += Anchor_FinishedRefinement;
-            anchor.RefinementModeChanged += Anchor_RefinementModeChanged;
+            // Subscribe from placing events
+            anchor.IsBeingPlacedChaged += Anchor_IsBeingPlacedChanged;
         }
 
         private TRefinement SubscribeRefinement<TRefinement>() where TRefinement : RefinementBase
@@ -332,12 +330,10 @@ namespace Microsoft.SpatialAlignment.Persistence
             return refinement;
         }
 
-        private void UnsubscribeAnchor(RefinableModel anchor)
+        private void UnsubscribeAnchor(TapToPlace anchor)
         {
-            // Unsubscribe from refinement events
-            anchor.RefinementCanceled -= Anchor_CanceledRefinement;
-            anchor.RefinementFinished -= Anchor_FinishedRefinement;
-            anchor.RefinementModeChanged -= Anchor_RefinementModeChanged;
+            // Unsubscribe from placing events
+            anchor.IsBeingPlacedChaged -= Anchor_IsBeingPlacedChanged;
         }
 
         private void UnsubscribeRefinement(RefinementBase refinement)
@@ -361,29 +357,11 @@ namespace Microsoft.SpatialAlignment.Persistence
         #endregion // Internal Methods
 
         #region Overrides / Event Handlers
-        private void Anchor_CanceledRefinement(object sender, System.EventArgs e)
-        {
-            // Cancel adding anchor
-            if (mode == RefinementExampleMode.AddAnchor)
-            {
-                CancelAddAnchor();
-            }
-        }
-
-        private void Anchor_FinishedRefinement(object sender, System.EventArgs e)
-        {
-            // Go on to the next step
-            if (mode == RefinementExampleMode.AddAnchor)
-            {
-                NextStep();
-            }
-        }
-
-        private void Anchor_RefinementModeChanged(object sender, EventArgs e)
+        private void Anchor_IsBeingPlacedChanged(object sender, EventArgs e)
         {
             // If we are placing an anchor and it's now placed,
             // go on to the next step.
-            if ((anchorStep == AddAnchorStep.PlacingAnchor) && (newAnchor.RefinementMode == RefinableModelMode.Placed))
+            if ((anchorStep == AddAnchorStep.PlacingAnchor) && (!newAnchor.IsBeingPlaced))
             {
                 NextStep();
             }
