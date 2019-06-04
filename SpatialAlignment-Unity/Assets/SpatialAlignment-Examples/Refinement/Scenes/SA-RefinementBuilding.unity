@@ -1692,5 +1692,110 @@ PrefabInstance:
       propertyPath: largeScaleModel
       value: 
       objectReference: {fileID: 1707357398}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: AddAnchorAction.id
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: AddAnchorAction.description
+      value: Add Anchor
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: AddAnchorAction.axisConstraint
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: CancelAnchorAction.id
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: CancelAnchorAction.description
+      value: Cancel Anchor
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: CancelAnchorAction.axisConstraint
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: RemoveAnchorAction.id
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: RemoveAnchorAction.description
+      value: Remove Last Anchor
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: RemoveAnchorAction.axisConstraint
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ResetAnchorsAction.id
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ResetAnchorsAction.description
+      value: Reset Anchors
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ResetAnchorsAction.axisConstraint
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ModeClosestAction.id
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ModeClosestAction.description
+      value: Mode Closest
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ModeClosestAction.axisConstraint
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ModeDistanceWeightedAction.id
+      value: 19
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ModeDistanceWeightedAction.description
+      value: Mode Distance Weighted
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: ModeDistanceWeightedAction.axisConstraint
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: SplitViewAction.id
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: SplitViewAction.description
+      value: Split View
+      objectReference: {fileID: 0}
+    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
+        type: 3}
+      propertyPath: SplitViewAction.axisConstraint
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b986616b0137454448074168d43b6ca7, type: 3}

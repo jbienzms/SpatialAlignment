@@ -44,11 +44,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2ad89e4380848b48a1ddeb71f725fbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isFocusRequired: 0
   anchorContainer: {fileID: 0}
   anchorPrefab: {fileID: 1448445313900646, guid: 6158ef895b66d154d8b68254085714a1,
     type: 3}
   largeScaleModel: {fileID: 0}
   splitViewManager: {fileID: 3181033918962605617}
+  AddAnchorAction:
+    id: 0
+    description: 
+    axisConstraint: 0
+  CancelAnchorAction:
+    id: 0
+    description: 
+    axisConstraint: 0
+  RemoveAnchorAction:
+    id: 0
+    description: 
+    axisConstraint: 0
+  ResetAnchorsAction:
+    id: 0
+    description: 
+    axisConstraint: 0
+  ModeClosestAction:
+    id: 0
+    description: 
+    axisConstraint: 0
+  ModeDistanceWeightedAction:
+    id: 0
+    description: 
+    axisConstraint: 0
+  SplitViewAction:
+    id: 0
+    description: 
+    axisConstraint: 0
 --- !u!1 &4357155795719337978
 GameObject:
   m_ObjectHideFlags: 0

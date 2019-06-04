@@ -24,6 +24,7 @@
 //
 
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
 using System;
@@ -39,7 +40,7 @@ namespace Microsoft.SpatialAlignment.Persistence
     /// <summary>
     /// An example manager that shows how to add and edit refinement anchors.
     /// </summary>
-    public class RefinementExampleManager : MonoBehaviour
+    public class RefinementExampleManager : BaseInputHandler, IMixedRealityInputActionHandler
     {
         private enum AddAnchorStep
         {
@@ -85,6 +86,15 @@ namespace Microsoft.SpatialAlignment.Persistence
         [SerializeField]
         [Tooltip("Used to enable split view for video recording.")]
         private SplitViewManager splitViewManager;
+
+        public MixedRealityInputAction AddAnchorAction;
+        public MixedRealityInputAction CancelAnchorAction;
+        public MixedRealityInputAction RemoveAnchorAction;
+        public MixedRealityInputAction ResetAnchorsAction;
+        public MixedRealityInputAction ModeClosestAction;
+        public MixedRealityInputAction ModeDistanceWeightedAction;
+        public MixedRealityInputAction SplitViewAction;
+
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -390,11 +400,51 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// <summary>
         /// Start is called before the first frame update
         /// </summary>
-        protected virtual void Start()
+        protected override void Start()
         {
+            base.Start();
             GatherDependencies();
         }
         #endregion // Unity Overrides
+
+        void IMixedRealityInputActionHandler.OnActionStarted(BaseInputEventData eventData)
+        {
+            var action = eventData.MixedRealityInputAction;
+
+            if (action == AddAnchorAction)
+            {
+                BeginAddAnchor();
+            }
+            else if (action == CancelAnchorAction)
+            {
+                CancelAddAnchor();
+            }
+            else if (action == RemoveAnchorAction)
+            {
+                RemoveLastAnchor();
+            }
+            else if (action == ResetAnchorsAction)
+            {
+                ResetAnchors();
+            }
+            else if (action == ModeClosestAction)
+            {
+                SetModeClosest();
+            }
+            else if (action == ModeDistanceWeightedAction)
+            {
+                SetModeDistanceWeighted();
+            }
+            else if (action == SplitViewAction)
+            {
+                SplitView();
+            }
+        }
+
+        void IMixedRealityInputActionHandler.OnActionEnded(BaseInputEventData eventData)
+        {
+
+        }
 
         #region Public Methods
         /// <summary>

@@ -681,6 +681,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="MixedRealityToolkit.Core.Inspectors.ServiceInspectors.csproj">
+      <Project>{214884C6-9188-92E5-81BE-EC0D467272FD}</Project>
+      <Name>MixedRealityToolkit.Core.Inspectors.ServiceInspectors</Name>
+    </ProjectReference>
     <ProjectReference Include="Microsoft.MixedReality.Toolkit.Providers.WindowsMixedReality.csproj">
       <Project>{9C2828B8-E70B-E646-22D6-125833ADF1A1}</Project>
       <Name>Microsoft.MixedReality.Toolkit.Providers.WindowsMixedReality</Name>
@@ -732,6 +736,10 @@
     <ProjectReference Include="Microsoft.MixedReality.Toolkit.Services.InputSimulation.Editor.csproj">
       <Project>{6449542E-7796-6F1C-ED9B-405CC22EDFE3}</Project>
       <Name>Microsoft.MixedReality.Toolkit.Services.InputSimulation.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="MixedRealityToolkit.Services.CameraSystem.csproj">
+      <Project>{06DD0BCC-AAE4-DE88-ABB3-7E20C9D85D23}</Project>
+      <Name>MixedRealityToolkit.Services.CameraSystem</Name>
     </ProjectReference>
     <ProjectReference Include="Microsoft.MixedReality.Toolkit.SDK.csproj">
       <Project>{A780A5ED-792C-C7FA-9812-1007838503CF}</Project>
@@ -792,14 +800,6 @@
     <ProjectReference Include="Microsoft.MixedReality.Toolkit.Services.InputSimulation.csproj">
       <Project>{4BA3D6BE-CEBE-C03B-214D-E05F98B8B789}</Project>
       <Name>Microsoft.MixedReality.Toolkit.Services.InputSimulation</Name>
-    </ProjectReference>
-    <ProjectReference Include="MixedRealityToolkit.Core.Inspectors.ServiceInspectors.csproj">
-      <Project>{214884C6-9188-92E5-81BE-EC0D467272FD}</Project>
-      <Name>MixedRealityToolkit.Core.Inspectors.ServiceInspectors</Name>
-    </ProjectReference>
-    <ProjectReference Include="MixedRealityToolkit.Services.CameraSystem.csproj">
-      <Project>{06DD0BCC-AAE4-DE88-ABB3-7E20C9D85D23}</Project>
-      <Name>MixedRealityToolkit.Services.CameraSystem</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
