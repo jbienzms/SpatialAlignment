@@ -793,6 +793,14 @@
       <Project>{4BA3D6BE-CEBE-C03B-214D-E05F98B8B789}</Project>
       <Name>Microsoft.MixedReality.Toolkit.Services.InputSimulation</Name>
     </ProjectReference>
+    <ProjectReference Include="MixedRealityToolkit.Core.Inspectors.ServiceInspectors.csproj">
+      <Project>{214884C6-9188-92E5-81BE-EC0D467272FD}</Project>
+      <Name>MixedRealityToolkit.Core.Inspectors.ServiceInspectors</Name>
+    </ProjectReference>
+    <ProjectReference Include="MixedRealityToolkit.Services.CameraSystem.csproj">
+      <Project>{06DD0BCC-AAE4-DE88-ABB3-7E20C9D85D23}</Project>
+      <Name>MixedRealityToolkit.Services.CameraSystem</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

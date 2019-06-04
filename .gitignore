@@ -310,4 +310,4 @@ mixedreality-azure-samples.Player.csproj
 *.blend1
 
 # Overly large model files for testing
-SpatialAlignment-Unity/Assets/SpatialAlignment-Examples/Refinement/Models/Building*
+SpatialAlignment-Unity/Assets/SpatialAlignment-Examples/Common/Models/Building*
