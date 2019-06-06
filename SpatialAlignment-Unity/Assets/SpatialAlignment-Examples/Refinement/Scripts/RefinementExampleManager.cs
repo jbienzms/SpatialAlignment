@@ -413,30 +413,37 @@ namespace Microsoft.SpatialAlignment.Persistence
 
             if (action == AddAnchorAction)
             {
+                eventData.Use();
                 BeginAddAnchor();
             }
             else if (action == CancelAnchorAction)
             {
+                eventData.Use();
                 CancelAddAnchor();
             }
             else if (action == RemoveAnchorAction)
             {
+                eventData.Use();
                 RemoveLastAnchor();
             }
             else if (action == ResetAnchorsAction)
             {
+                eventData.Use();
                 ResetAnchors();
             }
             else if (action == ModeClosestAction)
             {
+                eventData.Use();
                 SetModeClosest();
             }
             else if (action == ModeDistanceWeightedAction)
             {
+                eventData.Use();
                 SetModeDistanceWeighted();
             }
             else if (action == SplitViewAction)
             {
+                eventData.Use();
                 SplitView();
             }
         }

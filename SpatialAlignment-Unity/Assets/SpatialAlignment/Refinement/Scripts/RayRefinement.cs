@@ -341,8 +341,14 @@ namespace Microsoft.SpatialAlignment
         /// <inheritdoc />
         private void OnInputUp(InputEventData eventData)
         {
+            // If this event is already handled, ignore
+            if (eventData.used) { return; }
+
             // If we're not refining, ignore
             if (!IsRefining) { return; }
+
+            // We used it
+            eventData.Use();
 
             // If the current target has been successfully placed at least
             // once, move on to the next step
@@ -402,6 +408,14 @@ namespace Microsoft.SpatialAlignment
         #endregion // IInputClickHandler Interface
 
         #region Unity Overrides
+        protected override void OnDestroy()
+        {
+            // Unregister from global events
+            MixedRealityToolkit.InputSystem.Unregister(this.gameObject);
+
+            // Pass to base
+            base.OnDestroy();
+        }
         /// <inheritdoc />
         protected override void Start()
         {
@@ -413,7 +427,7 @@ namespace Microsoft.SpatialAlignment
                 var observer = MixedRealityToolkit.SpatialAwarenessSystem?.GetObservers().Where(o => o.IsRunning).FirstOrDefault();
 
                 // Use the observers layer mask or a reasonable default
-                int mask = (observer != null ? observer.DefaultPhysicsLayer : 1 << 0);
+                int mask = 1 << (observer != null ? observer.DefaultPhysicsLayer : 1);
 
                 // Update the layers
                 placementLayers = mask;

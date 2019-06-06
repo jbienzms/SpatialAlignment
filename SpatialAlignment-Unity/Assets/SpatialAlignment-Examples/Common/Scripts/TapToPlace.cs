@@ -31,10 +31,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TapToPlace : BaseInputHandler, IMixedRealityPointerHandler
+public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
 {
     #region Member Variables
     private SurfaceMagnetism surfaceMagnetism;
+    private bool lastIsBeingPlaced;
     #endregion // Member Variables
 
     #region Unity Inspector Variables
@@ -54,9 +55,25 @@ public class TapToPlace : BaseInputHandler, IMixedRealityPointerHandler
         // surfaceMagnetism.SurfaceNormalOffset = 0;
         // surfaceMagnetism.CloseDistance = 0.1;
         // surfaceMagnetism.OrientatioMode = Full;
+    }
 
-        // Enable or disable solver
+    private void SetPlacing()
+    {
+        // Enable or disable the solver
         surfaceMagnetism.enabled = isBeingPlaced;
+
+        // Notify change
+        OnIsBeingPlacedChaged();
+
+        // Register or unregister for tap events
+        if (isBeingPlaced)
+        {
+            MixedRealityToolkit.InputSystem.Register(this.gameObject);
+        }
+        else
+        {
+            MixedRealityToolkit.InputSystem.Unregister(this.gameObject);
+        }
     }
     #endregion // Internal Methods
 
@@ -67,20 +84,14 @@ public class TapToPlace : BaseInputHandler, IMixedRealityPointerHandler
     /// </summary>
     protected virtual void OnIsBeingPlacedChaged()
     {
-        // Enable or disable the solver
-        surfaceMagnetism.enabled = isBeingPlaced;
-
         // Raise the event
         this.IsBeingPlacedChaged?.Invoke(this, EventArgs.Empty);
     }
     #endregion // Overridables / Event Triggers
 
     #region Unity Overrides
-    protected override void Start()
+    protected virtual void Start()
     {
-        // Pass to base first
-        base.Start();
-
         // Get components
         surfaceMagnetism = this.EnsureComponent<SurfaceMagnetism>();
 
@@ -90,27 +101,29 @@ public class TapToPlace : BaseInputHandler, IMixedRealityPointerHandler
     protected virtual void Update()
     {
         // Track changes in editor
-        if ((surfaceMagnetism != null) && (surfaceMagnetism.enabled != isBeingPlaced))
+        if ((surfaceMagnetism != null) && (lastIsBeingPlaced != isBeingPlaced))
         {
-            OnIsBeingPlacedChaged();
+            lastIsBeingPlaced = isBeingPlaced;
+            SetPlacing();
         }
     }
     #endregion // Unity Overrides
 
-    #region IMixedRealityPointerHandler
-    void IMixedRealityPointerHandler.OnPointerClicked(MixedRealityPointerEventData eventData)
+    #region IMixedRealityInputHandler Interface
+    void IMixedRealityInputHandler.OnInputDown(InputEventData eventData) { }
+    void IMixedRealityInputHandler.OnInputUp(InputEventData eventData)
     {
         // Currently we're only going to place by tap, not start by tap
-        if (IsBeingPlaced)
+        if ((!eventData.used) && (lastIsBeingPlaced))
         {
+            // We used it
+            eventData.Use();
+
+            // No longer placing
             IsBeingPlaced = false;
         }
     }
-
-    void IMixedRealityPointerHandler.OnPointerDown(MixedRealityPointerEventData eventData) { }
-    void IMixedRealityPointerHandler.OnPointerUp(MixedRealityPointerEventData eventData) { }
-    void IMixedRealityPointerHandler.OnPointerDragged(MixedRealityPointerEventData eventData) { }
-    #endregion // IMixedRealityPointerHandler
+    #endregion // IInputClickHandler Interface
 
 
     #region Public Properties
@@ -126,14 +139,7 @@ public class TapToPlace : BaseInputHandler, IMixedRealityPointerHandler
         }
         set
         {
-            if (value != isBeingPlaced)
-            {
-                // Update
-                isBeingPlaced = value;
-
-                // Notify
-                OnIsBeingPlacedChaged();
-            }
+            isBeingPlaced = value;
         }
     }
     #endregion // Public Properties
