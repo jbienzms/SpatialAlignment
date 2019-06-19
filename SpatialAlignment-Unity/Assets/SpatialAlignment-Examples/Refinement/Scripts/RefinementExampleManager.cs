@@ -409,6 +409,11 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         void IMixedRealityInputActionHandler.OnActionStarted(BaseInputEventData eventData)
         {
+
+        }
+
+        void IMixedRealityInputActionHandler.OnActionEnded(BaseInputEventData eventData)
+        {
             var action = eventData.MixedRealityInputAction;
 
             if (action == AddAnchorAction)
@@ -446,11 +451,6 @@ namespace Microsoft.SpatialAlignment.Persistence
                 eventData.Use();
                 SplitView();
             }
-        }
-
-        void IMixedRealityInputActionHandler.OnActionEnded(BaseInputEventData eventData)
-        {
-
         }
 
         #region Public Methods

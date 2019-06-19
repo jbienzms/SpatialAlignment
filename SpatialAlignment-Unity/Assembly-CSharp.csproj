@@ -96,6 +96,7 @@
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SplitViewManager.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\UnityDispatcher.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\TapToPlace.cs" />
+    <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\TapToTest.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <None Include="Assets\MixedRealityToolkit.Providers\Version.txt" />
@@ -325,6 +326,9 @@
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.6f1/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/PackageCache/com.unity.analytics@3.2.0/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
@@ -336,9 +340,6 @@
     </Reference>
     <Reference Include="UnityEngine.Purchasing">
       <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Library/PackageCache/com.unity.purchasing@2.0.1/UnityEngine.Purchasing.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:/Users/jbienz/Code/JBienzMS/SpatialAlignment/SpatialAlignment-Unity/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.3.6f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
@@ -690,6 +691,10 @@
     <ProjectReference Include="MixedRealityToolkit.Core.Inspectors.ServiceInspectors.csproj">
       <Project>{214884C6-9188-92E5-81BE-EC0D467272FD}</Project>
       <Name>MixedRealityToolkit.Core.Inspectors.ServiceInspectors</Name>
+    </ProjectReference>
+    <ProjectReference Include="MixedRealityToolkit.Services.SceneSystem.csproj">
+      <Project>{AD22F68E-8C83-C537-0710-5D188E3667F1}</Project>
+      <Name>MixedRealityToolkit.Services.SceneSystem</Name>
     </ProjectReference>
     <ProjectReference Include="Microsoft.MixedReality.Toolkit.Providers.WindowsMixedReality.csproj">
       <Project>{9C2828B8-E70B-E646-22D6-125833ADF1A1}</Project>

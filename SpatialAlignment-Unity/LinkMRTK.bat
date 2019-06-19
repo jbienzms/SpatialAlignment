@@ -44,7 +44,6 @@ ECHO ===========================================================================
 ECHO.
 mklink /J "Assets\MixedRealityToolkit" "%MRTKSource%\Assets\MixedRealityToolkit"
 mklink /J "Assets\MixedRealityToolkit.Examples" "%MRTKSource%\Assets\MixedRealityToolkit.Examples"
-mklink /J "Assets\MixedRealityToolkit.Extensions" "%MRTKSource%\Assets\MixedRealityToolkit.Extensions"
 mklink /J "Assets\MixedRealityToolkit.Providers" "%MRTKSource%\Assets\MixedRealityToolkit.Providers"
 mklink /J "Assets\MixedRealityToolkit.SDK" "%MRTKSource%\Assets\MixedRealityToolkit.SDK"
 mklink /J "Assets\MixedRealityToolkit.Services" "%MRTKSource%\Assets\MixedRealityToolkit.Services"

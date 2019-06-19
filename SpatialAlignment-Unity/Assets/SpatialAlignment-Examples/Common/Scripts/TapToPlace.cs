@@ -116,11 +116,19 @@ public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
         // Currently we're only going to place by tap, not start by tap
         if ((!eventData.used) && (lastIsBeingPlaced))
         {
-            // We used it
+            // We used the event
             eventData.Use();
 
-            // No longer placing
-            IsBeingPlaced = false;
+            // If the object had been moved to a valid surface, consider it placed
+            if (surfaceMagnetism.OnSurface)
+            {
+                // No longer placing
+                IsBeingPlaced = false;
+            }
+            else
+            {
+                Debug.LogWarning($"'{gameObject.name}' tried to finish placing but isn't on a valid surface.");
+            }
         }
     }
     #endregion // IInputClickHandler Interface

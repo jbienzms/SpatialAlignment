@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 2344528240114672621}
   - component: {fileID: 6748190277977250891}
   - component: {fileID: 6400457106710342840}
+  - component: {fileID: 8752869507501138832}
   m_Layer: 0
   m_Name: AnchorMarker
   m_TagString: Untagged
@@ -258,5 +259,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7751601d35a112b4fb3681e0f0c6be23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isFocusRequired: 0
   isBeingPlaced: 0
+--- !u!114 &8752869507501138832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1448445313900646}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64887869cdf336346890fb70efb4446d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
