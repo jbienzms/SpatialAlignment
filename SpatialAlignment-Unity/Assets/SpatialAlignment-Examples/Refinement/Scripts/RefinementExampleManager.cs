@@ -25,12 +25,14 @@
 
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.SpatialAwareness;
 using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.XR.WSA;
@@ -321,6 +323,15 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
+        private void SetSpatialMesh(SpatialAwarenessMeshDisplayOptions options)
+        {
+            // Get all running observers
+            var observers = ((IMixedRealityDataProviderAccess)MixedRealityToolkit.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessMeshObserver>().Where(o => o.IsRunning);
+
+            // Turn off display
+            observers.ToList().ForEach(o => o.DisplayOption = options);
+        }
+
         private void SubscribeAnchor(TapToPlace anchor)
         {
             // Subscribe from placing events
@@ -403,7 +414,12 @@ namespace Microsoft.SpatialAlignment.Persistence
         protected override void Start()
         {
             base.Start();
+
+            // Gather dependencies
             GatherDependencies();
+
+            // Start in model mode
+            ShowModel();
         }
         #endregion // Unity Overrides
 
@@ -549,7 +565,11 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// </summary>
         public void HideModel()
         {
+            // Hide the mode
             largeScaleModel.gameObject.SetActive(false);
+
+            // Display the spatial mesh
+            SetSpatialMesh(SpatialAwarenessMeshDisplayOptions.Visible);
         }
 
         /// <summary>
@@ -658,7 +678,11 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// </summary>
         public void ShowModel()
         {
+            // Display the model
             largeScaleModel.gameObject.SetActive(true);
+
+            // Hide the spatial mesh
+            SetSpatialMesh(SpatialAwarenessMeshDisplayOptions.None);
         }
 
         /// <summary>

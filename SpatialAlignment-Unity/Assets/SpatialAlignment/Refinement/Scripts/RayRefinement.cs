@@ -25,6 +25,7 @@
 
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.SpatialAwareness;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using System.Collections;
@@ -408,14 +409,6 @@ namespace Microsoft.SpatialAlignment
         #endregion // IInputClickHandler Interface
 
         #region Unity Overrides
-        protected override void OnDestroy()
-        {
-            // Unregister from global events
-            MixedRealityToolkit.InputSystem.Unregister(this.gameObject);
-
-            // Pass to base
-            base.OnDestroy();
-        }
         /// <inheritdoc />
         protected override void Start()
         {
@@ -424,7 +417,7 @@ namespace Microsoft.SpatialAlignment
             if (placementLayers == 0)
             {
                 // Try to get the first running spatial mapping observer
-                var observer = MixedRealityToolkit.SpatialAwarenessSystem?.GetObservers().Where(o => o.IsRunning).FirstOrDefault();
+                var observer = ((IMixedRealityDataProviderAccess)MixedRealityToolkit.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessObserver>().Where(o => o.IsRunning).FirstOrDefault();
 
                 // Use the observers layer mask or a reasonable default
                 int mask = 1 << (observer != null ? observer.DefaultPhysicsLayer : 1);
