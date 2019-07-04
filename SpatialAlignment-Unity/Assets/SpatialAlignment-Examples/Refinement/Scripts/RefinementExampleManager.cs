@@ -42,7 +42,7 @@ namespace Microsoft.SpatialAlignment.Persistence
     /// <summary>
     /// An example manager that shows how to add and edit refinement anchors.
     /// </summary>
-    public class RefinementExampleManager : BaseInputHandler, IMixedRealityInputActionHandler
+    public class RefinementExampleManager : InputSystemGlobalHandlerListener, IMixedRealityInputActionHandler
     {
         private enum AddAnchorStep
         {
@@ -404,6 +404,16 @@ namespace Microsoft.SpatialAlignment.Persistence
             {
                 NextStep();
             }
+        }
+
+        protected override void RegisterHandlers()
+        {
+            InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
+        }
+
+        protected override void UnregisterHandlers()
+        {
+            InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
         }
         #endregion // Overrides / Event Handlers
 

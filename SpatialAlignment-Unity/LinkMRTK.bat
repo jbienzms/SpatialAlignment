@@ -48,7 +48,6 @@ mklink /J "Assets\MixedRealityToolkit.Providers" "%MRTKSource%\Assets\MixedReali
 mklink /J "Assets\MixedRealityToolkit.SDK" "%MRTKSource%\Assets\MixedRealityToolkit.SDK"
 mklink /J "Assets\MixedRealityToolkit.Services" "%MRTKSource%\Assets\MixedRealityToolkit.Services"
 mklink /J "Assets\MixedRealityToolkit.Tests" "%MRTKSource%\Assets\MixedRealityToolkit.Tests"
-mklink /J "Assets\MixedRealityToolkit-Examples" "%MRTKSource%\Assets\MixedRealityToolkit-Examples"
 ECHO.
 
 PAUSE

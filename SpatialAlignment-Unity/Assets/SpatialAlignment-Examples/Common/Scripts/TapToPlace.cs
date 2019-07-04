@@ -29,9 +29,10 @@ using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
+public class TapToPlace : InputSystemGlobalHandlerListener, IMixedRealityInputActionHandler
 {
     #region Member Variables
     private SurfaceMagnetism surfaceMagnetism;
@@ -42,14 +43,30 @@ public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
     [Tooltip("Setting this to true will enable the user to move and place the object in the scene without needing to tap on the object. Useful when you want to place an object immediately.")]
     [SerializeField]
     private bool isBeingPlaced;
+
+    [Tooltip("The input action that will be used to place the object. If one is not specified, 'Select' will be used.")]
+    [SerializeField]
+    private MixedRealityInputAction placeAction;
     #endregion // Unity Inspector Variables
 
     #region Internal Methods
     /// <summary>
-    /// Initializes the solver and optionally starts placing.
+    /// Initializes the solver, actions and optionally starts placing.
     /// </summary>
-    private void InitSolver()
+    private void Init()
     {
+        // If no placement action is specified, try to get the "Select" action
+        if (placeAction == MixedRealityInputAction.None)
+        {
+            // Try to get the input system
+            IMixedRealityInputSystem inputSystem;
+            if (MixedRealityServiceRegistry.TryGetService<IMixedRealityInputSystem>(out inputSystem))
+            {
+                // Try to get the "Select" action.
+                placeAction = inputSystem.InputSystemProfile.InputActionsProfile.InputActions.Where(a => a.Description == "Select").FirstOrDefault();
+            }
+        }
+
         // surfaceMagnetism.MaxDistance = 5;
         // surfaceMagnetism.RaycastDirection = RaycastDirectionEnum.CameraFacing;
         // surfaceMagnetism.SurfaceNormalOffset = 0;
@@ -64,16 +81,6 @@ public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
 
         // Notify change
         OnIsBeingPlacedChaged();
-
-        // Register or unregister for tap events
-        if (isBeingPlaced)
-        {
-            MixedRealityToolkit.InputSystem.Register(this.gameObject);
-        }
-        else
-        {
-            MixedRealityToolkit.InputSystem.Unregister(this.gameObject);
-        }
     }
     #endregion // Internal Methods
 
@@ -87,16 +94,31 @@ public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
         // Raise the event
         this.IsBeingPlacedChaged?.Invoke(this, EventArgs.Empty);
     }
+
+    /// <inheritdoc />
+    protected override void RegisterHandlers()
+    {
+        InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
+    }
+
+    /// <inheritdoc />
+    protected override void UnregisterHandlers()
+    {
+        InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
+    }
     #endregion // Overridables / Event Triggers
 
     #region Unity Overrides
-    protected virtual void Start()
+    protected override void Start()
     {
+        // Pass to base first
+        base.Start();
+
         // Get components
         surfaceMagnetism = this.EnsureComponent<SurfaceMagnetism>();
 
         // Initialize the solver
-        InitSolver();
+        Init();
     }
     protected virtual void Update()
     {
@@ -109,12 +131,12 @@ public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
     }
     #endregion // Unity Overrides
 
-    #region IMixedRealityInputHandler Interface
-    void IMixedRealityInputHandler.OnInputDown(InputEventData eventData) { }
-    void IMixedRealityInputHandler.OnInputUp(InputEventData eventData)
+    #region IMixedRealityInputActionHandler Interface
+    void IMixedRealityInputActionHandler.OnActionStarted(BaseInputEventData eventData) { }
+    void IMixedRealityInputActionHandler.OnActionEnded(BaseInputEventData eventData)
     {
-        // Currently we're only going to place by tap, not start by tap
-        if ((!eventData.used) && (lastIsBeingPlaced))
+        // Only place if this event hasn't already been used, we're actively placing, and it's the action we care about
+        if ((!eventData.used) && (isBeingPlaced) && (eventData.MixedRealityInputAction == placeAction))
         {
             // We used the event
             eventData.Use();
@@ -131,25 +153,22 @@ public class TapToPlace : MonoBehaviour, IMixedRealityInputHandler
             }
         }
     }
-    #endregion // IInputClickHandler Interface
+    #endregion // IMixedRealityInputActionHandler Interface
 
 
     #region Public Properties
     /// <summary>
     /// Gets or sets a value that indicates if the user is moving the object.
-    /// Setting this to true in the editor will allow you to place the object immediately.
+    /// Setting this to true in the editor will allow you to place the object
+    /// immediately.
     /// </summary>
-    public bool IsBeingPlaced
-    {
-        get
-        {
-            return isBeingPlaced;
-        }
-        set
-        {
-            isBeingPlaced = value;
-        }
-    }
+    public bool IsBeingPlaced { get => isBeingPlaced; set => isBeingPlaced = value; }
+
+    /// <summary>
+    /// Gets or sets the input action that will be used to place the object.
+    /// If one is not specified, 'Select' will be used.
+    /// </summary>
+    public MixedRealityInputAction PlaceAction { get => placeAction; set => placeAction = value; }
     #endregion // Public Properties
 
 
