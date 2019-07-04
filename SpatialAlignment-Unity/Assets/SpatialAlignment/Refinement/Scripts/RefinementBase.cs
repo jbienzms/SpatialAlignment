@@ -23,6 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Microsoft.MixedReality.Toolkit.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -70,7 +71,7 @@ namespace Microsoft.SpatialAlignment
     /// The base class for a behavior that provides cancelable refinement of the
     /// transform of an object.
     /// </summary>
-    public class RefinementBase : MonoBehaviour
+    public class RefinementBase : BaseInputHandler
     {
         #region Member Variables
         private bool isRefining;
@@ -133,6 +134,11 @@ namespace Microsoft.SpatialAlignment
             }
         }
 
+        /// <inheritdoc />
+        protected override void RegisterHandlers()
+        {
+        }
+
         /// <summary>
         /// Restores the last transform to the current transform.
         /// </summary>
@@ -149,6 +155,11 @@ namespace Microsoft.SpatialAlignment
         {
             lastPosition = targetTransform.position;
             lastRotation = targetTransform.rotation;
+        }
+
+        /// <inheritdoc />
+        protected override void UnregisterHandlers()
+        {
         }
         #endregion // Internal Methods
 
@@ -208,26 +219,14 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// This function is called when the behavior becomes disabled or inactive.
-        /// </summary>
-        protected virtual void OnDisable()
-        {
-
-        }
-
-        /// <summary>
-        /// Only called if the Object is active, this function is called just after the object is enabled.
-        /// </summary>
-        protected virtual void OnEnable()
-        {
-
-        }
-
-        /// <summary>
         /// Start is called before the first frame update.
         /// </summary>
-        protected virtual void Start()
+        protected override void Start()
         {
+            // Call base first
+            base.Start();
+
+            // Start refining?
             if (refineOnStart)
             {
                 StartRefinement();

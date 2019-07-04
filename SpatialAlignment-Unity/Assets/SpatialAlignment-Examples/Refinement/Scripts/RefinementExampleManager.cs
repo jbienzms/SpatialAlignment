@@ -406,11 +406,13 @@ namespace Microsoft.SpatialAlignment.Persistence
             }
         }
 
+        /// <inheritdoc />
         protected override void RegisterHandlers()
         {
             InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
         }
 
+        /// <inheritdoc />
         protected override void UnregisterHandlers()
         {
             InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);

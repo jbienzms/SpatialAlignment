@@ -401,6 +401,18 @@ namespace Microsoft.SpatialAlignment
             // Pass to base to notify
             base.OnRefinementStarted();
         }
+
+        protected override void RegisterHandlers()
+        {
+            base.RegisterHandlers();
+            InputSystem.RegisterHandler<IMixedRealityInputHandler>(this);
+        }
+
+        protected override void UnregisterHandlers()
+        {
+            InputSystem.UnregisterHandler<IMixedRealityInputHandler>(this);
+            base.UnregisterHandlers();
+        }
         #endregion // Overrides / Event Handlers
 
         #region IMixedRealityInputHandler Interface
@@ -412,6 +424,9 @@ namespace Microsoft.SpatialAlignment
         /// <inheritdoc />
         protected override void Start()
         {
+            // We do not require input focus
+            IsFocusRequired = false;
+
             // If no custom placement layer has been specified, pick something
             // intelligent.
             if (placementLayers == 0)
@@ -456,9 +471,6 @@ namespace Microsoft.SpatialAlignment
                 directionPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
                 directionPrefab.SetActive(false);
             }
-
-            // Register for global events
-            MixedRealityToolkit.InputSystem.Register(this.gameObject);
 
             // Pass to base to complete startup
             base.Start();
