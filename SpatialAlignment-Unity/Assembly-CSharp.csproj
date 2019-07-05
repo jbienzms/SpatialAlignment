@@ -95,6 +95,7 @@
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SpatialExtensions.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SplitViewManager.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\UnityDispatcher.cs" />
+    <Compile Include="Assets\SpatialAlignment\UX\Interactable\Scripts\Events\InteractableInputActionReceiver.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\TapToPlace.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\TapToTest.cs" />
     <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
