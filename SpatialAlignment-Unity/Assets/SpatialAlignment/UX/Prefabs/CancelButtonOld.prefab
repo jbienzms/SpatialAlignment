@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3588661084107836717}
   m_Layer: 0
-  m_Name: CancelButton
+  m_Name: CancelButtonOld
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,8 +43,6 @@ GameObject:
   - component: {fileID: 8751105705452762159}
   - component: {fileID: 8751105705453729519}
   - component: {fileID: 1299106109535568223}
-  - component: {fileID: 7475255916199766656}
-  - component: {fileID: 1829247220196815933}
   m_Layer: 0
   m_Name: Cancel
   m_TagString: Untagged
@@ -124,35 +122,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.079131, y: 0.07913, z: 0.006503}
   m_Center: {x: 0.000024501234, y: -0.000059001148, z: 0.00003949995}
---- !u!114 &7475255916199766656
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8751105705451464745}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e77a98cf320fe9340a55eecfe4567ca4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buttonState: 4
-  buttonPressFilter: 1
-  requireGaze: 1
-  MainCollider: {fileID: 1299106109535568223}
-  MainRenderer: {fileID: 8751105705453729519}
---- !u!114 &1829247220196815933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8751105705451464745}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86772d5ca853e924ba484bc960537c04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Profile: {fileID: 11400000, guid: c32d3ea5ce1f0384085e289cd51e0878, type: 2}
-  TargetTransform: {fileID: 8751105705451435017}
-  Renderer: {fileID: 8751105705453729519}

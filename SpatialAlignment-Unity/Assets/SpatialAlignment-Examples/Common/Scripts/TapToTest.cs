@@ -31,8 +31,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TapToTest : InputSystemGlobalListener, IMixedRealityInputHandler, IMixedRealityInputActionHandler
+public class TapToTest : InputSystemGlobalHandlerListener, IMixedRealityInputHandler, IMixedRealityInputActionHandler
 {
+    /// <inheritdoc />
+    protected override void RegisterHandlers()
+    {
+        InputSystem.RegisterHandler<IMixedRealityInputHandler>(this);
+        InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
+    }
+
+    /// <inheritdoc />
+    protected override void UnregisterHandlers()
+    {
+        InputSystem.UnregisterHandler<IMixedRealityInputHandler>(this);
+        InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
+    }
+
     public void OnActionEnded(BaseInputEventData eventData)
     {
         Debug.Log($"Action ENDED: {eventData.MixedRealityInputAction.Description}");
