@@ -23,7 +23,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
 using System;
 using UnityEngine;
 
@@ -60,7 +59,7 @@ namespace Microsoft.SpatialAlignment
     /// Controls the rendering of a split holographic / non-holographic view.
     /// </summary>
     [RequireComponent(typeof(MeshRenderer))]
-    public class SplitViewManager : Singleton<SplitViewManager>
+    public class SplitViewManager : MonoBehaviour
     {
         #region Member Variables
         private SplitViewMode lastMode;
@@ -127,14 +126,13 @@ namespace Microsoft.SpatialAlignment
 
         #region Unity Overrides
         /// <inheritdoc />
-        protected override void Awake()
+        protected virtual void Awake()
         {
             GatherComponents();
             if (enabled)
             {
                 ApplyMode();
             }
-            base.Awake();
         }
 
         protected virtual void Update()

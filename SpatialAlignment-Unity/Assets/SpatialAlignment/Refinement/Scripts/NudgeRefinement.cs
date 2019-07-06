@@ -23,9 +23,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
-using HoloToolkit.Unity.InputModule;
-using HoloToolkit.Unity.SpatialMapping;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,16 +77,16 @@ namespace Microsoft.SpatialAlignment
         private float rotationAmount = 1.8f;
 
         [SerializeField]
-        [Tooltip("The coordinate system to use when performing operations.")]
-        private Space space = Space.Self;
-
-        [SerializeField]
         [Tooltip("The axis that should be considered Up for rotation operations.")]
         private RefinementDirection upDirection = RefinementDirection.Up;
 
         [SerializeField]
         [Tooltip("Whether to display the UX controller when performing refinement.")]
         private bool useController = true;
+
+        [SerializeField]
+        [Tooltip("Whether the look direction of the controller should be used as the forward direction for nudge operations.")]
+        private bool useLookDirection = true;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -248,7 +245,7 @@ namespace Microsoft.SpatialAlignment
             Vector3 offset = actualDireciton.ToVector() * directionAmount;
 
             // Update the position using the correct coordinate space (local vs world)
-            TargetTransform.Translate(offset, space);
+            TargetTransform.Translate(offset, Space);
         }
 
         /// <summary>
@@ -263,7 +260,7 @@ namespace Microsoft.SpatialAlignment
             float angle = (rotation == NudgeRotation.Left ? -rotationAmount : rotationAmount);
 
             // Update the rotation
-            TargetTransform.Rotate(upDirection.ToVector(), angle, space);
+            TargetTransform.Rotate(upDirection.ToVector(), angle, Space);
         }
 
         /// <summary>
@@ -332,14 +329,6 @@ namespace Microsoft.SpatialAlignment
         public float RotationAmount { get { return rotationAmount; } set { rotationAmount = value; } }
 
         /// <summary>
-        /// Gets or sets the coordinate system to use when performing operations.
-        /// </summary>
-        /// <remarks>
-        /// The default is <see cref="Space.Self"/>.
-        /// </remarks>
-        public Space Space { get { return space; } set { space = value; } }
-
-        /// <summary>
         /// Gets or sets the axis that should be considered Up for rotation operations.
         /// </summary>
         /// <remarks>
@@ -351,6 +340,15 @@ namespace Microsoft.SpatialAlignment
         /// Gets or sets whether to display the UX controller when performing refinement.
         /// </summary>
         public bool UseController { get { return useController; } set { useController = value; } }
+
+        /// <summary>
+        /// Gets or sets whether the look direction of the <see cref="TargetTransform"/> should be
+        /// used as the forward direction for nudge operations.
+        /// </summary>
+        /// <remarks>
+        /// The default is <c>true</c>.
+        /// </remarks>
+        public bool UseLookDirection { get { return useLookDirection; } set { useLookDirection = value; } }
         #endregion // Public Properties
     }
 }

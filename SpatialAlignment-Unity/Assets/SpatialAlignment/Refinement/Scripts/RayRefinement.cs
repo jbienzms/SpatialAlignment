@@ -23,9 +23,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using HoloToolkit.Unity;
-using HoloToolkit.Unity.InputModule;
-using HoloToolkit.Unity.SpatialMapping;
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.Toolkit.SpatialAwareness;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ namespace Microsoft.SpatialAlignment
     /// A controller that refines the transform based on an origin point and
     /// a direction.
     /// </summary>
-    public class RayRefinement : RefinementBase, IInputClickHandler
+    public class RayRefinement : RefinementBase, IMixedRealityInputHandler
     {
         #region Constants
         private const float DEF_SCALE = 0.05f;
@@ -83,6 +84,7 @@ namespace Microsoft.SpatialAlignment
 
         #region Member Variables
         private RayRefinementStep currentStep;      // What step we're on in the refinement
+        private GameObject currentTarget;           // Current target to be moved
         private Vector3 lastTargetPosition;			// The last position where a target was placed
         private GameObject modelDirection;          // GameObject instance representing the models direction
         private LineRenderer modelLine;             // Used to render a line pointing from the model origin in the model direction
@@ -90,7 +92,6 @@ namespace Microsoft.SpatialAlignment
         private GameObject placementDirection;      // GameObject instance representing the placement direction
         private LineRenderer placementLine;         // Used to render a line pointing from the placement origin in the placement direction
         private GameObject placementOrigin;         // GameObject instance representing the placement origin
-        private Interpolator targetInterpolator;    // Interpolator used to move the current target
         private bool targetPlaced;                  // Whether or not the current target has been placed
         #endregion // Member Variables
 
@@ -191,8 +192,8 @@ namespace Microsoft.SpatialAlignment
             // Name it
             target.name = name;
 
-            // Ensure it has an interpolator and store the reference
-            targetInterpolator = target.EnsureComponent<Interpolator>();
+            // Store the reference
+            currentTarget = target;
 
             // Target has not been placed
             targetPlaced = false;
@@ -318,7 +319,7 @@ namespace Microsoft.SpatialAlignment
         private void StopAndCleanup()
         {
             // No longer modal
-            InputManager.Instance.PopModalInputHandler();
+            MixedRealityToolkit.InputSystem.PopModalInputHandler();
 
             // No longer in any step
             currentStep = RayRefinementStep.None;
@@ -333,16 +334,22 @@ namespace Microsoft.SpatialAlignment
             lastTargetPosition = Vector3.zero;
             modelLine = null;
             placementLine = null;
-            targetInterpolator = null;
+            currentTarget = null;
         }
         #endregion // Internal Methods
 
         #region Overrides / Event Handlers
         /// <inheritdoc />
-        protected virtual void OnInputClicked(InputClickedEventData eventData)
+        private void OnInputUp(InputEventData eventData)
         {
+            // If this event is already handled, ignore
+            if (eventData.used) { return; }
+
             // If we're not refining, ignore
             if (!IsRefining) { return; }
+
+            // We used it
+            eventData.Use();
 
             // If the current target has been successfully placed at least
             // once, move on to the next step
@@ -385,7 +392,7 @@ namespace Microsoft.SpatialAlignment
         protected override void OnRefinementStarted()
         {
             // Capture input handler (released in StopAndCleanup)
-            InputManager.Instance.PushModalInputHandler(gameObject);
+            MixedRealityToolkit.InputSystem.PushModalInputHandler(gameObject);
 
             // Start
             currentStep = RayRefinementStep.None;
@@ -394,23 +401,43 @@ namespace Microsoft.SpatialAlignment
             // Pass to base to notify
             base.OnRefinementStarted();
         }
+
+        protected override void RegisterHandlers()
+        {
+            base.RegisterHandlers();
+            InputSystem.RegisterHandler<IMixedRealityInputHandler>(this);
+        }
+
+        protected override void UnregisterHandlers()
+        {
+            InputSystem.UnregisterHandler<IMixedRealityInputHandler>(this);
+            base.UnregisterHandlers();
+        }
         #endregion // Overrides / Event Handlers
 
-        #region IInputClickHandler Interface
-        void IInputClickHandler.OnInputClicked(InputClickedEventData eventData) { OnInputClicked(eventData); }
+        #region IMixedRealityInputHandler Interface
+        void IMixedRealityInputHandler.OnInputDown(InputEventData eventData) { }
+        void IMixedRealityInputHandler.OnInputUp(InputEventData eventData) { OnInputUp(eventData); }
         #endregion // IInputClickHandler Interface
 
         #region Unity Overrides
         /// <inheritdoc />
         protected override void Start()
         {
+            // We do not require input focus
+            IsFocusRequired = false;
+
             // If no custom placement layer has been specified, pick something
             // intelligent.
             if (placementLayers == 0)
             {
-                // If SpatialMappingManager is valid, use its layer mask
-                // Otherwise, use the 'Default' layer.
-                int mask = (SpatialMappingManager.Instance != null ? SpatialMappingManager.Instance.LayerMask : 1 << 0);
+                // Try to get the first running spatial mapping observer
+                var observer = ((IMixedRealityDataProviderAccess)MixedRealityToolkit.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessObserver>().Where(o => o.IsRunning).FirstOrDefault();
+
+                // Use the observers layer mask or a reasonable default
+                int mask = 1 << (observer != null ? observer.DefaultPhysicsLayer : 1);
+
+                // Update the layers
                 placementLayers = mask;
             }
 
@@ -478,7 +505,7 @@ namespace Microsoft.SpatialAlignment
                 lastTargetPosition = hitInfo.point;
 
                 // Tell the target to move to the new position
-                targetInterpolator.SetTargetPosition(lastTargetPosition);
+                currentTarget.transform.position = lastTargetPosition;
 
                 // Target has been placed
                 targetPlaced = true;
@@ -498,7 +525,7 @@ namespace Microsoft.SpatialAlignment
                 Vector3 relativePos = direction.position - origin.position;
 
                 // Rotate the target direction to point away from the origin
-                targetInterpolator.SetTargetRotation(Quaternion.FromToRotation(TargetTransform.up, relativePos));
+                currentTarget.transform.rotation = Quaternion.FromToRotation(TargetTransform.up, relativePos);
 
                 // Get the line renderer
                 LineRenderer line = (isModel ? modelLine : placementLine);

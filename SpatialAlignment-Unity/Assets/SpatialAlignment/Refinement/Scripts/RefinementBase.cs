@@ -23,6 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Microsoft.MixedReality.Toolkit.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -70,7 +71,7 @@ namespace Microsoft.SpatialAlignment
     /// The base class for a behavior that provides cancelable refinement of the
     /// transform of an object.
     /// </summary>
-    public class RefinementBase : MonoBehaviour
+    public class RefinementBase : BaseInputHandler
     {
         #region Member Variables
         private bool isRefining;
@@ -84,11 +85,85 @@ namespace Microsoft.SpatialAlignment
         private bool refineOnStart;
 
         [SerializeField]
+        [Tooltip("The coordinate system to use when performing operations.")]
+        private Space space = Space.Self;
+
+        [SerializeField]
         [Tooltip("Optional transform where nudge operations will be applied. If none is specified, the transform of the applied GameObject will be used.")]
         private Transform targetTransform;
         #endregion // Unity Inspector Variables
 
-        #region Overrides / Event Handlers
+        #region Internal Methods
+        /// <summary>
+        /// Gets a relative "look" direction for the <see cref="TargetTransform"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="RefinementDirection"/> that represents the look
+        /// direction for the target transform.
+        /// </returns>
+        protected virtual RefinementDirection GetLookDirection()
+        {
+            // Which "forward" are we using
+            Vector3 forward;
+            if (space == Space.World)
+            {
+                // Just use controller forward
+                forward = transform.forward;
+            }
+            else
+            {
+                // Use controller forward but in target local space
+                forward = targetTransform.InverseTransformDirection(transform.forward);
+            }
+
+            // Get the absolute axis for the forward direction (snaps to axis only)
+            forward = forward.AbsoluteAxis();
+
+            // Normalize it toward 1.0
+            forward = forward.normalized;
+
+            // Try to convert the vector to a direction
+            RefinementDirection direction;
+            if (forward.TryGetDirection(out direction))
+            {
+                return direction;
+            }
+            else
+            {
+                return RefinementDirection.Forward;
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void RegisterHandlers()
+        {
+        }
+
+        /// <summary>
+        /// Restores the last transform to the current transform.
+        /// </summary>
+        protected virtual void RestoreLastTransform()
+        {
+            targetTransform.position = lastPosition;
+            targetTransform.rotation = lastRotation;
+        }
+
+        /// <summary>
+        /// Saves the current transform as the last transform.
+        /// </summary>
+        protected virtual void SaveLastTransform()
+        {
+            lastPosition = targetTransform.position;
+            lastRotation = targetTransform.rotation;
+        }
+
+        /// <inheritdoc />
+        protected override void UnregisterHandlers()
+        {
+        }
+        #endregion // Internal Methods
+
+        #region Overridables / Event Triggers
         /// <summary>
         /// Called when the user has canceled refinement.
         /// </summary>
@@ -120,25 +195,7 @@ namespace Microsoft.SpatialAlignment
         {
             RefinementStarted?.Invoke(this, EventArgs.Empty);
         }
-
-        /// <summary>
-        /// Restores the last transform to the current transform.
-        /// </summary>
-        protected virtual void RestoreLastTransform()
-        {
-            targetTransform.position = lastPosition;
-            targetTransform.rotation = lastRotation;
-        }
-
-        /// <summary>
-        /// Saves the current transform as the last transform.
-        /// </summary>
-        protected virtual void SaveLastTransform()
-        {
-            lastPosition = targetTransform.position;
-            lastRotation = targetTransform.rotation;
-        }
-        #endregion // Overrides / Event Handlers
+        #endregion // Overridables / Event Triggers
 
         #region Unity Overrides
         /// <summary>
@@ -162,26 +219,14 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
-        /// This function is called when the behavior becomes disabled or inactive.
-        /// </summary>
-        protected virtual void OnDisable()
-        {
-
-        }
-
-        /// <summary>
-        /// Only called if the Object is active, this function is called just after the object is enabled.
-        /// </summary>
-        protected virtual void OnEnable()
-        {
-
-        }
-
-        /// <summary>
         /// Start is called before the first frame update.
         /// </summary>
-        protected virtual void Start()
+        protected override void Start()
         {
+            // Call base first
+            base.Start();
+
+            // Start refining?
             if (refineOnStart)
             {
                 StartRefinement();
@@ -276,6 +321,14 @@ namespace Microsoft.SpatialAlignment
         /// Gets or sets whether to begin refining when the behavior starts.
         /// </summary>
         public bool RefineOnStart { get => refineOnStart; set => refineOnStart = value; }
+
+        /// <summary>
+        /// Gets or sets the coordinate system to use when performing operations.
+        /// </summary>
+        /// <remarks>
+        /// The default is <see cref="Space.Self"/>.
+        /// </remarks>
+        public Space Space { get { return space; } set { space = value; } }
 
         /// <summary>
         /// Gets or sets an optional transform where nudge operations will be applied. If none is specified, the transform of the applied GameObject will be used.
