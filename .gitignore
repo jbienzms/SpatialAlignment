@@ -34,9 +34,10 @@ SharingClient.dll
 PlaneFinding.dll
 
 # Mixed Reality Toolkit which is symlinked in
-MixedRealityToolkit*/
-Microsoft.MixedReality.Toolkit*.*
-MixedRealityToolkit*.*
+SpatialAlignment-Unity/Microsoft.MixedReality.Toolkit*.*
+SpatialAlignment-Unity/MixedRealityToolkit*.*
+SpatialAlignment-Unity/Assets/MixedRealityToolkit*/
+SpatialAlignment-Unity/Assets/MixedRealityToolkit*.*
 
 
 # Google AR Core which should be imported separately
