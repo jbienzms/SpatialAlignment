@@ -1,5 +1,27 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+﻿//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license.
+//
+// MIT License:
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,11 +33,11 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
     /// Class providing the default implementation of the <see cref="IMixedRealitySpatialAlignmentSystem"/> interface.
     /// </summary>
     [DocLink("https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/SpatialAlignment/SpatialAlignmentGettingStarted.html")]
-    public class MixedRealitySpatialAlignmentSystem : BaseCoreSystem, IMixedRealitySpatialAlignmentSystem, IMixedRealityDataProviderAccess, IMixedRealityCapabilityCheck
+    public class MixedRealitySpatialAlignmentSystem : BaseCoreSystem, ISpatialAlignmentSystem, IMixedRealityDataProviderAccess, IMixedRealityCapabilityCheck, IMixedRealityExtensionService
     {
         public MixedRealitySpatialAlignmentSystem(
             IMixedRealityServiceRegistrar registrar,
-            MixedRealitySpatialAlignmentSystemProfile profile) : base(registrar, profile)
+            SpatialAlignmentSystemProfile profile) : base(registrar, profile)
         {
             if (registrar == null)
             {
@@ -32,10 +54,10 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
             {
                 IMixedRealityCapabilityCheck capabilityChecker = observers[i] as IMixedRealityCapabilityCheck;
 
-                // If one of the running data providers supports the requested capability, 
+                // If one of the running data providers supports the requested capability,
                 // the application has the needed support to leverage the desired functionality.
                 if ((capabilityChecker != null) &&
-                    capabilityChecker.CheckCapability(capability))
+                        capabilityChecker.CheckCapability(capability))
                 {
                     return true;
                 }
@@ -48,7 +70,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
 
         #region IMixedRealityToolkitService Implementation
 
-        private MixedRealitySpatialAlignmentEventData<SpatialAlignmentCoordinateObject> coordinateEventData = null;
+        private SpatialCoordinateEventData<ISpatialCoordinate> coordinateEventData = null;
 
         /// <inheritdoc/>
         public override void Initialize()
@@ -62,11 +84,11 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         /// </summary>
         private void InitializeInternal()
         {
-            coordinateEventData = new MixedRealitySpatialAlignmentEventData<SpatialAlignmentCoordinateObject>(EventSystem.current);
+            coordinateEventData = new SpatialCoordinateEventData<ISpatialCoordinate>(EventSystem.current);
 
-#if UNITY_EDITOR
-            // No need to enable capabilities at this level, but perhaps at the provider leve. For example, QR Code.
-#endif // UNITY_EDITOR
+            #if UNITY_EDITOR
+            // No need to enable capabilities at this level, but perhaps at the provider level. For example, QR Code.
+            #endif // UNITY_EDITOR
         }
 
         /// <inheritdoc/>
@@ -81,7 +103,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
                 {
                     if (observers[i] != null)
                     {
-                        Registrar.UnregisterDataProvider<IMixedRealitySpatialCoordinateObserver>(observers[i]);
+                        Registrar.UnregisterDataProvider<ISpatialCoordinateObserver>(observers[i]);
                     }
                 }
             }
@@ -93,22 +115,22 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         {
             base.Enable();
 
-            MixedRealitySpatialAlignmentSystemProfile profile = ConfigurationProfile as MixedRealitySpatialAlignmentSystemProfile;
+            SpatialAlignmentSystemProfile profile = ConfigurationProfile as SpatialAlignmentSystemProfile;
 
             if ((observers.Count == 0) && (profile != null))
             {
                 // Register the spatial observers.
                 for (int i = 0; i < profile.ObserverConfigurations.Length; i++)
                 {
-                    MixedRealityCoordinateObserverConfiguration configuration = profile.ObserverConfigurations[i];
+                    CoordinateObserverConfiguration configuration = profile.ObserverConfigurations[i];
                     object[] args = { Registrar, this, configuration.ComponentName, configuration.Priority, configuration.ObserverProfile };
 
-                    if (Registrar.RegisterDataProvider<IMixedRealitySpatialCoordinateObserver>(
-                        configuration.ComponentType.Type,
-                        configuration.RuntimePlatform,
-                        args))
+                    if (Registrar.RegisterDataProvider<ISpatialCoordinateObserver>(
+                                configuration.ComponentType.Type,
+                                configuration.RuntimePlatform,
+                                args))
                     {
-                        observers.Add(Registrar.GetDataProvider<IMixedRealitySpatialCoordinateObserver>(configuration.ComponentName));
+                        observers.Add(Registrar.GetDataProvider<ISpatialCoordinateObserver>(configuration.ComponentName));
                     }
                 }
             }
@@ -125,9 +147,9 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         /// <inheritdoc/>
         public override void Destroy()
         {
-#if UNITY_EDITOR
-            // No need to disable capabilities at this level, but perhaps at the provider leve. For example, QR Code.
-#endif // UNITY_EDITOR
+            #if UNITY_EDITOR
+            // No need to disable capabilities at this level, but perhaps at the provider level. For example, QR Code.
+            #endif // UNITY_EDITOR
 
             // Cleanup game objects created during execution.
             if (Application.isPlaying)
@@ -154,9 +176,9 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         #region IMixedRealitySpatialAlignmentSystem Implementation
 
         /// <summary>
-        /// The collection of registered spatial corrdinate observers.
+        /// The collection of registered spatial coordinate observers.
         /// </summary>
-        private List<IMixedRealitySpatialCoordinateObserver> observers = new List<IMixedRealitySpatialCoordinateObserver>();
+        private List<ISpatialCoordinateObserver> observers = new List<ISpatialCoordinateObserver>();
 
         /// <summary>
         /// The parent object, in the hierarchy, under which all observed game objects will be placed.
@@ -188,7 +210,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         {
             GameObject objectParent = new GameObject(name);
 
-            objectParent.transform.parent = SpatialAObjectParent.transform;
+            objectParent.transform.parent = SpatialAlignmentObjectParent.transform;
 
             return objectParent;
         }
@@ -201,35 +223,35 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
             return nextSourceId++;
         }
 
-        private MixedRealitySpatialAlignmentSystemProfile spatialAlignmentSystemProfile = null;
+        private SpatialAlignmentSystemProfile spatialAlignmentSystemProfile = null;
 
         /// <inheritdoc/>
-        public MixedRealitySpatialAlignmentSystemProfile SpatialAlignmentSystemProfile
+        public SpatialAlignmentSystemProfile SpatialAlignmentSystemProfile
         {
             get
             {
                 if (spatialAlignmentSystemProfile == null)
                 {
-                    spatialAlignmentSystemProfile = ConfigurationProfile as MixedRealitySpatialAlignmentSystemProfile;
+                    spatialAlignmentSystemProfile = ConfigurationProfile as SpatialAlignmentSystemProfile;
                 }
                 return spatialAlignmentSystemProfile;
             }
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<IMixedRealitySpatialCoordinateObserver> GetObservers()
+        public IReadOnlyList<ISpatialCoordinateObserver> GetObservers()
         {
-            return GetDataProviders() as IReadOnlyList<IMixedRealitySpatialCoordinateObserver>;
+            return GetDataProviders() as IReadOnlyList<ISpatialCoordinateObserver>;
         }
 
         /// <inheritdoc />
         public IReadOnlyList<IMixedRealityDataProvider> GetDataProviders()
         {
-            return new List<IMixedRealitySpatialCoordinateObserver>(observers) as IReadOnlyList<IMixedRealitySpatialCoordinateObserver>;
+            return new List<ISpatialCoordinateObserver>(observers) as IReadOnlyList<ISpatialCoordinateObserver>;
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<T> GetObservers<T>() where T : IMixedRealitySpatialCoordinateObserver
+        public IReadOnlyList<T> GetObservers<T>() where T : ISpatialCoordinateObserver
         {
             return GetDataProviders<T>();
         }
@@ -252,9 +274,9 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         }
 
         /// <inheritdoc />
-        public IMixedRealitySpatialCoordinateObserver GetObserver(string name)
+        public ISpatialCoordinateObserver GetObserver(string name)
         {
-            return GetDataProvider(name) as IMixedRealitySpatialCoordinateObserver;
+            return GetDataProvider(name) as ISpatialCoordinateObserver;
         }
 
         /// <inheritdoc />
@@ -272,7 +294,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         }
 
         /// <inheritdoc />
-        public T GetObserver<T>(string name = null) where T : IMixedRealitySpatialCoordinateObserver
+        public T GetObserver<T>(string name = null) where T : ISpatialCoordinateObserver
         {
             return GetDataProvider<T>(name);
         }
@@ -304,7 +326,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         }
 
         /// <inheritdoc />
-        public void ResumeObservers<T>() where T : IMixedRealitySpatialCoordinateObserver
+        public void ResumeObservers<T>() where T : ISpatialCoordinateObserver
         {
             for (int i = 0; i < observers.Count; i++)
             {
@@ -316,7 +338,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         }
 
         /// <inheritdoc />
-        public void ResumeObserver<T>(string name) where T : IMixedRealitySpatialCoordinateObserver
+        public void ResumeObserver<T>(string name) where T : ISpatialCoordinateObserver
         {
             for (int i = 0; i < observers.Count; i++)
             {
@@ -338,7 +360,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         }
 
         /// <inheritdoc />
-        public void SuspendObservers<T>() where T : IMixedRealitySpatialCoordinateObserver
+        public void SuspendObservers<T>() where T : ISpatialCoordinateObserver
         {
             for (int i = 0; i < observers.Count; i++)
             {
@@ -350,7 +372,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         }
 
         /// <inheritdoc />
-        public void SuspendObserver<T>(string name) where T : IMixedRealitySpatialCoordinateObserver
+        public void SuspendObserver<T>(string name) where T : ISpatialCoordinateObserver
         {
             for (int i = 0; i < observers.Count; i++)
             {
@@ -372,49 +394,49 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         }
 
         /// <inheritdoc />
-        public void ClearObservations<T>(string name) where T : IMixedRealitySpatialCoordinateObserver
+        public void ClearObservations<T>(string name) where T : ISpatialCoordinateObserver
         {
             T observer = GetObserver<T>(name);
             observer?.ClearObservations();
         }
 
         /// <inheritdoc />
-        public void RaiseCoordinateAdded(IMixedRealitySpatialCoordinateObserver observer, int coordinateId, SpatialCoordinateObject coordinateObject)
+        public void RaiseCoordinateAdded(ISpatialCoordinateObserver observer, ISpatialCoordinate coordinate)
         {
-            coordinateEventData.Initialize(observer, coordinateId, coordinateObject);
+            coordinateEventData.Initialize(observer, coordinate.Id, coordinate);
             HandleEvent(coordinateEventData, OnCoordinateAdded);
         }
 
         /// <summary>
         /// Event sent whenever a coordinate is added.
         /// </summary>
-        private static readonly ExecuteEvents.EventFunction<IMixedRealitySpatialCoordinateHandler<SpatialCoordinateObject>> OnCoordinateAdded =
-            delegate (IMixedRealitySpatialCoordinateHandler<SpatialCoordinateObject> handler, BaseEventData eventData)
-            {
-                MixedRealitySpatialCoordinateEventData<SpatialCoordinateObject> spatialEventData = ExecuteEvents.ValidateEventData<MixedRealityCoordinateEventData<SpatialCoordinateObject>>(eventData);
-                handler.OnCoordinateAdded(spatialEventData);
-            };
+        private static readonly ExecuteEvents.EventFunction<ISpatialCoordinateHandler<ISpatialCoordinate>> OnCoordinateAdded =
+            delegate (ISpatialCoordinateHandler<ISpatialCoordinate> handler, BaseEventData eventData)
+        {
+            SpatialCoordinateEventData<ISpatialCoordinate> spatialEventData = ExecuteEvents.ValidateEventData<SpatialCoordinateEventData<ISpatialCoordinate>>(eventData);
+            handler.OnCoordinateAdded(spatialEventData);
+        };
 
         /// <inheritdoc />
-        public void RaiseCoordinateUpdated(IMixedRealitySpatialCoordinateObserver observer, int coordinateId, SpatialCoordinateObject coordinateObject)
+        public void RaiseCoordinateUpdated(ISpatialCoordinateObserver observer, ISpatialCoordinate coordinate)
         {
-            coordinateEventData.Initialize(observer, coordinateId, coordinateObject);
+            coordinateEventData.Initialize(observer, coordinate.Id, coordinate);
             HandleEvent(coordinateEventData, OnCoordinateUpdated);
         }
 
         /// <summary>
         /// Event sent whenever a coordinate is updated.
         /// </summary>
-        private static readonly ExecuteEvents.EventFunction<IMixedRealitySpatialCoordinateHandler<SpatialCoordinateObject>> OnCoordinateUpdated =
-            delegate (IMixedRealitySpatialCoordinateHandler<SpatialCoordinateObject> handler, BaseEventData eventData)
-            {
-                MixedRealityCoordinateEventData<SpatialCoordinateObject> spatialEventData = ExecuteEvents.ValidateEventData<MixedRealityCoordinateEventData<SpatialCoordinateObject>>(eventData);
-                handler.OnCoordinateUpdated(spatialEventData);
-            };
+        private static readonly ExecuteEvents.EventFunction<ISpatialCoordinateHandler<ISpatialCoordinate>> OnCoordinateUpdated =
+            delegate (ISpatialCoordinateHandler<ISpatialCoordinate> handler, BaseEventData eventData)
+        {
+            SpatialCoordinateEventData<ISpatialCoordinate> spatialEventData = ExecuteEvents.ValidateEventData<SpatialCoordinateEventData<ISpatialCoordinate>>(eventData);
+            handler.OnCoordinateUpdated(spatialEventData);
+        };
 
 
         /// <inheritdoc />
-        public void RaiseCoordinateRemoved(IMixedRealitySpatialCoordinateObserver observer, int coordinateId)
+        public void RaiseCoordinateRemoved(ISpatialCoordinateObserver observer, string coordinateId)
         {
             coordinateEventData.Initialize(observer, coordinateId, null);
             HandleEvent(coordinateEventData, OnCoordinateRemoved);
@@ -423,12 +445,12 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
         /// <summary>
         /// Event sent whenever a coordinate is discarded.
         /// </summary>
-        private static readonly ExecuteEvents.EventFunction<IMixedRealitySpatialCoordinateHandler<SpatialCoordinateObject>> OnCoordinateRemoved =
-            delegate (IMixedRealitySpatialCoordinateHandler<SpatialCoordinateObject> handler, BaseEventData eventData)
-            {
-                MixedRealityCoordinateEventData<SpatialCoordinateObject> spatialEventData = ExecuteEvents.ValidateEventData<MixedRealityCoordinateEventData<SpatialCoordinateObject>>(eventData);
-                handler.OnCoordinateRemoved(spatialEventData);
-            };
+        private static readonly ExecuteEvents.EventFunction<ISpatialCoordinateHandler<ISpatialCoordinate>> OnCoordinateRemoved =
+            delegate (ISpatialCoordinateHandler<ISpatialCoordinate> handler, BaseEventData eventData)
+        {
+            SpatialCoordinateEventData<ISpatialCoordinate> spatialEventData = ExecuteEvents.ValidateEventData<SpatialCoordinateEventData<ISpatialCoordinate>>(eventData);
+            handler.OnCoordinateRemoved(spatialEventData);
+        };
 
         #endregion IMixedRealitySpatialAlignmentSystem Implementation
     }

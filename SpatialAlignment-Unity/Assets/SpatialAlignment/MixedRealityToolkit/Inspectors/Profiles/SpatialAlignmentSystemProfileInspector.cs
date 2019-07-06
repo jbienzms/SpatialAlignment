@@ -1,5 +1,27 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information. 
+﻿//
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license.
+//
+// MIT License:
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
 
 using Microsoft.MixedReality.Toolkit.Editor;
 using Microsoft.MixedReality.Toolkit.Utilities.Editor;
@@ -7,21 +29,21 @@ using UnityEngine;
 using UnityEditor;
 using Microsoft.MixedReality.Toolkit.Utilities;
 
-namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
+namespace Microsoft.MixedReality.Toolkit.SpatialAlignment.Editor
 {
-    [CustomEditor(typeof(MixedRealitySpatialAwarenessSystemProfile))]
-    public class MixedRealitySpatialAwarenessSystemProfileInspector : BaseMixedRealityToolkitConfigurationProfileInspector
+    [CustomEditor(typeof(SpatialAlignmentSystemProfile))]
+    public class SpatialAlignmentSystemProfileInspector : BaseMixedRealityToolkitConfigurationProfileInspector
     {
-        private static readonly GUIContent AddObserverContent = new GUIContent("+ Add Spatial Observer", "Add Spatial Observer");
-        private static readonly GUIContent RemoveObserverContent = new GUIContent("-", "Remove Spatial Observer");
+        private static readonly GUIContent AddObserverContent = new GUIContent("+ Add Coordinate Observer", "Add Coordinate Observer");
+        private static readonly GUIContent RemoveObserverContent = new GUIContent("-", "Remove Coordinate Observer");
 
         private static readonly GUIContent ComponentTypeContent = new GUIContent("Type");
         private static readonly GUIContent RuntimePlatformContent = new GUIContent("Platform(s)");
 
         private SerializedProperty observerConfigurations;
 
-        private const string ProfileTitle = "Spatial Awareness System Settings";
-        private const string ProfileDescription = "The Spatial Awareness System profile allows developers to configure cross-platform environmental awareness.";
+        private const string ProfileTitle = "Spatial Alignment System Settings";
+        private const string ProfileDescription = "The Spatial Alignment System profile allows developers to configure cross-platform coordinate tracking.";
 
         private static bool[] observerFoldouts;
 
@@ -59,7 +81,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
             var profile = target as BaseMixedRealityProfile;
             return MixedRealityToolkit.IsInitialized && profile != null &&
                    MixedRealityToolkit.Instance.HasActiveProfile &&
-                   profile == MixedRealityToolkit.Instance.ActiveProfile.SpatialAwarenessSystemProfile;
+                   profile == MixedRealityToolkit.Instance.ActiveProfile;
         }
 
         private void RenderList(SerializedProperty list)
@@ -84,7 +106,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
 
                     serializedObject.ApplyModifiedProperties();
 
-                    SystemType observerType = ((MixedRealitySpatialAwarenessSystemProfile)serializedObject.targetObject).ObserverConfigurations[list.arraySize - 1].ComponentType;
+                    SystemType observerType = ((SpatialAlignmentSystemProfile)serializedObject.targetObject).ObserverConfigurations[list.arraySize - 1].ComponentType;
                     observerType.Type = null;
 
                     observerFoldouts = new bool[list.arraySize];
@@ -93,7 +115,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
 
                 if (list == null || list.arraySize == 0)
                 {
-                    EditorGUILayout.HelpBox("The Mixed Reality Spatial Awareness System requires one or more observers.", MessageType.Warning);
+                    EditorGUILayout.HelpBox("The Mixed Reality Spatial Alignment System requires one or more observers.", MessageType.Warning);
                     return;
                 }
 
@@ -110,7 +132,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             observerFoldouts[i] = EditorGUILayout.Foldout(observerFoldouts[i], observerName.stringValue, true);
- 
+
                             if (GUILayout.Button(RemoveObserverContent, EditorStyles.miniButtonRight, GUILayout.Width(24f)))
                             {
                                 list.DeleteArrayElementAtIndex(i);
@@ -127,7 +149,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
                             if (EditorGUI.EndChangeCheck())
                             {
                                 serializedObject.ApplyModifiedProperties();
-                                System.Type type = ((MixedRealitySpatialAwarenessSystemProfile)serializedObject.targetObject).ObserverConfigurations[i].ComponentType.Type;
+                                System.Type type = ((SpatialAlignmentSystemProfile)serializedObject.targetObject).ObserverConfigurations[i].ComponentType.Type;
                                 ApplyObserverConfiguration(type, observerName, observerProfile, runtimePlatform);
                                 break;
                             }
@@ -139,7 +161,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
                             System.Type serviceType = null;
                             if (observerProfile.objectReferenceValue != null)
                             {
-                                serviceType = (target as MixedRealitySpatialAwarenessSystemProfile).ObserverConfigurations[i].ComponentType;
+                                serviceType = (target as SpatialAlignmentSystemProfile).ObserverConfigurations[i].ComponentType;
                             }
 
                             changed |= RenderProfile(observerProfile, null, true, false, serviceType);
@@ -156,7 +178,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness.Editor
             }
         }
         private void ApplyObserverConfiguration(
-            System.Type type, 
+            System.Type type,
             SerializedProperty observerName,
             SerializedProperty configurationProfile,
             SerializedProperty runtimePlatform)

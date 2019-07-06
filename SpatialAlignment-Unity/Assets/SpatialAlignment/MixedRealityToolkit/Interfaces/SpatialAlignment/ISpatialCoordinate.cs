@@ -8,7 +8,7 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAlignment
 	/// <summary>
 	/// The base interface for a spatial coordinate.
 	/// </summary>	
-    public interface IMixedRealitySpatialCoordinate
+    public interface ISpatialCoordinate
     {
         /// <summary>
         /// Gets the ID of the coordinate.
