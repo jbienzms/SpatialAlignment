@@ -35,7 +35,7 @@ ECHO =                               Linking SpatialAlignment                   
 ECHO ===============================================================================
 ECHO.
 mklink /J "Assets\SpatialAlignment" "%SpatialAlignmentSource%\Assets\SpatialAlignment"
-mklink /J "Assets\SpatialAlignment-Examples" "%SpatialAlignmentSource%\Assets\SpatialAlignment-Examples"
+mklink /J "Assets\SpatialAlignment.Examples" "%SpatialAlignmentSource%\Assets\SpatialAlignment.Examples"
 ECHO.
 
 PAUSE

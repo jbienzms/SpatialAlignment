@@ -60,6 +60,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\SpatialAlignment.Examples\Common\Scripts\TapToPlace.cs" />
+    <Compile Include="Assets\SpatialAlignment.Examples\Common\Scripts\TapToTest.cs" />
+    <Compile Include="Assets\SpatialAlignment.Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
+    <Compile Include="Assets\SpatialAlignment.Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\INativePersistence.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\ISpatialAlignmentStore.cs" />
     <Compile Include="Assets\SpatialAlignment\Persistence\Json\AlignmentStrategyConverter.cs" />
@@ -96,10 +100,6 @@
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\SplitViewManager.cs" />
     <Compile Include="Assets\SpatialAlignment\Utilities\Scripts\UnityDispatcher.cs" />
     <Compile Include="Assets\SpatialAlignment\UX\Interactable\Scripts\Events\InteractableInputActionReceiver.cs" />
-    <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\TapToPlace.cs" />
-    <Compile Include="Assets\SpatialAlignment-Examples\Common\Scripts\TapToTest.cs" />
-    <Compile Include="Assets\SpatialAlignment-Examples\Persistence\Scripts\PersistenceExampleManager.cs" />
-    <Compile Include="Assets\SpatialAlignment-Examples\Refinement\Scripts\RefinementExampleManager.cs" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\MixedRealityToolkit.Providers\Version.txt" />
