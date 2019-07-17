@@ -76,7 +76,7 @@ namespace Microsoft.SpatialAlignment
     /// A controller that refines the transform based on an origin point and
     /// a direction.
     /// </summary>
-    public class RayRefinement : RefinementBase, IMixedRealityInputHandler
+    public class RayRefinement : RefinementBase, IMixedRealityInputActionHandler
     {
         #region Constants
         private const float DEF_SCALE = 0.05f;
@@ -99,6 +99,10 @@ namespace Microsoft.SpatialAlignment
         [SerializeField]
         [Tooltip("Whether to automatically show and hide the mesh during placement.")]
         private bool autoHideMeshes = true;
+
+        [Tooltip("The input action that will be used to advance refinement. If one is not specified, 'Select' will be used.")]
+        [SerializeField]
+        private MixedRealityInputAction advanceAction;
 
         [SerializeField]
         [Tooltip("The prefab used to represent a direction. If one is not specified, a capsule will be used.")]
@@ -197,6 +201,30 @@ namespace Microsoft.SpatialAlignment
 
             // Target has not been placed
             targetPlaced = false;
+        }
+
+        /// <summary>
+        /// Initializes the solver, actions and optionally starts placing.
+        /// </summary>
+        private void Init()
+        {
+            // If no placement action is specified, try to get the "Select" action
+            if (advanceAction == MixedRealityInputAction.None)
+            {
+                // Try to get the input system
+                IMixedRealityInputSystem inputSystem;
+                if (MixedRealityServiceRegistry.TryGetService<IMixedRealityInputSystem>(out inputSystem))
+                {
+                    // Try to get the "Select" action.
+                    advanceAction = inputSystem.InputSystemProfile.InputActionsProfile.InputActions.Where(a => a.Description == "Select").FirstOrDefault();
+                }
+            }
+
+            // surfaceMagnetism.MaxDistance = 5;
+            // surfaceMagnetism.RaycastDirection = RaycastDirectionEnum.CameraFacing;
+            // surfaceMagnetism.SurfaceNormalOffset = 0;
+            // surfaceMagnetism.CloseDistance = 0.1;
+            // surfaceMagnetism.OrientatioMode = Full;
         }
 
         /// <summary>
@@ -340,10 +368,10 @@ namespace Microsoft.SpatialAlignment
 
         #region Overrides / Event Handlers
         /// <inheritdoc />
-        private void OnInputUp(InputEventData eventData)
+        private void OnActionEnded(BaseInputEventData eventData)
         {
-            // If this event is already handled, ignore
-            if (eventData.used) { return; }
+            // If this event is already handled or it's not the one we care about, ignore
+            if ((eventData.used) || (eventData.MixedRealityInputAction != advanceAction)) { return; }
 
             // If we're not refining, ignore
             if (!IsRefining) { return; }
@@ -405,25 +433,31 @@ namespace Microsoft.SpatialAlignment
         protected override void RegisterHandlers()
         {
             base.RegisterHandlers();
-            InputSystem.RegisterHandler<IMixedRealityInputHandler>(this);
+            InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
         }
 
         protected override void UnregisterHandlers()
         {
-            InputSystem.UnregisterHandler<IMixedRealityInputHandler>(this);
+            InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
             base.UnregisterHandlers();
         }
         #endregion // Overrides / Event Handlers
 
         #region IMixedRealityInputHandler Interface
-        void IMixedRealityInputHandler.OnInputDown(InputEventData eventData) { }
-        void IMixedRealityInputHandler.OnInputUp(InputEventData eventData) { OnInputUp(eventData); }
+        void IMixedRealityInputActionHandler.OnActionStarted(BaseInputEventData eventData) { }
+        void IMixedRealityInputActionHandler.OnActionEnded(BaseInputEventData eventData) { OnActionEnded(eventData); }
         #endregion // IInputClickHandler Interface
 
         #region Unity Overrides
         /// <inheritdoc />
         protected override void Start()
         {
+            // Pass to base first
+            base.Start();
+
+            // Initialize input actions
+            Init();
+
             // We do not require input focus
             IsFocusRequired = false;
 
@@ -471,9 +505,6 @@ namespace Microsoft.SpatialAlignment
                 directionPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
                 directionPrefab.SetActive(false);
             }
-
-            // Pass to base to complete startup
-            base.Start();
         }
 
         /// <inheritdoc />
@@ -537,6 +568,12 @@ namespace Microsoft.SpatialAlignment
         #endregion // Unity Overrides
 
         #region Public Properties
+        /// <summary>
+        /// Gets or sets the input action that will be used to advance refinement of the object.
+        /// If one is not specified, 'Select' will be used.
+        /// </summary>
+        public MixedRealityInputAction AdvanceAction { get => advanceAction; set => advanceAction = value; }
+
         /// <summary>
         /// Gets or sets whether to automatically show and hide the mesh during placement.
         /// </summary>
