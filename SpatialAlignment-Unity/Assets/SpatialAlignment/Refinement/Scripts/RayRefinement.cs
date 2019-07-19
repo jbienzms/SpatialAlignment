@@ -86,12 +86,16 @@ namespace Microsoft.SpatialAlignment
         private RayRefinementStep currentStep;      // What step we're on in the refinement
         private GameObject currentTarget;           // Current target to be moved
         private Vector3 lastTargetPosition;			// The last position where a target was placed
-        private GameObject modelDirection;          // GameObject instance representing the models direction
+        private GameObject modelDirectionGO;        // GameObject instance representing the models direction
+        private Vector3 modelDirection;             // Position representing the models direction
         private LineRenderer modelLine;             // Used to render a line pointing from the model origin in the model direction
-        private GameObject modelOrigin;				// GameObject instance representing the models origin
-        private GameObject placementDirection;      // GameObject instance representing the placement direction
+        private GameObject modelOriginGO;			// GameObject instance representing the models origin
+        private Vector3 modelOrigin;		        // Position of the models origin
+        private GameObject placementDirectionGO;    // GameObject instance representing the placement direction
+        private Vector3 placementDirection;         // Position representing the placement direction
         private LineRenderer placementLine;         // Used to render a line pointing from the placement origin in the placement direction
-        private GameObject placementOrigin;         // GameObject instance representing the placement origin
+        private GameObject placementOriginGO;       // GameObject instance representing the placement origin
+        private Vector3 placementOrigin;            // Position of the placement origin
         private bool targetPlaced;                  // Whether or not the current target has been placed
         #endregion // Member Variables
 
@@ -248,10 +252,10 @@ namespace Microsoft.SpatialAlignment
                 case RayRefinementStep.ModelOrigin:
 
                     // Create the target
-                    CreateTarget(originPrefab, ref modelOrigin, currentStep.ToString());
+                    CreateTarget(originPrefab, ref modelOriginGO, currentStep.ToString());
 
                     // Parent the target
-                    modelOrigin.transform.SetParent(TargetTransform, worldPositionStays: true);
+                    modelOriginGO.transform.SetParent(TargetTransform, worldPositionStays: true);
 
                     break;
 
@@ -259,13 +263,13 @@ namespace Microsoft.SpatialAlignment
                 case RayRefinementStep.ModelDirection:
 
                     // Create the target
-                    CreateTarget(directionPrefab, ref modelDirection, currentStep.ToString());
+                    CreateTarget(directionPrefab, ref modelDirectionGO, currentStep.ToString());
 
                     // Parent the target
-                    modelDirection.transform.SetParent(TargetTransform, worldPositionStays: true);
+                    modelDirectionGO.transform.SetParent(TargetTransform, worldPositionStays: true);
 
                     // Add line renderer
-                    modelLine = AddLine(modelDirection);
+                    modelLine = AddLine(modelDirectionGO);
 
                     break;
 
@@ -280,7 +284,7 @@ namespace Microsoft.SpatialAlignment
                     }
 
                     // Create the target
-                    CreateTarget(originPrefab, ref placementOrigin, currentStep.ToString());
+                    CreateTarget(originPrefab, ref placementOriginGO, currentStep.ToString());
 
                     break;
 
@@ -288,10 +292,10 @@ namespace Microsoft.SpatialAlignment
                 case RayRefinementStep.PlacementDirection:
 
                     // Create the target
-                    CreateTarget(directionPrefab, ref placementDirection, currentStep.ToString());
+                    CreateTarget(directionPrefab, ref placementDirectionGO, currentStep.ToString());
 
                     // Add line renderer
-                    placementLine = AddLine(placementDirection);
+                    placementLine = AddLine(placementDirectionGO);
 
                     break;
 
@@ -306,10 +310,10 @@ namespace Microsoft.SpatialAlignment
                     }
 
                     // Get transform positions
-                    Vector3 modelOriginWorld = modelOrigin.transform.position;
-                    Vector3 modelDirectionWorld = modelDirection.transform.position;
-                    Vector3 placementOriginWorld = placementOrigin.transform.position;
-                    Vector3 placementDirectionWorld = placementDirection.transform.position;
+                    Vector3 modelOriginWorld = modelOriginGO.transform.position;
+                    Vector3 modelDirectionWorld = modelDirectionGO.transform.position;
+                    Vector3 placementOriginWorld = placementOriginGO.transform.position;
+                    Vector3 placementDirectionWorld = placementDirectionGO.transform.position;
 
                     // Calculate the model angle
                     float modelAngle = Mathf.Atan2(modelDirectionWorld.x - modelOriginWorld.x, modelDirectionWorld.z - modelOriginWorld.z) * Mathf.Rad2Deg;
@@ -352,11 +356,18 @@ namespace Microsoft.SpatialAlignment
             // No longer in any step
             currentStep = RayRefinementStep.None;
 
+            // TODO: Update transforms on every frame
+            // HACK: Save transforms
+            modelOrigin = (modelOriginGO != null ?  modelOriginGO.transform.position : Vector3.zero);
+            modelDirection = (modelDirectionGO != null ? modelDirectionGO.transform.position : Vector3.zero);
+            placementOrigin = (placementOriginGO != null ? placementOriginGO.transform.position : Vector3.zero);
+            placementDirection = (placementDirectionGO != null ? placementDirectionGO.transform.position : Vector3.zero);
+
             // Cleanup resources
-            Cleanup(ref modelOrigin);
-            Cleanup(ref modelDirection);
-            Cleanup(ref placementOrigin);
-            Cleanup(ref placementDirection);
+            Cleanup(ref modelOriginGO);
+            Cleanup(ref modelDirectionGO);
+            Cleanup(ref placementOriginGO);
+            Cleanup(ref placementDirectionGO);
 
             // Reset placeholders
             lastTargetPosition = Vector3.zero;
@@ -547,10 +558,10 @@ namespace Microsoft.SpatialAlignment
             if (isDirection)
             {
                 // Get this directions transform
-                Transform direction = (isModel ? modelDirection.transform : placementDirection.transform);
+                Transform direction = (isModel ? modelDirectionGO.transform : placementDirectionGO.transform);
 
                 // Get the transform of the origin that matches this direction
-                Transform origin = (isModel ? modelOrigin.transform : placementOrigin.transform);
+                Transform origin = (isModel ? modelOriginGO.transform : placementOriginGO.transform);
 
                 // Calculate the relative offset between the two
                 Vector3 relativePos = direction.position - origin.position;
@@ -602,6 +613,14 @@ namespace Microsoft.SpatialAlignment
         public float MaxDistance { get { return maxDistance; } set { maxDistance = value; } }
 
         /// <summary>
+        /// Gets the position of the model direction point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the model direction point hasn't been placed.
+        /// </remarks>
+        public Vector3 ModelDirection { get => modelDirection; }
+
+        /// <summary>
         /// Gets or sets the layers that represent the model.
         /// </summary>
         /// <remarks>
@@ -611,12 +630,28 @@ namespace Microsoft.SpatialAlignment
         public LayerMask ModelLayers { get { return modelLayers; } set { modelLayers = value; } }
 
         /// <summary>
+        /// Gets the position of the model origin point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the model origin point hasn't been placed.
+        /// </remarks>
+        public Vector3 ModelOrigin { get => modelOrigin;  }
+
+        /// <summary>
         /// Gets or sets The prefab used to represent an origin point.
         /// </summary>
         /// <remarks>
         /// If one is not specified, a sphere will be used.
         /// </remarks>
         public GameObject OriginPrefab { get { return originPrefab; } set { originPrefab = value; } }
+
+        /// <summary>
+        /// Gets the position of the placement direction point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the placement direction point hasn't been placed.
+        /// </remarks>
+        public Vector3 PlacementDirection { get => placementDirection; }
 
         /// <summary>
         /// Gets or sets the layers that represent potential placement.
@@ -634,6 +669,14 @@ namespace Microsoft.SpatialAlignment
         /// </para>
         /// </remarks>
         public LayerMask PlacementLayers { get { return placementLayers; } set { placementLayers = value; } }
+
+        /// <summary>
+        /// Gets the position of the placement origin point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the placement origin point hasn't been placed.
+        /// </remarks>
+        public Vector3 PlacementOrigin { get => placementOrigin; }
         #endregion // Public Properties
     }
 }
