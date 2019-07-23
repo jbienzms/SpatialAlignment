@@ -38,6 +38,14 @@ MixedRealityToolkit*/
 Microsoft.MixedReality.Toolkit*.*
 MixedRealityToolkit*.*
 
+# Azure Spatial Anchors which comes from an Asset Package
+AzureSpatialAnchors*/
+AzureSpatialAnchors*.meta
+/*/Assets/Plugins.meta
+/*/Assets/Plugins/Android.meta
+/*/Assets/Plugins/Android/mainTemplate.gradle.meta
+/*/Assets/Plugins/Android/mainTemplate.gradle
+
 
 # Google AR Core which should be imported separately
 GoogleARCore/
