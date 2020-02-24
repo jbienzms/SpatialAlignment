@@ -56,9 +56,9 @@ namespace Microsoft.MixedReality.Toolkit.UI
         #endregion // Internal Methods
 
         #region Constructors
-        public InteractableInputActionReceiver(UnityEvent ev) : base(ev)
+        public InteractableInputActionReceiver(UnityEvent ev) : base(ev, "InputAction")
         {
-            Name = "InputAction";
+            // Name = "InputAction";
         }
         #endregion // Constructors
 

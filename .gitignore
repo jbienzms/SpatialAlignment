@@ -1,7 +1,10 @@
+# NuGet Packages
+SpatialAlignment-Unity/Assets/Packages
+SpatialAlignment-Unity/Assets/Packages.meta
+
 # TextMesh Pro Assets
 SpatialAlignment-Unity/Assets/TextMesh Pro.meta
 SpatialAlignment-Unity/Assets/TextMesh Pro/
-
 
 # Overly large model files for testing
 SpatialAlignment-Unity/Assets/SpatialAlignment.Examples/Common/Models/Building.meta

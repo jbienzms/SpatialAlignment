@@ -254,59 +254,6 @@ namespace Microsoft.SpatialAlignment
                     throw new InvalidOperationException($"Unknown {nameof(RefinementDirection)}: {direction}");
             }
         }
-
-        /// <summary>
-        /// Attempts to convert a <see cref="Vector3"/> into a <see cref="RefinementDirection"/>.
-        /// </summary>
-        /// <param name="vector">
-        /// The <see cref="Vector3"/> to convert.
-        /// </param>
-        /// <param name="direction">
-        /// The output <see cref="RefinementDirection"/> if successfully converted.
-        /// </param>
-        /// <returns>
-        /// <c>true</c> if the conversion was successful; otherwise <c>false</c>.
-        /// </returns>
-        static public bool TryGetDirection(this Vector3 vector, out RefinementDirection direction)
-        {
-            // Default to forward
-            direction = RefinementDirection.Forward;
-
-            // What is the vector?
-            if (vector == Vector3.back)
-            {
-                direction = RefinementDirection.Back;
-                return true;
-            }
-            else if (vector == Vector3.down)
-            {
-                direction = RefinementDirection.Down;
-                return true;
-            }
-            else if (vector == Vector3.forward)
-            {
-                direction = RefinementDirection.Forward;
-                return true;
-            }
-            else if (vector == Vector3.left)
-            {
-                direction = RefinementDirection.Left;
-                return true;
-            }
-            else if (vector == Vector3.right)
-            {
-                direction = RefinementDirection.Right;
-                return true;
-            }
-            else if (vector == Vector3.up)
-            {
-                direction = RefinementDirection.Up;
-                return true;
-            }
-
-            // No conversion possible
-            return false;
-        }
         #endregion // RefinementDirection Extensions
 
         #region Vector Extensions
@@ -397,6 +344,93 @@ namespace Microsoft.SpatialAlignment
                        Mathf.Round(vector.x * multiplier) / multiplier,
                        Mathf.Round(vector.y * multiplier) / multiplier,
                        Mathf.Round(vector.z * multiplier) / multiplier);
+        }
+
+        /// <summary>
+        /// Returns the <see cref="RefinementDirection"/> which is closest to the
+        /// <see cref="Vector3"/> direction.
+        /// </summary>
+        /// <param name="vector">
+        /// The vector used to obtain the <see cref="RefinementDirection"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="RefinementDirection"/> that most closely matches the <see cref="Vector3"/>
+        /// direction.
+        /// </returns>
+        static public RefinementDirection ToNearestDirection(this Vector3 vector)
+        {
+            // Get the absolute axis
+            var abs = vector.AbsoluteAxis();
+
+            // Which axis won?
+            if (abs.x != 0)
+            {
+                // X did. Either left or right.
+                return (abs.x < 0) ? RefinementDirection.Left : RefinementDirection.Right;
+            }
+            else if (abs.y != 0)
+            {
+                // Y did. Either down or up.
+                return (abs.y < 0) ? RefinementDirection.Down : RefinementDirection.Up;
+            }
+            else
+            {
+                // Z did. Either backward or forward.
+                return (abs.z < 0) ? RefinementDirection.Back : RefinementDirection.Forward;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to convert a <see cref="Vector3"/> into a <see cref="RefinementDirection"/>.
+        /// </summary>
+        /// <param name="vector">
+        /// The <see cref="Vector3"/> to convert.
+        /// </param>
+        /// <param name="direction">
+        /// The output <see cref="RefinementDirection"/> if successfully converted.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if the conversion was successful; otherwise <c>false</c>.
+        /// </returns>
+        static public bool TryGetDirection(this Vector3 vector, out RefinementDirection direction)
+        {
+            // Default to forward
+            direction = RefinementDirection.Forward;
+
+            // What is the vector?
+            if (vector == Vector3.back)
+            {
+                direction = RefinementDirection.Back;
+                return true;
+            }
+            else if (vector == Vector3.down)
+            {
+                direction = RefinementDirection.Down;
+                return true;
+            }
+            else if (vector == Vector3.forward)
+            {
+                direction = RefinementDirection.Forward;
+                return true;
+            }
+            else if (vector == Vector3.left)
+            {
+                direction = RefinementDirection.Left;
+                return true;
+            }
+            else if (vector == Vector3.right)
+            {
+                direction = RefinementDirection.Right;
+                return true;
+            }
+            else if (vector == Vector3.up)
+            {
+                direction = RefinementDirection.Up;
+                return true;
+            }
+
+            // No conversion possible
+            return false;
         }
 
         /// <summary>

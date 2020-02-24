@@ -351,7 +351,7 @@ namespace Microsoft.SpatialAlignment
         private void StopAndCleanup()
         {
             // No longer modal
-            MixedRealityToolkit.InputSystem.PopModalInputHandler();
+            CoreServices.InputSystem?.PopModalInputHandler();
 
             // No longer in any step
             currentStep = RayRefinementStep.None;
@@ -431,7 +431,7 @@ namespace Microsoft.SpatialAlignment
         protected override void OnRefinementStarted()
         {
             // Capture input handler (released in StopAndCleanup)
-            MixedRealityToolkit.InputSystem.PushModalInputHandler(gameObject);
+            CoreServices.InputSystem?.PushModalInputHandler(gameObject);
 
             // Start
             currentStep = RayRefinementStep.None;
@@ -444,12 +444,12 @@ namespace Microsoft.SpatialAlignment
         protected override void RegisterHandlers()
         {
             base.RegisterHandlers();
-            InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
+            CoreServices.InputSystem?.RegisterHandler<IMixedRealityInputActionHandler>(this);
         }
 
         protected override void UnregisterHandlers()
         {
-            InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
+            CoreServices.InputSystem?.UnregisterHandler<IMixedRealityInputActionHandler>(this);
             base.UnregisterHandlers();
         }
         #endregion // Overrides / Event Handlers
@@ -477,13 +477,19 @@ namespace Microsoft.SpatialAlignment
             if (placementLayers == 0)
             {
                 // Try to get the first running spatial mapping observer
-                var observer = ((IMixedRealityDataProviderAccess)MixedRealityToolkit.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessObserver>().Where(o => o.IsRunning).FirstOrDefault();
+                var observer = ((IMixedRealityDataProviderAccess)CoreServices.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessObserver>().Where(o => o.IsRunning).FirstOrDefault();
 
-                // Use the observers layer mask or a reasonable default
-                int mask = 1 << (observer != null ? observer.DefaultPhysicsLayer : 1);
-
-                // Update the layers
-                placementLayers = mask;
+                // Do we have an observer?
+                if (observer != null)
+                {
+                    // Yup. Use its physics layer.
+                    placementLayers = 1 << observer.DefaultPhysicsLayer;
+                }
+                else
+                {
+                    // Nope. Use default.
+                    placementLayers = LayerMask.GetMask("Default");
+                }
             }
 
             // If any prefab has not been specified, create something default

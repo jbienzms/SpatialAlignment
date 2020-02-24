@@ -1,5 +1,15 @@
 {
+    "scopedRegistries": [
+        {
+            "name": "MS Build for Unity",
+            "url": "https://pkgs.dev.azure.com/UnityDeveloperTools/MSBuildForUnity/_packaging/UnityDeveloperTools/npm/registry",
+            "scopes": [
+                "com.microsoft"
+            ]
+        }
+    ],
   "dependencies": {
+    "com.microsoft.msbuildforunity": "0.9.1-20200131.14",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ads": "2.0.8",
@@ -16,6 +26,8 @@
     "com.unity.timeline": "1.1.0",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.legacyinputhelpers": "2.0.2",
+    "com.unity.xr.oculus.standalone": "1.38.4",
+    "com.unity.xr.openvr.standalone": "1.0.5",
     "com.unity.xr.windowsmr.metro": "3.0.6",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",

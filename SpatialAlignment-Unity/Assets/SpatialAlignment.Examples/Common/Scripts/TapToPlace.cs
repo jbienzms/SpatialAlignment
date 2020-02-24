@@ -72,6 +72,9 @@ public class TapToPlace : InputSystemGlobalHandlerListener, IMixedRealityInputAc
         // surfaceMagnetism.SurfaceNormalOffset = 0;
         // surfaceMagnetism.CloseDistance = 0.1;
         // surfaceMagnetism.OrientatioMode = Full;
+        surfaceMagnetism.SurfaceNormalOffset = 0.05f;
+        surfaceMagnetism.CurrentOrientationMode = SurfaceMagnetism.OrientationMode.SurfaceNormal;
+        surfaceMagnetism.KeepOrientationVertical = false;
     }
 
     private void SetPlacing()
@@ -98,13 +101,13 @@ public class TapToPlace : InputSystemGlobalHandlerListener, IMixedRealityInputAc
     /// <inheritdoc />
     protected override void RegisterHandlers()
     {
-        InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
+        CoreServices.InputSystem?.RegisterHandler<IMixedRealityInputActionHandler>(this);
     }
 
     /// <inheritdoc />
     protected override void UnregisterHandlers()
     {
-        InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
+        CoreServices.InputSystem?.UnregisterHandler<IMixedRealityInputActionHandler>(this);
     }
     #endregion // Overridables / Event Triggers
 

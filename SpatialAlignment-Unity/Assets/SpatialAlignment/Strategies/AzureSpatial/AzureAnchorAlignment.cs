@@ -358,7 +358,7 @@ namespace Microsoft.SpatialAlignment.Azure
             await EnsureManagerSessionAsync();
 
             // Convert native anchor format to cloud anchor format
-            await cloudNativeAnchor.NativeToCloudAsync();
+            cloudNativeAnchor.NativeToCloud();
 
             // Now save cloud anchor
             await manager.CreateAnchorAsync(cloudNativeAnchor.CloudAnchor, cancellationToken);
