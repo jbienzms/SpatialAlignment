@@ -36,15 +36,15 @@ public class TapToTest : InputSystemGlobalHandlerListener, IMixedRealityInputHan
     /// <inheritdoc />
     protected override void RegisterHandlers()
     {
-        InputSystem.RegisterHandler<IMixedRealityInputHandler>(this);
-        InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
+        CoreServices.InputSystem?.RegisterHandler<IMixedRealityInputHandler>(this);
+        CoreServices.InputSystem?.RegisterHandler<IMixedRealityInputActionHandler>(this);
     }
 
     /// <inheritdoc />
     protected override void UnregisterHandlers()
     {
-        InputSystem.UnregisterHandler<IMixedRealityInputHandler>(this);
-        InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
+        CoreServices.InputSystem?.UnregisterHandler<IMixedRealityInputHandler>(this);
+        CoreServices.InputSystem?.UnregisterHandler<IMixedRealityInputActionHandler>(this);
     }
 
     public void OnActionEnded(BaseInputEventData eventData)

@@ -174,11 +174,20 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                 case AddAnchorStep.ModelNudge:
 
+                    // Get the placement origin from the RayRefinement so we ca use it as the
+                    // custom pivot point for NudgeRefinement
+                    Vector3 pivotPoint = ((RayRefinement)largeScaleRefinement).PlacementOrigin;
+
                     // Unsubscribe from RayRefinement
                     UnsubscribeRefinement<RayRefinement>();
 
                     // Create and subscribe to NudgeRefinement
-                    largeScaleRefinement = SubscribeRefinement<NudgeRefinement>();
+                    var nudgeRefinement = SubscribeRefinement<NudgeRefinement>();
+                    largeScaleRefinement = nudgeRefinement;
+
+                    // Use custom pivot point
+                    nudgeRefinement.PivotPoint = pivotPoint;
+                    nudgeRefinement.UsePivotPoint = true;
 
                     // Start the new refining mode
                     largeScaleRefinement.StartRefinement();
@@ -326,7 +335,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         private void SetSpatialMesh(SpatialAwarenessMeshDisplayOptions options)
         {
             // Get all running observers
-            var observers = ((IMixedRealityDataProviderAccess)MixedRealityToolkit.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessMeshObserver>().Where(o => o.IsRunning);
+            var observers = ((IMixedRealityDataProviderAccess)CoreServices.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessMeshObserver>().Where(o => o.IsRunning);
 
             // Turn off display
             observers.ToList().ForEach(o => o.DisplayOption = options);
@@ -409,13 +418,13 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// <inheritdoc />
         protected override void RegisterHandlers()
         {
-            InputSystem.RegisterHandler<IMixedRealityInputActionHandler>(this);
+            CoreServices.InputSystem?.RegisterHandler<IMixedRealityInputActionHandler>(this);
         }
 
         /// <inheritdoc />
         protected override void UnregisterHandlers()
         {
-            InputSystem.UnregisterHandler<IMixedRealityInputActionHandler>(this);
+            CoreServices.InputSystem?.UnregisterHandler<IMixedRealityInputActionHandler>(this);
         }
         #endregion // Overrides / Event Handlers
 

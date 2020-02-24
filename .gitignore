@@ -1,7 +1,10 @@
+# NuGet Packages
+SpatialAlignment-Unity/Assets/Packages
+SpatialAlignment-Unity/Assets/Packages.meta
+
 # TextMesh Pro Assets
 SpatialAlignment-Unity/Assets/TextMesh Pro.meta
 SpatialAlignment-Unity/Assets/TextMesh Pro/
-
 
 # Overly large model files for testing
 SpatialAlignment-Unity/Assets/SpatialAlignment.Examples/Common/Models/Building.meta
@@ -37,6 +40,14 @@ PlaneFinding.dll
 MixedRealityToolkit*/
 Microsoft.MixedReality.Toolkit*.*
 MixedRealityToolkit*.*
+
+# Azure Spatial Anchors which comes from an Asset Package
+AzureSpatialAnchors*/
+AzureSpatialAnchors*.meta
+/*/Assets/Plugins.meta
+/*/Assets/Plugins/Android.meta
+/*/Assets/Plugins/Android/mainTemplate.gradle.meta
+/*/Assets/Plugins/Android/mainTemplate.gradle
 
 
 # Google AR Core which should be imported separately

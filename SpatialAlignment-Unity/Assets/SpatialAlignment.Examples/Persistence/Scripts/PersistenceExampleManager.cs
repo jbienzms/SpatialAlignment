@@ -25,6 +25,7 @@
 
 using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -40,53 +41,14 @@ namespace Microsoft.SpatialAlignment.Persistence
   {
     ""$id"": ""1"",
     ""alignmentStrategy"": {
-      ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-      ""currentAccuracy"": {
-        ""x"": 0.0,
-        ""y"": 0.0,
-        ""z"": 0.0
-      },
-      ""currentState"": ""Resolved""
+      ""$type"": ""Microsoft.SpatialAlignment.Azure.AzureAnchorAlignment, Assembly-CSharp"",
+      ""anchorId"": ""4c7c32c0-41e4-429d-a7d3-4a1609dd91d1"",
+      ""loadOnStart"": false
     },
     ""id"": ""Parent1""
   },
   {
     ""$id"": ""2"",
-    ""alignmentStrategy"": {
-      ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-      ""currentAccuracy"": {
-        ""x"": 0.0,
-        ""y"": 0.0,
-        ""z"": 0.0
-      },
-      ""currentState"": ""Resolved""
-    },
-    ""id"": ""Parent2""
-  },
-  {
-    ""$id"": ""3"",
-    ""alignmentStrategy"": {
-      ""$type"": ""Microsoft.SpatialAlignment.SimulatedAlignment, Assembly-CSharp"",
-      ""currentAccuracy"": {
-        ""x"": 0.0,
-        ""y"": 0.0,
-        ""z"": 0.0
-      },
-      ""currentState"": ""Resolved""
-    },
-    ""id"": ""Parent3""
-  },
-  {
-    ""$id"": ""4"",
-    ""alignmentStrategy"": {
-      ""$type"": ""Microsoft.SpatialAlignment.WorldAnchorAlignment, Assembly-CSharp"",
-      ""anchorId"": ""Parent4Anchor"",
-      ""loadOnStart"": false
-    },
-    ""id"": ""Parent4""
-  },
-  {
-    ""$id"": ""5"",
     ""alignmentStrategy"": {
       ""$type"": ""Microsoft.SpatialAlignment.MultiParentAlignment, Assembly-CSharp"",
       ""distancePower"": 1.1,
@@ -105,88 +67,7 @@ namespace Microsoft.SpatialAlignment.Persistence
           ""position"": {
             ""x"": 0.0,
             ""y"": 0.0,
-            ""z"": 0.0
-          },
-          ""rotation"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0,
-            ""w"": 1.0
-          },
-          ""scale"": {
-            ""x"": 0.3,
-            ""y"": 0.3,
             ""z"": 0.3
-          }
-        },
-        {
-          ""frame"": {
-            ""$ref"": ""2""
-          },
-          ""minimumAccuracy"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0
-          },
-          ""minimumState"": ""Resolved"",
-          ""position"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0
-          },
-          ""rotation"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0,
-            ""w"": 1.0
-          },
-          ""scale"": {
-            ""x"": 0.3,
-            ""y"": 0.3,
-            ""z"": 0.3
-          }
-        },
-        {
-          ""frame"": {
-            ""$ref"": ""3""
-          },
-          ""minimumAccuracy"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0
-          },
-          ""minimumState"": ""Resolved"",
-          ""position"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0
-          },
-          ""rotation"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0,
-            ""w"": 1.0
-          },
-          ""scale"": {
-            ""x"": 0.3,
-            ""y"": 0.3,
-            ""z"": 0.3
-          }
-        },
-        {
-          ""frame"": {
-            ""$ref"": ""4""
-          },
-          ""minimumAccuracy"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0
-          },
-          ""minimumState"": ""Resolved"",
-          ""position"": {
-            ""x"": 0.0,
-            ""y"": 0.0,
-            ""z"": 0.0
           },
           ""rotation"": {
             ""x"": 0.0,
@@ -203,7 +84,7 @@ namespace Microsoft.SpatialAlignment.Persistence
       ],
       ""updateFrequency"": 1.0
     },
-    ""id"": ""ChildFrame""
+    ""id"": ""ModelFrame""
   }
 ]";
         #endregion // Constants
@@ -230,12 +111,18 @@ namespace Microsoft.SpatialAlignment.Persistence
         }
 
         // Start is called before the first frame update
-        void Start()
+        async void Start()
         {
             store = new JsonStore();
-            // var t = SaveAsync();
-            var t = LoadAsync();
-            t.Wait();
+            try
+            {
+                // await SaveAsync();
+                await LoadAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error: {ex.Message}");
+            }
         }
     }
 }

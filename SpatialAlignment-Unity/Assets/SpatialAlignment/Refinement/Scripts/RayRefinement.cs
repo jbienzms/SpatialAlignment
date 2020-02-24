@@ -76,7 +76,7 @@ namespace Microsoft.SpatialAlignment
     /// A controller that refines the transform based on an origin point and
     /// a direction.
     /// </summary>
-    public class RayRefinement : RefinementBase, IMixedRealityInputHandler
+    public class RayRefinement : RefinementBase, IMixedRealityInputActionHandler
     {
         #region Constants
         private const float DEF_SCALE = 0.05f;
@@ -86,12 +86,16 @@ namespace Microsoft.SpatialAlignment
         private RayRefinementStep currentStep;      // What step we're on in the refinement
         private GameObject currentTarget;           // Current target to be moved
         private Vector3 lastTargetPosition;			// The last position where a target was placed
-        private GameObject modelDirection;          // GameObject instance representing the models direction
+        private GameObject modelDirectionGO;        // GameObject instance representing the models direction
+        private Vector3 modelDirection;             // Position representing the models direction
         private LineRenderer modelLine;             // Used to render a line pointing from the model origin in the model direction
-        private GameObject modelOrigin;				// GameObject instance representing the models origin
-        private GameObject placementDirection;      // GameObject instance representing the placement direction
+        private GameObject modelOriginGO;			// GameObject instance representing the models origin
+        private Vector3 modelOrigin;		        // Position of the models origin
+        private GameObject placementDirectionGO;    // GameObject instance representing the placement direction
+        private Vector3 placementDirection;         // Position representing the placement direction
         private LineRenderer placementLine;         // Used to render a line pointing from the placement origin in the placement direction
-        private GameObject placementOrigin;         // GameObject instance representing the placement origin
+        private GameObject placementOriginGO;       // GameObject instance representing the placement origin
+        private Vector3 placementOrigin;            // Position of the placement origin
         private bool targetPlaced;                  // Whether or not the current target has been placed
         #endregion // Member Variables
 
@@ -99,6 +103,10 @@ namespace Microsoft.SpatialAlignment
         [SerializeField]
         [Tooltip("Whether to automatically show and hide the mesh during placement.")]
         private bool autoHideMeshes = true;
+
+        [Tooltip("The input action that will be used to advance refinement. If one is not specified, 'Select' will be used.")]
+        [SerializeField]
+        private MixedRealityInputAction advanceAction;
 
         [SerializeField]
         [Tooltip("The prefab used to represent a direction. If one is not specified, a capsule will be used.")]
@@ -200,6 +208,30 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
+        /// Initializes the solver, actions and optionally starts placing.
+        /// </summary>
+        private void Init()
+        {
+            // If no placement action is specified, try to get the "Select" action
+            if (advanceAction == MixedRealityInputAction.None)
+            {
+                // Try to get the input system
+                IMixedRealityInputSystem inputSystem;
+                if (MixedRealityServiceRegistry.TryGetService<IMixedRealityInputSystem>(out inputSystem))
+                {
+                    // Try to get the "Select" action.
+                    advanceAction = inputSystem.InputSystemProfile.InputActionsProfile.InputActions.Where(a => a.Description == "Select").FirstOrDefault();
+                }
+            }
+
+            // surfaceMagnetism.MaxDistance = 5;
+            // surfaceMagnetism.RaycastDirection = RaycastDirectionEnum.CameraFacing;
+            // surfaceMagnetism.SurfaceNormalOffset = 0;
+            // surfaceMagnetism.CloseDistance = 0.1;
+            // surfaceMagnetism.OrientatioMode = Full;
+        }
+
+        /// <summary>
         /// Executes the next step in the refinement process.
         /// </summary>
         private void NextStep()
@@ -220,10 +252,10 @@ namespace Microsoft.SpatialAlignment
                 case RayRefinementStep.ModelOrigin:
 
                     // Create the target
-                    CreateTarget(originPrefab, ref modelOrigin, currentStep.ToString());
+                    CreateTarget(originPrefab, ref modelOriginGO, currentStep.ToString());
 
                     // Parent the target
-                    modelOrigin.transform.SetParent(TargetTransform, worldPositionStays: true);
+                    modelOriginGO.transform.SetParent(TargetTransform, worldPositionStays: true);
 
                     break;
 
@@ -231,13 +263,13 @@ namespace Microsoft.SpatialAlignment
                 case RayRefinementStep.ModelDirection:
 
                     // Create the target
-                    CreateTarget(directionPrefab, ref modelDirection, currentStep.ToString());
+                    CreateTarget(directionPrefab, ref modelDirectionGO, currentStep.ToString());
 
                     // Parent the target
-                    modelDirection.transform.SetParent(TargetTransform, worldPositionStays: true);
+                    modelDirectionGO.transform.SetParent(TargetTransform, worldPositionStays: true);
 
                     // Add line renderer
-                    modelLine = AddLine(modelDirection);
+                    modelLine = AddLine(modelDirectionGO);
 
                     break;
 
@@ -252,7 +284,7 @@ namespace Microsoft.SpatialAlignment
                     }
 
                     // Create the target
-                    CreateTarget(originPrefab, ref placementOrigin, currentStep.ToString());
+                    CreateTarget(originPrefab, ref placementOriginGO, currentStep.ToString());
 
                     break;
 
@@ -260,10 +292,10 @@ namespace Microsoft.SpatialAlignment
                 case RayRefinementStep.PlacementDirection:
 
                     // Create the target
-                    CreateTarget(directionPrefab, ref placementDirection, currentStep.ToString());
+                    CreateTarget(directionPrefab, ref placementDirectionGO, currentStep.ToString());
 
                     // Add line renderer
-                    placementLine = AddLine(placementDirection);
+                    placementLine = AddLine(placementDirectionGO);
 
                     break;
 
@@ -278,10 +310,10 @@ namespace Microsoft.SpatialAlignment
                     }
 
                     // Get transform positions
-                    Vector3 modelOriginWorld = modelOrigin.transform.position;
-                    Vector3 modelDirectionWorld = modelDirection.transform.position;
-                    Vector3 placementOriginWorld = placementOrigin.transform.position;
-                    Vector3 placementDirectionWorld = placementDirection.transform.position;
+                    Vector3 modelOriginWorld = modelOriginGO.transform.position;
+                    Vector3 modelDirectionWorld = modelDirectionGO.transform.position;
+                    Vector3 placementOriginWorld = placementOriginGO.transform.position;
+                    Vector3 placementDirectionWorld = placementDirectionGO.transform.position;
 
                     // Calculate the model angle
                     float modelAngle = Mathf.Atan2(modelDirectionWorld.x - modelOriginWorld.x, modelDirectionWorld.z - modelOriginWorld.z) * Mathf.Rad2Deg;
@@ -319,16 +351,23 @@ namespace Microsoft.SpatialAlignment
         private void StopAndCleanup()
         {
             // No longer modal
-            MixedRealityToolkit.InputSystem.PopModalInputHandler();
+            CoreServices.InputSystem?.PopModalInputHandler();
 
             // No longer in any step
             currentStep = RayRefinementStep.None;
 
+            // TODO: Update transforms on every frame
+            // HACK: Save transforms
+            modelOrigin = (modelOriginGO != null ?  modelOriginGO.transform.position : Vector3.zero);
+            modelDirection = (modelDirectionGO != null ? modelDirectionGO.transform.position : Vector3.zero);
+            placementOrigin = (placementOriginGO != null ? placementOriginGO.transform.position : Vector3.zero);
+            placementDirection = (placementDirectionGO != null ? placementDirectionGO.transform.position : Vector3.zero);
+
             // Cleanup resources
-            Cleanup(ref modelOrigin);
-            Cleanup(ref modelDirection);
-            Cleanup(ref placementOrigin);
-            Cleanup(ref placementDirection);
+            Cleanup(ref modelOriginGO);
+            Cleanup(ref modelDirectionGO);
+            Cleanup(ref placementOriginGO);
+            Cleanup(ref placementDirectionGO);
 
             // Reset placeholders
             lastTargetPosition = Vector3.zero;
@@ -340,10 +379,10 @@ namespace Microsoft.SpatialAlignment
 
         #region Overrides / Event Handlers
         /// <inheritdoc />
-        private void OnInputUp(InputEventData eventData)
+        private void OnActionEnded(BaseInputEventData eventData)
         {
-            // If this event is already handled, ignore
-            if (eventData.used) { return; }
+            // If this event is already handled or it's not the one we care about, ignore
+            if ((eventData.used) || (eventData.MixedRealityInputAction != advanceAction)) { return; }
 
             // If we're not refining, ignore
             if (!IsRefining) { return; }
@@ -392,7 +431,7 @@ namespace Microsoft.SpatialAlignment
         protected override void OnRefinementStarted()
         {
             // Capture input handler (released in StopAndCleanup)
-            MixedRealityToolkit.InputSystem.PushModalInputHandler(gameObject);
+            CoreServices.InputSystem?.PushModalInputHandler(gameObject);
 
             // Start
             currentStep = RayRefinementStep.None;
@@ -405,25 +444,31 @@ namespace Microsoft.SpatialAlignment
         protected override void RegisterHandlers()
         {
             base.RegisterHandlers();
-            InputSystem.RegisterHandler<IMixedRealityInputHandler>(this);
+            CoreServices.InputSystem?.RegisterHandler<IMixedRealityInputActionHandler>(this);
         }
 
         protected override void UnregisterHandlers()
         {
-            InputSystem.UnregisterHandler<IMixedRealityInputHandler>(this);
+            CoreServices.InputSystem?.UnregisterHandler<IMixedRealityInputActionHandler>(this);
             base.UnregisterHandlers();
         }
         #endregion // Overrides / Event Handlers
 
         #region IMixedRealityInputHandler Interface
-        void IMixedRealityInputHandler.OnInputDown(InputEventData eventData) { }
-        void IMixedRealityInputHandler.OnInputUp(InputEventData eventData) { OnInputUp(eventData); }
+        void IMixedRealityInputActionHandler.OnActionStarted(BaseInputEventData eventData) { }
+        void IMixedRealityInputActionHandler.OnActionEnded(BaseInputEventData eventData) { OnActionEnded(eventData); }
         #endregion // IInputClickHandler Interface
 
         #region Unity Overrides
         /// <inheritdoc />
         protected override void Start()
         {
+            // Pass to base first
+            base.Start();
+
+            // Initialize input actions
+            Init();
+
             // We do not require input focus
             IsFocusRequired = false;
 
@@ -432,13 +477,19 @@ namespace Microsoft.SpatialAlignment
             if (placementLayers == 0)
             {
                 // Try to get the first running spatial mapping observer
-                var observer = ((IMixedRealityDataProviderAccess)MixedRealityToolkit.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessObserver>().Where(o => o.IsRunning).FirstOrDefault();
+                var observer = ((IMixedRealityDataProviderAccess)CoreServices.SpatialAwarenessSystem).GetDataProviders<IMixedRealitySpatialAwarenessObserver>().Where(o => o.IsRunning).FirstOrDefault();
 
-                // Use the observers layer mask or a reasonable default
-                int mask = 1 << (observer != null ? observer.DefaultPhysicsLayer : 1);
-
-                // Update the layers
-                placementLayers = mask;
+                // Do we have an observer?
+                if (observer != null)
+                {
+                    // Yup. Use its physics layer.
+                    placementLayers = 1 << observer.DefaultPhysicsLayer;
+                }
+                else
+                {
+                    // Nope. Use default.
+                    placementLayers = LayerMask.GetMask("Default");
+                }
             }
 
             // If any prefab has not been specified, create something default
@@ -471,9 +522,6 @@ namespace Microsoft.SpatialAlignment
                 directionPrefab.transform.localScale = new Vector3(DEF_SCALE, DEF_SCALE, DEF_SCALE);
                 directionPrefab.SetActive(false);
             }
-
-            // Pass to base to complete startup
-            base.Start();
         }
 
         /// <inheritdoc />
@@ -516,10 +564,10 @@ namespace Microsoft.SpatialAlignment
             if (isDirection)
             {
                 // Get this directions transform
-                Transform direction = (isModel ? modelDirection.transform : placementDirection.transform);
+                Transform direction = (isModel ? modelDirectionGO.transform : placementDirectionGO.transform);
 
                 // Get the transform of the origin that matches this direction
-                Transform origin = (isModel ? modelOrigin.transform : placementOrigin.transform);
+                Transform origin = (isModel ? modelOriginGO.transform : placementOriginGO.transform);
 
                 // Calculate the relative offset between the two
                 Vector3 relativePos = direction.position - origin.position;
@@ -537,6 +585,12 @@ namespace Microsoft.SpatialAlignment
         #endregion // Unity Overrides
 
         #region Public Properties
+        /// <summary>
+        /// Gets or sets the input action that will be used to advance refinement of the object.
+        /// If one is not specified, 'Select' will be used.
+        /// </summary>
+        public MixedRealityInputAction AdvanceAction { get => advanceAction; set => advanceAction = value; }
+
         /// <summary>
         /// Gets or sets whether to automatically show and hide the mesh during placement.
         /// </summary>
@@ -565,6 +619,14 @@ namespace Microsoft.SpatialAlignment
         public float MaxDistance { get { return maxDistance; } set { maxDistance = value; } }
 
         /// <summary>
+        /// Gets the position of the model direction point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the model direction point hasn't been placed.
+        /// </remarks>
+        public Vector3 ModelDirection { get => modelDirection; }
+
+        /// <summary>
         /// Gets or sets the layers that represent the model.
         /// </summary>
         /// <remarks>
@@ -574,12 +636,28 @@ namespace Microsoft.SpatialAlignment
         public LayerMask ModelLayers { get { return modelLayers; } set { modelLayers = value; } }
 
         /// <summary>
+        /// Gets the position of the model origin point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the model origin point hasn't been placed.
+        /// </remarks>
+        public Vector3 ModelOrigin { get => modelOrigin;  }
+
+        /// <summary>
         /// Gets or sets The prefab used to represent an origin point.
         /// </summary>
         /// <remarks>
         /// If one is not specified, a sphere will be used.
         /// </remarks>
         public GameObject OriginPrefab { get { return originPrefab; } set { originPrefab = value; } }
+
+        /// <summary>
+        /// Gets the position of the placement direction point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the placement direction point hasn't been placed.
+        /// </remarks>
+        public Vector3 PlacementDirection { get => placementDirection; }
 
         /// <summary>
         /// Gets or sets the layers that represent potential placement.
@@ -597,6 +675,14 @@ namespace Microsoft.SpatialAlignment
         /// </para>
         /// </remarks>
         public LayerMask PlacementLayers { get { return placementLayers; } set { placementLayers = value; } }
+
+        /// <summary>
+        /// Gets the position of the placement origin point.
+        /// </summary>
+        /// <remarks>
+        /// Returns <see cref="Vector3.zero"/> if the placement origin point hasn't been placed.
+        /// </remarks>
+        public Vector3 PlacementOrigin { get => placementOrigin; }
         #endregion // Public Properties
     }
 }

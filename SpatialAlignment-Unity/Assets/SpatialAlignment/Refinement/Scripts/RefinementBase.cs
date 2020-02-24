@@ -236,9 +236,9 @@ namespace Microsoft.SpatialAlignment
         /// <summary>
         /// Update is called once per frame.
         /// </summary>
-        protected virtual void Update()
+        protected override void Update()
         {
-
+            base.Update();
         }
         #endregion // Unity Overrides
 

@@ -65,6 +65,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -142,6 +143,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -163,8 +165,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4416302045123920}
-  - component: {fileID: 2344528240114672621}
-  - component: {fileID: 6748190277977250891}
   - component: {fileID: 6400457106710342840}
   - component: {fileID: 8752869507501138832}
   m_Layer: 0
@@ -182,7 +182,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1448445313900646}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1.72}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children:
   - {fileID: 4675667425309724}
@@ -190,63 +190,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2344528240114672621
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1448445313900646}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b55691ad5b034fe6966763a6e23818d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  handedness: 0
-  trackedObjectToReference: 0
-  trackedHandJoint: 2
-  additionalOffset: {x: 0, y: 0, z: 0}
-  additionalRotation: {x: 0, y: 0, z: 0}
-  transformTarget: {fileID: 0}
-  updateSolvers: 1
---- !u!114 &6748190277977250891
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1448445313900646}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e9078183f524b1baa8197daf640b60f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  updateLinkedTransform: 0
-  moveLerpTime: 0.1
-  rotateLerpTime: 0.1
-  scaleLerpTime: 0
-  maintainScale: 1
-  smoothing: 1
-  lifetime: 0
-  SolverHandler: {fileID: 2344528240114672621}
-  magneticSurfaces:
-  - serializedVersion: 2
-    m_Bits: 4294967291
-  maxDistance: 5
-  closeDistance: 0.1
-  surfaceNormalOffset: 0
-  surfaceRayOffset: 0
-  raycastMode: 0
-  boxRaysPerEdge: 3
-  orthographicBoxCast: 0
-  maximumNormalVariance: 0.5
-  sphereSize: 1
-  volumeCastSizeOverride: 0
-  useLinkedAltScaleOverride: 0
-  raycastDirection: 0
-  orientationMode: 2
-  orientationBlend: 0.65
-  debugEnabled: 0
 --- !u!114 &6400457106710342840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,6 +203,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isBeingPlaced: 0
+  placeAction:
+    id: 0
+    description: 
+    axisConstraint: 0
 --- !u!114 &8752869507501138832
 MonoBehaviour:
   m_ObjectHideFlags: 0

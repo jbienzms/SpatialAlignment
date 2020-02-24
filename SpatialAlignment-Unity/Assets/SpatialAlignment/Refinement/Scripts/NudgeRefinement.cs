@@ -73,6 +73,10 @@ namespace Microsoft.SpatialAlignment
         private RefinementDirection forwardDirection = RefinementDirection.Forward;
 
         [SerializeField]
+        [Tooltip("The custom pivot point if Use Pivot Point is true.")]
+        private Vector3 pivotPoint = Vector3.zero;
+
+        [SerializeField]
         [Tooltip("The amount to rotate in rotational operations.")]
         private float rotationAmount = 1.8f;
 
@@ -87,6 +91,10 @@ namespace Microsoft.SpatialAlignment
         [SerializeField]
         [Tooltip("Whether the look direction of the controller should be used as the forward direction for nudge operations.")]
         private bool useLookDirection = true;
+
+        [SerializeField]
+        [Tooltip("Whether to use the custom pivot point for rotations. If false, the model pivot point will be used.")]
+        private bool usePivotPoint = false;
         #endregion // Unity Inspector Variables
 
         #region Internal Methods
@@ -209,6 +217,20 @@ namespace Microsoft.SpatialAlignment
             // Pass to base
             base.OnEnable();
         }
+
+        /// <inheritdoc />
+        protected override void Update()
+        {
+            // Update base first
+            base.Update();
+
+            // Should we update forward direction?
+            if ((useLookDirection) && (controller != null))
+            {
+                // Convert the controllers forward direction to our forward direction
+                forwardDirection = controller.transform.forward.ToNearestDirection();
+            }
+        }
         #endregion // Unity Overrides
 
         #region Public Methods
@@ -260,7 +282,14 @@ namespace Microsoft.SpatialAlignment
             float angle = (rotation == NudgeRotation.Left ? -rotationAmount : rotationAmount);
 
             // Update the rotation
-            TargetTransform.Rotate(upDirection.ToVector(), angle, Space);
+            if (usePivotPoint)
+            {
+                TargetTransform.RotateAround(pivotPoint, upDirection.ToVector(), angle);
+            }
+            else
+            {
+                TargetTransform.Rotate(upDirection.ToVector(), angle, Space);
+            }
         }
 
         /// <summary>
@@ -321,6 +350,14 @@ namespace Microsoft.SpatialAlignment
         }
 
         /// <summary>
+        /// Gets or sets the custom pivot point if <see cref="UsePivotPoint"/> is <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// The default is the scene origin (0,0,0).
+        /// </remarks>
+        public Vector3 PivotPoint { get { return pivotPoint; } set { pivotPoint = value; } }
+
+        /// <summary>
         /// Gets or sets the amount to rotate in rotational operations.
         /// </summary>
         /// <remarks>
@@ -349,6 +386,11 @@ namespace Microsoft.SpatialAlignment
         /// The default is <c>true</c>.
         /// </remarks>
         public bool UseLookDirection { get { return useLookDirection; } set { useLookDirection = value; } }
+
+        /// <summary>
+        /// Gets or sets whether to use the custom pivot point for rotations. If false, the model pivot point will be used.
+        /// </summary>
+        public bool UsePivotPoint { get { return usePivotPoint; } set { usePivotPoint = value; } }
         #endregion // Public Properties
     }
 }

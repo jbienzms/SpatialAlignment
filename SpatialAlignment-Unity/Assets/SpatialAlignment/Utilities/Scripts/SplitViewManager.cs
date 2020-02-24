@@ -23,6 +23,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Microsoft.MixedReality.Toolkit.Utilities;
 using System;
 using UnityEngine;
 
@@ -135,6 +136,18 @@ namespace Microsoft.SpatialAlignment
             }
         }
 
+        /// <inheritdoc />
+        protected virtual void Start()
+        {
+            // Attempt to re-parent to camera
+            var mainCamera = CameraCache.Main;
+            if (mainCamera != null)
+            {
+                this.transform.SetParent(mainCamera.transform, worldPositionStays: false);
+            }
+        }
+
+        /// <inheritdoc />
         protected virtual void Update()
         {
             if (lastMode != mode)

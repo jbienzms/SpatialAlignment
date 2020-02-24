@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f18fec9b55c4f818e284af454161962, type: 3}
+  m_Script: {fileID: 2011956830, guid: b8b5d457124950a49ae6d531804d7442, type: 3}
   m_Name: RefinementSpeechProfile
   m_EditorClassIdentifier: 
   isCustomProfile: 1
@@ -32,7 +32,7 @@ MonoBehaviour:
       axisConstraint: 2
   - localizationKey: 
     keyword: Add Anchor
-    keyCode: 97
+    keyCode: 111
     action:
       id: 14
       description: Add Anchor
@@ -74,7 +74,7 @@ MonoBehaviour:
       axisConstraint: 2
   - localizationKey: 
     keyword: Split View
-    keyCode: 115
+    keyCode: 92
     action:
       id: 20
       description: Split View
