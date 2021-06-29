@@ -22,8 +22,8 @@
     <UnityCurrentTargetFramework>netstandard2.0</UnityCurrentTargetFramework>
     
     <UnityMajorVersion>2019</UnityMajorVersion>
-    <UnityMinorVersion>2</UnityMinorVersion>
-    <UnityEditorInstallPath>C:\Program Files\Unity\Hub\Editor\2019.2.17f1\Editor</UnityEditorInstallPath>
+    <UnityMinorVersion>4</UnityMinorVersion>
+    <UnityEditorInstallPath>C:\Program Files\Unity\Hub\Editor\2019.4.17f1\Editor</UnityEditorInstallPath>
   </PropertyGroup>
   
   <PropertyGroup>
