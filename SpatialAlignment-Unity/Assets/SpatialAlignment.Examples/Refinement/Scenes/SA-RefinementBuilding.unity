@@ -1603,7 +1603,6 @@ GameObject:
   - component: {fileID: 2044895796}
   - component: {fileID: 2044895795}
   - component: {fileID: 2044895799}
-  - component: {fileID: 2044895798}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -1691,29 +1690,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &2044895798
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2044895793}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf98dd1206224111a38765365e98e207, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lockCursorWhenFocusLocked: 1
-  setCursorInvisibleWhenFocusLocked: 0
-  maxGazeCollisionDistance: 10
-  raycastLayerMasks:
-  - serializedVersion: 2
-    m_Bits: 4294967291
-  stabilizer:
-    storedStabilitySamples: 60
-  gazeTransform: {fileID: 0}
-  minHeadVelocityThreshold: 0.5
-  maxHeadVelocityThreshold: 2
 --- !u!114 &2044895799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1897,111 +1873,6 @@ PrefabInstance:
       propertyPath: largeScaleModel
       value: 
       objectReference: {fileID: 1707357398}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: AddAnchorAction.id
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: SplitViewAction.id
-      value: 22
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ModeClosestAction.id
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: CancelAnchorAction.id
-      value: 17
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: RemoveAnchorAction.id
-      value: 18
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ResetAnchorsAction.id
-      value: 19
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: AddAnchorAction.description
-      value: Add Anchor
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: SplitViewAction.description
-      value: Split View
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ModeClosestAction.description
-      value: Mode Closest
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ModeDistanceWeightedAction.id
-      value: 21
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: AddAnchorAction.axisConstraint
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: CancelAnchorAction.description
-      value: Cancel Anchor
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: RemoveAnchorAction.description
-      value: Remove Anchor
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ResetAnchorsAction.description
-      value: Reset Anchors
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: SplitViewAction.axisConstraint
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ModeClosestAction.axisConstraint
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: CancelAnchorAction.axisConstraint
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: RemoveAnchorAction.axisConstraint
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ResetAnchorsAction.axisConstraint
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ModeDistanceWeightedAction.description
-      value: Mode Distance Weighted
-      objectReference: {fileID: 0}
-    - target: {fileID: 1633407209877629886, guid: b986616b0137454448074168d43b6ca7,
-        type: 3}
-      propertyPath: ModeDistanceWeightedAction.axisConstraint
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1633407209877629887, guid: b986616b0137454448074168d43b6ca7,
         type: 3}
       propertyPath: m_RootOrder
