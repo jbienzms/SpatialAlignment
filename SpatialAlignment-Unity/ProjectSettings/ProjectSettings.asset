@@ -427,7 +427,8 @@ PlayerSettings:
     m_Devices: []
   - m_BuildTarget: Windows Store Apps
     m_Enabled: 1
-    m_Devices: []
+    m_Devices:
+    - WindowsMR
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
@@ -689,16 +690,16 @@ PlayerSettings:
     Windows Store Apps: 6
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: Template3D
-  metroPackageVersion: 1.0.0.0
+  metroPackageName: SpatialAlignment
+  metroPackageVersion: 1.0.1.0
   metroCertificatePath: Assets/WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: DefaultCompany
-  metroCertificateIssuer: DefaultCompany
-  metroCertificateNotAfter: 80eba3433b07d701
-  metroApplicationDescription: Template_3D
+  metroCertificateSubject: Sample Company
+  metroCertificateIssuer: Sample Company
+  metroCertificateNotAfter: 00072905a18bd801
+  metroApplicationDescription: Spatial Alignment
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: Spatial Alignment
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
