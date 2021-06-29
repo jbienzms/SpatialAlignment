@@ -26,6 +26,7 @@
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialAwareness;
+using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
 using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
 using System;
@@ -136,7 +137,7 @@ namespace Microsoft.SpatialAlignment.Persistence
                     SubscribeAnchor(newAnchor);
 
                     // Put the anchor in placement mode
-                    newAnchor.IsBeingPlaced = true;
+                    newAnchor.StartPlacement();
                     break;
 
 
@@ -153,7 +154,7 @@ namespace Microsoft.SpatialAlignment.Persistence
                     newAnchor.gameObject.AddComponent<NativeAnchorAlignment>();
 
                     // Done placing anchor
-                    newAnchor.IsBeingPlaced = false;
+                    newAnchor.StopPlacement();
 
                     // Show the model
                     ShowModel();
@@ -343,8 +344,8 @@ namespace Microsoft.SpatialAlignment.Persistence
 
         private void SubscribeAnchor(TapToPlace anchor)
         {
-            // Subscribe from placing events
-            anchor.IsBeingPlacedChaged += Anchor_IsBeingPlacedChanged;
+            // Subscribe to placing events
+            anchor.OnPlacingStopped.AddListener(Anchor_OnPlacingStopped);
         }
 
         private TRefinement SubscribeRefinement<TRefinement>() where TRefinement : RefinementBase
@@ -363,7 +364,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         private void UnsubscribeAnchor(TapToPlace anchor)
         {
             // Unsubscribe from placing events
-            anchor.IsBeingPlacedChaged -= Anchor_IsBeingPlacedChanged;
+            anchor.OnPlacingStopped.RemoveListener(Anchor_OnPlacingStopped);
         }
 
         private void UnsubscribeRefinement(RefinementBase refinement)
@@ -387,7 +388,7 @@ namespace Microsoft.SpatialAlignment.Persistence
         #endregion // Internal Methods
 
         #region Overrides / Event Handlers
-        private void Anchor_IsBeingPlacedChanged(object sender, EventArgs e)
+        private void Anchor_OnPlacingStopped()
         {
             // If we are placing an anchor and it's now placed,
             // go on to the next step.
