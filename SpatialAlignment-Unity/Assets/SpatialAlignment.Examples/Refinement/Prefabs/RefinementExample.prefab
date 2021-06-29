@@ -50,32 +50,32 @@ MonoBehaviour:
   largeScaleModel: {fileID: 0}
   splitViewManager: {fileID: 3181033918962605617}
   AddAnchorAction:
-    id: 0
-    description: 
+    id: 16
+    description: Add Anchor
     axisConstraint: 0
   CancelAnchorAction:
-    id: 0
-    description: 
+    id: 17
+    description: Cancel Anchor
     axisConstraint: 0
   RemoveAnchorAction:
-    id: 0
-    description: 
+    id: 18
+    description: Remove Anchor
     axisConstraint: 0
   ResetAnchorsAction:
-    id: 0
-    description: 
+    id: 19
+    description: Reset Anchors
     axisConstraint: 0
   ModeClosestAction:
-    id: 0
-    description: 
+    id: 20
+    description: Mode Closest
     axisConstraint: 0
   ModeDistanceWeightedAction:
-    id: 0
-    description: 
+    id: 21
+    description: Mode Distance Weighted
     axisConstraint: 0
   SplitViewAction:
-    id: 0
-    description: 
+    id: 22
+    description: Split View
     axisConstraint: 0
 --- !u!1 &4357155795719337978
 GameObject:
@@ -132,6 +132,7 @@ MeshRenderer:
   m_MotionVectors: 2
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
