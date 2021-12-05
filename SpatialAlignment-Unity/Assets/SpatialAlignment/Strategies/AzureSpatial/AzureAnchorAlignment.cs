@@ -114,10 +114,11 @@ namespace Microsoft.SpatialAlignment.Azure
         /// </returns>
         static private async Task StartWatchingAsync(string anchorId)
         {
-            #if UNITY_EDITOR
-            Debug.Log("Azure Spatial Anchors does not currently work in Unity Editor. Ignoring request to start watching.");
-            return;
-            #endif // UNITY_EDITOR
+            if (Application.isEditor)
+            {
+                Debug.Log("Azure Spatial Anchors does not currently work in Unity Editor. Ignoring request to start watching.");
+                return;
+            }
 
             // If we're already watching this ID, just ignore
             if (idsToLocate.Contains(anchorId)) { return; }
@@ -270,6 +271,12 @@ namespace Microsoft.SpatialAlignment.Azure
         /// <inheritdoc />
         protected override void OnDisable()
         {
+            // If there is an anchor, disable it
+            if (cloudNativeAnchor != null)
+            {
+                cloudNativeAnchor.enabled = false;
+            }
+
             // If we have a manager, unsubscribe
             if (manager != null) { UnsubscribeManager(); }
 
@@ -280,6 +287,12 @@ namespace Microsoft.SpatialAlignment.Azure
         /// <inheritdoc />
         protected override void OnEnable()
         {
+            // If there is no anchor, create it
+            if (cloudNativeAnchor == null) { cloudNativeAnchor = gameObject.AddComponent<CloudNativeAnchor>(); }
+
+            // Make sure the anchor is enabled
+            cloudNativeAnchor.enabled = true;
+
             // Make sure we've got a manager
             EnsureManager();
 
@@ -349,16 +362,18 @@ namespace Microsoft.SpatialAlignment.Azure
             // If there is no anchor, create it
             if (cloudNativeAnchor == null) { cloudNativeAnchor = gameObject.AddComponent<CloudNativeAnchor>(); }
 
-            #if UNITY_EDITOR
-            Debug.Log("Azure Spatial Anchors does not currently work in Unity Editor. Ignoring request to save anchor.");
-            return;
-            #endif // UNITY_EDITOR
+            // Can't save in editor
+            if (Application.isEditor)
+            {
+                Debug.Log("Azure Spatial Anchors does not currently work in Unity Editor. Ignoring request to save anchor.");
+                return;
+            }
 
             // Make sure we have the cloud manager and session
             await EnsureManagerSessionAsync();
 
             // Convert native anchor format to cloud anchor format
-            cloudNativeAnchor.NativeToCloud();
+            await cloudNativeAnchor.NativeToCloud();
 
             // Now save cloud anchor
             await manager.CreateAnchorAsync(cloudNativeAnchor.CloudAnchor, cancellationToken);

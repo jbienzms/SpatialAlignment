@@ -1,4 +1,7 @@
-﻿//
+﻿#if UNITY_WSA && !UNITY_2020_1_OR_NEWER
+#define SAA_LEGACY_XR
+#endif
+//
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license.
 //
@@ -23,21 +26,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+#if SAA_LEGACY_XR
+
 using Microsoft.SpatialAlignment.Persistence;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using UnityEngine;
-
-#if UNITY_WSA
 using UnityEngine.XR.WSA;
 using UnityEngine.XR.WSA.Persistence;
 using NativeAnchor = UnityEngine.XR.WSA.WorldAnchor;
-#else
-using NativeAnchor = UnityEngine.Component;
-#endif
 
 namespace Microsoft.SpatialAlignment
 {
@@ -52,9 +50,7 @@ namespace Microsoft.SpatialAlignment
     {
         #region Member Variables
         private NativeAnchor nativeAnchor;
-        #if UNITY_WSA
         private WorldAnchorStore anchorStore;
-        #endif // UNITY_WSA
         #endregion // Member Variables
 
         #region Unity Inspector Variables
@@ -81,7 +77,6 @@ namespace Microsoft.SpatialAlignment
         private async Task EnsureAnchorStoreAsync()
 #pragma warning restore CS1998
         {
-            #if UNITY_WSA
             // Do we need to acquire the store?
             if (anchorStore == null)
             {
@@ -105,7 +100,6 @@ namespace Microsoft.SpatialAlignment
                 State = AlignmentState.Error;
                 throw new UnauthorizedAccessException($"{nameof(NativeAnchorAlignment)}: WorldAnchorStore could not be acquired.");
             }
-            #endif // UNITY_WSA
         }
 
         /// <summary>
@@ -113,17 +107,20 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         private void SubscribeAnchor()
         {
-            #if UNITY_EDITOR
-            // The anchor store will never be available in the editor, so
-            // when in the editor just pretend that the anchor is resolved
-            State = AlignmentState.Resolved;
-            #elif UNITY_WSA
-            // Subscribe to anchor events
-            nativeAnchor.OnTrackingChanged += Anchor_OnTrackingChanged;
+            if (Application.isEditor)
+            {
+                // The anchor store will never be available in the editor, so
+                // when in the editor just pretend that the anchor is resolved
+                State = AlignmentState.Resolved;
+            }
+            else
+            {
+                // Subscribe to anchor events
+                nativeAnchor.OnTrackingChanged += Anchor_OnTrackingChanged;
 
-            // Update state based on anchor state
-            State = (nativeAnchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
-            #endif
+                // Update state based on anchor state
+                State = (nativeAnchor.isLocated ? AlignmentState.Tracking : AlignmentState.Unresolved);
+            }
         }
 
         /// <summary>
@@ -131,10 +128,8 @@ namespace Microsoft.SpatialAlignment
         /// </summary>
         private void UnsubscribeAnchor()
         {
-            #if UNITY_WSA
             // Unsubscribe from events
             nativeAnchor.OnTrackingChanged -= Anchor_OnTrackingChanged;
-            #endif
         }
         #endregion // Internal Methods
 
@@ -151,13 +146,11 @@ namespace Microsoft.SpatialAlignment
         #endregion // INativePersistence Members
 
         #region Overrides / Event Handlers
-        #if UNITY_WSA
         private void Anchor_OnTrackingChanged(WorldAnchor worldAnchor, bool located)
         {
             // Update state based on anchor tracking state
             State = (located ? AlignmentState.Tracking : AlignmentState.Unresolved);
         }
-        #endif // UNITY_WSA
         #endregion // Overrides / Event Handlers
 
         #region Unity Overrides
@@ -272,15 +265,14 @@ namespace Microsoft.SpatialAlignment
             if (nativeAnchor != null) { UnloadNative(); }
 
             // The anchor store is not accessible in the editor
-            #if !UNITY_EDITOR && UNITY_WSA
+            if (!Application.isEditor)
+            {
+                // Make sure we have access to the anchor store
+                await EnsureAnchorStoreAsync();
 
-            // Make sure we have access to the anchor store
-            await EnsureAnchorStoreAsync();
-
-            // Now try to load the anchor itself
-            nativeAnchor = anchorStore.Load(anchorId, this.gameObject);
-
-            #endif // !UNITY_EDITOR && UNITY_WSA
+                // Now try to load the anchor itself
+                nativeAnchor = anchorStore.Load(anchorId, this.gameObject);
+            }
 
             // If still not loaded, log and fail
             if (nativeAnchor == null)
@@ -321,15 +313,14 @@ namespace Microsoft.SpatialAlignment
             if (nativeAnchor == null) { CreateNative(); }
 
             // The anchor store is not accessible in the editor
-            #if !UNITY_EDITOR && UNITY_WSA
+            if (!Application.isEditor)
+            {
+                // Make sure we have access to the anchor store
+                await EnsureAnchorStoreAsync();
 
-            // Make sure we have access to the anchor store
-            await EnsureAnchorStoreAsync();
-
-            // Now try to save the anchor itself
-            anchorStore.Save(anchorId, nativeAnchor);
-
-            #endif // !UNITY_EDITOR && UNITY_WSA
+                // Now try to save the anchor itself
+                anchorStore.Save(anchorId, nativeAnchor);
+            }
         }
 
         /// <summary>
@@ -372,3 +363,4 @@ namespace Microsoft.SpatialAlignment
         #endregion // Public Properties
     }
 }
+#endif // SAA_LEGACY_XR

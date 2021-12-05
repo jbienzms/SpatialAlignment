@@ -20,4 +20,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/SpatialAlignment.Examples/Geocentric/Scenes/SA-GeocentricARCore.unity
     guid: 504250a324f587844bd810ad10ab8b4a
-  m_configObjects: {}
+  m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: d02f8dc8fec370b40ac7554485ba4330,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 7b80fb90b1c39b34d8c6b3e817695d9c,
+      type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 20ef0546696157d45be0ef4372500ee7,
+      type: 2}
