@@ -52,8 +52,8 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// configuration data has been loaded from non-native storage.
         /// </para>
         /// <para>
-        /// For example, <see cref="NativeAnchorAlignment"/> uses this method to load
-        /// the underlying WorldAnchor from the WorldAnchorStore after the rest of its
+        /// For example, <see cref="AzureAnchorAlignment"/> uses this method to load
+        /// the CloudSpatialAnchor from the ASA service after the rest of its
         /// configuration data has been loaded.
         /// </para>
         /// </remarks>
@@ -71,8 +71,8 @@ namespace Microsoft.SpatialAlignment.Persistence
         /// remaining data is stored in non-native storage.
         /// </para>
         /// <para>
-        /// For example, <see cref="NativeAnchorAlignment"/> uses this method to save
-        /// the underlying WorldAnchor in the WorldAnchorStore before the rest of its
+        /// For example, <see cref="AzureAnchorAlignment"/> uses this method to save
+        /// the CloudSpatialAnchor to the ASA service before the rest of its
         /// configuration data can be saved.
         /// </para>
         /// </remarks>

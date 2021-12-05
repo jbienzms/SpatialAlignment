@@ -27,6 +27,7 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.SpatialAwareness;
 using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
+using Microsoft.SpatialAlignment.Azure;
 using Microsoft.SpatialAlignment.Persistence.Json;
 using Newtonsoft.Json;
 using System;
@@ -150,8 +151,9 @@ namespace Microsoft.SpatialAlignment.Persistence
 
                 case AddAnchorStep.ModelRay:
 
-                    // Add a native alignment to the anchor so that it stays in place
-                    newAnchor.gameObject.AddComponent<NativeAnchorAlignment>();
+                    // Add an AzureAnchor so that it stays in place.
+                    // This works cross-platform even if we don't save.
+                    newAnchor.gameObject.AddComponent<AzureAnchorAlignment>();
 
                     // Done placing anchor
                     newAnchor.StopPlacement();
@@ -234,11 +236,8 @@ namespace Microsoft.SpatialAlignment.Persistence
                     // Give the frame an ID
                     newFrame.Id = id;
 
-                    // Add a WorldAnchorAlignment to SpatialFrame
-                    NativeAnchorAlignment worldAlignment = frameGO.AddComponent<NativeAnchorAlignment>();
-
-                    // Give the anchor an ID
-                    worldAlignment.AnchorId = id;
+                    // Add an AzureAnchorAlignment to SpatialFrame
+                    AzureAnchorAlignment anchorAlignment = frameGO.AddComponent<AzureAnchorAlignment>();
 
                     // Temporarily parent the large model to the new frame
                     largeScaleFrame.transform.SetParent(newFrame.transform, worldPositionStays: true);
